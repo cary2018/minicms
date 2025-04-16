@@ -1,0 +1,55 @@
+<footer class="footer bg-dark">
+    <div class="container clearfix">
+        <div class="footer-fill">
+            <div class="footer-column">
+                <div class="footer-menu">
+                    .....
+                </div>
+                <div class="footer-copyright text-xs">
+                    {$Think.config.web.web_Copyright|raw}
+                    <span class="rt-sql">访问量：{cymini:total table="visit" where='[]'}次</span>
+                </div>
+            </div>
+        </div>
+        <div class="footer-hidden-xs">
+            <div class="f-last-line">
+                <p>
+                    {$Think.config.web.web_footer_title}
+                </p>
+            </div>
+        </div>
+        <div class="footer-links">
+            <div class="footer-RunTime">
+                {$Think.config.web.web_Copy|raw}
+            </div>
+        </div>
+    </div>
+    <div id="backtop" class="backtop">
+        <div class="bt-box top" title="返回顶部" style="display: none;">
+            <i class="icon font-top"></i>
+        </div>
+        <div class="bt-box qq" title="联系QQ">
+            <a href="https://wpa.qq.com/msgrd?v=3&amp;uin=373889161&amp;site=qq&amp;menu=yes" rel="nofollow" target="_blank" title="联系QQ"><i class="icon font-qq"></i></a>
+        </div>
+        {if $Request.controller == 'Detail'}
+        <div class="bt-box bt-comments">
+            <a href="#comments" target="_self" title="发表评论"><i class="icon font-comment"></i></a>
+        </div>
+        {/if}
+        <div class="bt-box bottom" title="网页底部">
+            <i class="icon font-bottom"></i>
+        </div>
+    </div>
+    <div class="sea_wave">
+        <svg class="sea_wave_svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewbox="0 24 150 28" preserveaspectratio="none">
+            <defs>
+                <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z"></path>
+            </defs>
+            <g class="sea_wave_g">
+                <use xlink:href="#gentle-wave" x="50" y="0" fill="#4579e2"></use>
+                <use xlink:href="#gentle-wave" x="50" y="3" fill="#3461c1"></use>
+                <use xlink:href="#gentle-wave" x="50" y="6" fill="#2d55aa"></use>
+            </g>
+        </svg>
+    </div>
+</footer>

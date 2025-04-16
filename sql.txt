@@ -1,0 +1,393 @@
+//后台菜单数据表
+create table cy_menu(
+    id int primary key auto_increment,
+    pid int not null comment'上级分类',
+    title varchar(55) not null comment'标题',
+    hrefUrl varchar(120) not null comment'链接地址',
+    imageUrl varchar(100) not null comment'图片地址',
+    imagePath varchar(110) not null comment'缩略图',
+    icon varchar(110) not null comment'图标',
+    target varchar(10) not null comment'target属性',
+    isShow tinyint not null default 1 comment'是否开启',
+    orderSort varchar(200) not null comment'排序',
+    path varchar(200) not null comment'路径，做无限分类用',
+    createTime int not null comment'创建时间',
+    updateTime int not null comment'更新时间'
+)engine=myisam charset=utf8;
+alter table cy_menu add remark varchar(200) not null default'' COMMENT'备注' after title;
+alter table cy_menu add ident tinyint(1) not null default 0 COMMENT'首页标识' after icon;
+
+//系统节点
+create table cy_node(
+    id int primary key auto_increment,
+    pid int not null default 0 comment'上级id',
+    path varchar(150) not null default '' comment'无限分类路径',
+    title varchar(55) not null default '' comment'节点名称',
+    field varchar(30) not null default '' comment'字段名',
+    checked tinyint(1) not null default 0 comment'是否选中：0否，1是',
+    spread tinyint(1) not null default 0 comment'是否展开：0否，1是',
+    href varchar(120) not null default '' comment'跳转地址：留空不跳转'
+)engine=myisam charset=utf8;
+alter table cy_node add nodeUrl varchar(200) not null default'' COMMENT'系统节点' after title;
+alter table cy_node add isOpen tinyint(1) not null default 1 COMMENT'节点开关:0关闭，1打开' after nodeUrl;
+alter table cy_node add createTime int not null COMMENT'创建时间';
+
+//系统管理员
+create table cy_admin(
+    id int primary key auto_increment,
+    pid int not null default 0 comment'上级',
+    path varchar(150) not null default '' comment'分类路径',
+    username varchar(55) not null default '' comment'用户名',
+    nickname varchar(55) not null default '' comment'用户昵称',
+    password varchar(100) not null default '' comment'密码',
+    headImg varchar(100) not null default '' comment'用户头像',
+    role varchar(120) not null default '' comment'角色权限',
+    iphone varchar(20) not null default '' comment'电话',
+    remark varchar(100) not null default '' comment'备注',
+    createTime int not null comment'添加时间'
+)engine=MyIsam charset=utf8;
+alter table cy_admin add status tinyint(1) not null default 1 COMMENT'用户状态' after iphone;
+alter table cy_admin add updateTime int not null default 0 COMMENT'更新时间';
+alter table cy_admin add thumbImg varchar(100) not null default '' COMMENT'缩略图' after headImg;
+alter table cy_admin add isAdmin tinyint(1) not null default 0 COMMENT'是否是超级管理员' after path;
+
+alter table cy_admin add email varchar(50) not null default '' COMMENT'email地址' after iphone;
+alter table cy_admin add realname varchar(20) not null default '' COMMENT'真实名字' after email;
+alter table cy_admin add identity varchar(18) not null default '' COMMENT'身份证号' after realname;
+alter table cy_admin add gender tinyint(1) not null default 0 COMMENT'性别' after identity;
+alter table cy_admin add position_id int not null default 0 COMMENT'职位' after gender;
+alter table cy_admin add dept_id int not null default 0 COMMENT'部门' after position_id;
+alter table cy_admin add province_id int not null default 0 COMMENT'省份' after dept_id;
+alter table cy_admin add city_id int not null default 0 COMMENT'城市' after province_id;
+alter table cy_admin add county_id int not null default 0 COMMENT'县区' after city_id;
+alter table cy_admin add address varchar(100) not null default '' COMMENT'详细地址' after county_id;
+alter table cy_admin add entry_date int not null default 0 COMMENT'入职时间' after address;
+alter table cy_admin add depart_date int not null default 0 COMMENT'离职时间' after entry_date;
+alter table cy_admin add group_id tinyint(1) not null default 0 COMMENT'用户分组' after path;
+
+//行政区域
+create table cy_area(
+    id int primary key auto_increment,
+    name varchar(20) not null default '' comment'标题',
+    pid int not null default 0 comment'上级id',
+    path varchar(100) not null default '' comment'上级路径',
+    code varchar(15) not null default '' comment'编码',
+    createTime int not null default 0 comment'创建时间'
+)engine=MyIsam charset=utf8;
+
+//职位
+create table cy_position(
+    id int primary key auto_increment,
+    name varchar(30) not null default '' comment'名称',
+    orderSort int not null default 0 comment'排序',
+    status tinyint(1) not null default 0 comment'状态'
+)engine=MyIsam charset=utf8;
+alter table cy_position add remark varchar(200) not null default '' COMMENT'备注';
+//部门
+create table cy_department(
+    id int primary key auto_increment,
+    pid int not null default 0 comment'上级部门id',
+    path varchar(100) not null default '' comment'路径',
+    name varchar(30) not null default '' comment'名称',
+    code varchar(30) not null default '' comment'编码',
+    orderSort int not null default 0 comment'排序',
+    remark varchar(200) not null default '' comment'备注'
+)engine=MyIsam charset=utf8;
+//角色管理
+create table cy_role(
+    id int primary key auto_increment,
+    title varchar(30) not null default '' comment'权限名称',
+    auth varchar(1000) not null default '' comment'节点权限列表',
+    remark varchar(100) not null default '' comment'备注',
+    createTime int not null comment'添加时间'
+)engine=MyIsam charset=utf8;
+alter table cy_role add updateTime int not null default 0 COMMENT'更新时间';
+alter table cy_role add status int not null default 0 COMMENT'状态' after auth;
+alter table cy_role add menuAuth varchar(500) not null default '' COMMENT'系统后台菜单权限' after auth;
+
+//网站日志
+create table cy_weblog(
+    id int primary key auto_increment,
+    username varchar(30) not null default '' comment'用户名',
+    ip varchar(20) not null default '' comment'ip地址',
+    path varchar(120) not null default '' comment'访问地址',
+    remark varchar(30) not null default '' comment'描述',
+    createTime int not null default 0 comment'添加时间'
+)engine=MyIsam charset=utf8;
+alter table cy_weblog add region varchar(50) not null default '' COMMENT'所在区域' after ip;
+
+//系统配置
+create table cy_config(
+    id int primary key auto_increment,
+    pid int not null default 0 comment'上级',
+    path varchar(150) not null default '' comment'分类路径',
+    sys_title varchar(50) not null default '' comment'标题',
+    sys_variable varchar(50) not null default '' comment'变量名',
+    sys_content text not null default '' comment'变量值',
+    sys_order int not null default 100 comment'排序',
+    sys_remark varchar(255) not null comment'备注',
+    sys_type varchar(20) not null comment'字段类型'
+)engine=MyIsam charset=utf8;
+//广告横幅
+create table cy_banner(
+    id int primary key auto_increment,
+    title varchar(50) not null default '' comment'标题',
+    link varchar(120) not null default '' comment'链接地址',
+    target varchar(8) not null default '' comment'target属性',
+    remark varchar(200) not null default '' comment'备注',
+    img varchar(120) not null default '' comment'原图',
+    thumbImg varchar(120) not null default '' comment'缩略图',
+    enable tinyint(1) not null default 0 comment'是否显示',
+    ident varchar(2) not null default '' comment'标识',
+    createTime int not null default 0 comment'创建时间',
+    updateTime int not null default 0 comment'创建时间'
+)engine=MyIsam charset=utf8;
+alter table cy_banner add orderSort int not null default 100 COMMENT'排序' after ident;
+//友情链接
+create table cy_link(
+    id int primary key auto_increment,
+    title varchar(50) not null default '' comment'标题',
+    link varchar(150) not null default '' comment'链接地址',
+    target varchar(8) not null default '' comment'target属性',
+    remark varchar(200) not null default '' comment'备注',
+    logo varchar(120) not null default '' comment'友链logo',
+    enable tinyint(1) not null default 0 comment'是否启用',
+    createTime int not null default 0 comment'创建时间',
+    updateTime int not null default 0 comment'创建时间'
+)engine=MyIsam charset=utf8;
+alter table cy_link add orderSort int not null default 100 COMMENT'排序' after enable;
+//网站访问记录
+create table cy_visit(
+    id int primary key auto_increment,
+    ip varchar(20) not null default '' comment'ip地址',
+    from_url varchar(150) not null default '' comment'来访链接地址',
+    to_url varchar(150) not null default '' comment'访问地址',
+    region varchar(100) not null default '' comment'来访地区',
+    clientInfo varchar(100) not null default '' comment'客户端设备信息',
+    count int not null default 0 comment'统计短时间内访问次数',
+    createTime int not null default 0 comment'访问时间'
+)engine=MyIsam charset=utf8;
+alter table cy_visit add clientInfo varchar(500) not null default '' comment'客户端设备信息' after region;
+alter table cy_visit add clientType varchar(30) not null default '' comment'客户类型' after clientInfo;
+//记录 api 调用
+CREATE TABLE `cy_visit_api` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `ip` varchar(20) NOT NULL DEFAULT '' COMMENT 'ip地址',
+  `guv` varchar(60) NOT NULL DEFAULT '' COMMENT '访客标记uv',
+  `from_url` varchar(150) NOT NULL DEFAULT '' COMMENT '来访链接地址',
+  `to_url` varchar(150) NOT NULL DEFAULT '' COMMENT '访问地址',
+  `region` varchar(100) NOT NULL DEFAULT '' COMMENT '来访地区',
+  `clientInfo` varchar(500) NOT NULL DEFAULT '' COMMENT '客户端设备信息',
+  `clientType` varchar(30) NOT NULL DEFAULT '' COMMENT '客户类型',
+  `count` int(11) NOT NULL DEFAULT '0' COMMENT '统计短时间内访问次数',
+  `createTime` int(11) NOT NULL DEFAULT '0' COMMENT '访问时间',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='记录api调用';
+
+//文章
+create table cy_article(
+    id int primary key auto_increment,
+    cid int not null default 0 comment'文章分类',
+    aid int not null default 0 comment'所有用户',
+    groupId tinyint(2) not null default 0 comment'用户分组',
+    author varchar(30) not null default '' comment'作者',
+    title varchar(60) not null default '' comment'文章标题',
+    keywords varchar(60) not null default '' comment'关键字',
+    description varchar(160) not null default '' comment'描述',
+    content longtext not null default '' comment'内容',
+    articleImg varchar(120)  not null default '' comment'原图',
+    articleThumbImg varchar(120)  not null default '' comment'缩略图',
+    annex varchar(150) not null default '' comment'附件',
+    views int not null default 0 comment'浏览量',
+    click int not null default 0 comment'点击量',
+    download int not null default 0 comment'下载量',
+    downloadJur int not null default 0 comment'下载权限',
+    status tinyint(1) not null default 0 comment'状态',
+    orderSort int not null default 0 comment'排序',
+    attrId varchar(120) not null default '' comment'属性',
+    createTime int not null default 0 comment'创建时间',
+    updateTime int not null default 0 comment'更新时间'
+)engine=MyIsam charset=utf8;
+alter table cy_article add uid int not null default 0 comment'所属用户' after cid;
+alter table cy_article add tags varchar(100) not null default '' comment'tag标签' after title;
+alter table cy_article add recycle tinyint(1) not null default 0 comment'回收站' after status;
+//采集规则
+CREATE TABLE `cy_collection` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL DEFAULT '' COMMENT '采集名称',
+  `url` varchar(120) NOT NULL DEFAULT '' COMMENT '采集地址列表',
+  `ps` tinyint(2) NOT NULL DEFAULT '0' COMMENT '列表起始页',
+  `pe` tinyint(2) NOT NULL DEFAULT '0' COMMENT '列表结束页',
+  `start` varchar(150) NOT NULL DEFAULT '' COMMENT '匹配网址起始标记',
+  `end` varchar(150) NOT NULL DEFAULT '' COMMENT '匹配网址结束标记',
+  `title` varchar(150) NOT NULL DEFAULT '' COMMENT '匹配标题',
+  `content` varchar(150) NOT NULL DEFAULT '' COMMENT '匹配内容',
+  `createTime` int(11) NOT NULL COMMENT '创建时间',
+  `updateTime` int(11) NOT NULL COMMENT '修改时间',
+  `download` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否下载远程文件到本地',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='数据采集规则表';
+//采集内容暂存
+CREATE TABLE `cy_collection_content` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `cid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '采集规则id',
+  `url` varchar(150) NOT NULL DEFAULT '' COMMENT '采集地址',
+  `title` varchar(100) NOT NULL DEFAULT '' COMMENT '采集标题',
+  `content` longtext NOT NULL COMMENT '采集数据内容',
+  `status` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '是否导入状态',
+  PRIMARY KEY (`id`),
+  KEY `cid` (`cid`),
+  KEY `status` (`status`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='采集数据暂存表';
+//tag标签
+create table cy_taglist(
+    id int primary key auto_increment,
+    cid int not null default 0 comment'文章分类id',
+    tag varchar(12) not null default '' comment'tag标签',
+    createTime int not null default 0 comment'创建时间'
+)engine=MyIsam charset=utf8;
+//评论
+create table cy_feedback(
+    id int primary key auto_increment,
+    rid int not null default 0 comment'回复id',
+    aid int not null default 0 comment'文章id',
+    cid int not null default 0 comment'文章分类id',
+    username varchar(100) not null default '' comment'用户名',
+    article varchar(100) not null default '' comment'文章标题',
+    email varchar(60) not null default '' comment'邮箱',
+    ip varchar(60) not null default '' comment'ip地址',
+    msg text not null default '' comment'评论内容',
+    good int not null default 0 comment'支持',
+    bad int not null default 0 comment'反对',
+    cate int not null default 0 comment'类型',
+    status int not null default 0 comment'状态',
+    createTime int not null default 0 comment'创建时间'
+)engine=MyIsam charset=utf8;
+//附件下载地址
+CREATE TABLE `cy_software` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `aid` int(11) NOT NULL DEFAULT '0' COMMENT '所属信息',
+  `code` varchar(6) NOT NULL DEFAULT '' COMMENT '提取码',
+  `name` varchar(30) NOT NULL DEFAULT '' COMMENT '下载名称',
+  `url` varchar(200) NOT NULL DEFAULT '' COMMENT '下载地址',
+  `orderSort` int NOT NULL DEFAULT '100' COMMENT '排序',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM CHARSET=utf8 COMMENT='软件下载地址表';
+//文章分类
+create table cy_category(
+    id int primary key auto_increment,
+    pid int not null default 0 comment'上级',
+    path varchar(200) not null default '' comment'分类路径',
+    name varchar(60) not null default '' comment'类名',
+    orderSort int not null default 100 comment'排序',
+    isShow tinyint(1) not null default 0 comment'是否显示',
+    isUrl tinyint(1) not null default 0 comment'是否启用外链',
+    outUrl varchar(120) not null default '' comment'外链地址',
+    target varchar(10) not null default '' comment'target属性',
+    temp_list varchar(50) not null default '' comment'列表模板',
+    temp_archives varchar(50) not null default '' comment'文章模板'
+)engine=MyIsam charset=utf8;
+alter table cy_category add remark varchar(300) not null comment'备注';
+alter table cy_category add keywords varchar(300) not null comment'关键字';
+alter table cy_category add description varchar(300) not null comment'描述';
+alter table cy_category add iconfont varchar(30) not null default '' comment'icon图标' after keywords;
+alter table cy_category add share tinyint(1) not null default 0 comment'会员共享' after isShow;
+//文章属性
+CREATE TABLE `cy_attribute` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `code` varchar(2) NOT NULL DEFAULT '0' COMMENT '属性标识',
+  `remarks` varchar(10) NOT NULL DEFAULT '' COMMENT '备注',
+  `orderSort` int NOT NULL DEFAULT '100' COMMENT '排序',
+  `status` tinyint(1) NOT NULL DEFAULT 0 COMMENT '状态',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM CHARSET=utf8 COMMENT='文章属性';
+alter table cy_attribute add status tinyint(1) not null default 0 comment'状态';
+//相册
+create table cy_album(
+    id int not null primary key auto_increment,
+    cid int not null default 0 comment'相册分类',
+    uid int not null default 0 comment'用户id',
+    title varchar(60) not null default '' comment'标题',
+    remarks varchar(200) not null default '' comment'备注',
+    img varchar(120) not null default '' comment'原图片',
+    thumbImg varchar(120) not null default '' comment'缩略图片',
+    `status` tinyint(1) NOT NULL DEFAULT 0 COMMENT '状态',
+    createTime int not null default 0 comment'添加时间'
+)Engine=MyIsam charset=utf8;
+//相册分类
+create table cy_album_category(
+    id int not null primary key auto_increment,
+    pid int not null default 0 comment'上级',
+    path varchar(200) not null default '' comment'分类路径',
+    name varchar(30) not null default '' comment'类名',
+    `orderSort` int NOT NULL DEFAULT '100' COMMENT '排序',
+    keyword varchar(120) not null default '' comment'关键字',
+    description varchar(230) not null default '' comment'描述',
+    `status` tinyint(1) NOT NULL DEFAULT 0 COMMENT '状态'
+)engine=MyIsam charset=utf8;
+//失信名单
+create table cy_liar(
+    id int not null primary key auto_increment,
+    uid int not null default 0 comment'用户id预留',
+    suspect varchar(100) not null default '' comment'嫌疑者通信号',
+    victim varchar(100) not null default '' comment'受害者通信号',
+    email varchar(60) not null default '' comment'email',
+    status int not null default 0 comment'身份确证，1：确认骗子，0：疑似骗子',
+    remarks varchar(200) not null default '' comment'备注',
+    isShow tinyint(1) not null default 0 comment'是否显示',
+    createTime int not null default 0 comment'添加时间'
+)engine=myisam charset=utf8;
+//失信凭证
+create table cy_liar_img(
+    id int not null primary key auto_increment,
+    lid int not null default 0 comment'失信id',
+    img varchar(120) not null default '' comment'原图',
+    thumbImg varchar(120) not null default '' comment'缩略图'
+)engine=myisam charset=utf8;
+//导航分类
+CREATE TABLE `cy_classify` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `pid` int(11) NOT NULL DEFAULT '0' COMMENT '上级分类(预留)',
+  `name` varchar(30) NOT NULL COMMENT '导航分类名',
+  `keywords` varchar(150) NOT NULL COMMENT '关键字',
+  `description` varchar(150) NOT NULL COMMENT '描述',
+  `number` tinyint(3) unsigned NOT NULL COMMENT '首页显示导航列表数',
+  `orderBy` int unsigned NOT NULL DEFAULT '100' COMMENT '排序',
+  `status` tinyint(1) unsigned NOT NULL COMMENT '状态是否显示',
+  `path` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM CHARSET=utf8 COMMENT='导航分类表';
+//导航地址
+CREATE TABLE `cy_navigation` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `cid` int(3) NOT NULL DEFAULT '0' COMMENT '所属分类',
+  `nav_name` varchar(30) NOT NULL COMMENT '导航名称',
+  `nav_url` varchar(200) NOT NULL COMMENT '导航链接地址',
+  `sun_name` varchar(30) NOT NULL COMMENT '子级导航分类',
+  `sun_url` varchar(200) NOT NULL COMMENT '子级导航链接',
+  `keywords` varchar(100) NOT NULL COMMENT '关键字',
+  `description` varchar(150) NOT NULL COMMENT '描述',
+  `orderBy` int(11) NOT NULL DEFAULT '100' COMMENT '排序',
+  `target` varchar(10) NOT NULL DEFAULT '' COMMENT 'target属性',
+  `is_show` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否显示',
+  `createTime` int NOT NULL COMMENT '添加时间',
+  `updateTime` int NOT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM CHARSET=utf8 COMMENT='导航地址表';
+//站群配置
+create table `cy_domain`(
+    id int(11) not null primary key auto_increment,
+    web_domain varchar(130) not null default '' comment'网站域名',
+    web_logo varchar(130) not null default '' comment'网站logo',
+    web_title varchar(60) not null default '' comment'标题',
+    web_key varchar(100) not null default '' comment'关键字',
+    web_desc varchar(200) not null default '' comment'描述',
+    web_Copyright text not null default '' comment'备案信息',
+    web_Copy text not null default '' comment'版权信息',
+    web_footer_title varchar(350) not null default '' comment'底部标语|其他',
+    view_path varchar(50) not null default '' comment'网站模板',
+    createTime int not null default 0 comment'创建时间',
+    updateTime int not null default 0 comment'创建时间'
+)engine=myisam charset=utf8 comment='站群配置表';
+alter table cy_domain add web_ico varchar(130) not null default '' comment'ico图标' after web_logo;
+

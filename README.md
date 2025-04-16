@@ -1,5 +1,15 @@
 ## 系统安装
 
+github仓库： https://github.com/cary2018/CyMini
+
+压缩包下载地址：https://github.com/cary2018/update_cymini
+
+gitee仓库：  https://gitee.com/cary10000/CyMini
+
+压缩包下载地址：https://gitee.com/cary10000/update_cymini
+
+文档管理一目了然，站群配置简单，管理方便，系统不定期更新增加功能
+
 网站根目录指向 public 下
 
 **如果需要重新安装：**
@@ -33,6 +43,12 @@ public/template
 ## 文档管理
 
 ![image-20240612233117896](README.assets/image-20240612233117896.png)
+
+### 回收站（文档删除后会进入回收站）
+
+![image-20241103214743444](README.assets/image-20241103214743444.png)
+
+
 
 ## 后台管理菜单
 
@@ -195,6 +211,16 @@ public/template
 ### 文件管理
 
 ![image-20240629204218050](README.assets/image-20240629204218050.png)
+
+### 站群配置
+
+![image-20241103214239033](README.assets/image-20241103214239033.png)
+
+![image-20241103214339260](README.assets/image-20241103214339260.png)
+
+![image-20241103214427407](README.assets/image-20241103214427407.png)
+
+
 
 ### 数据库
 

@@ -25,10 +25,10 @@ class Banner extends Model
         }else{
             if(array_key_exists('img',$data)){
                 $img = FindTable('banner',[['id','=',$data['id']]]);
-                if(file_exists($img['img'])){
+                if(file_exists($img['img']) && $data['img']!=$img['img']){
                     unlink($img['img']);
                 }
-                if(file_exists($img['thumbImg'])){
+                if(file_exists($img['thumbImg']) && $data['thumbImg']!=$img['thumbImg']){
                     unlink($img['thumbImg']);
                 }
             }

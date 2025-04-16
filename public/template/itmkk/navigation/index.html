@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xml:lang="zh-Hans" lang="zh-Hans" style="transform: none;">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover" />
+    <meta name="applicable-device" content="pc,mobile" />
+    <meta name="renderer" content="webkit" />
+    <meta name="force-rendering" content="webkit" />
+    <title>{cymini:cate field='name'}-{$Think.config.web.web_title}</title>
+    <meta name="Keywords" content="{$Think.config.web.web_key}" />
+    <meta name="description" content="{$Think.config.web.web_desc}" />
+    <meta property="og:type" content="category" />
+    <meta property="og:title" content="{$Think.config.web.web_title}" />
+    <meta property="og:description" content="{$Think.config.web.web_desc}" />
+    {include file='layout/file-js'}
+    {include file='layout/file-style'}
+    <link rel="stylesheet" href="{$view_path}/static/css/navigation.css" type="text/css" media="all" />
+    {include file='layout/icon'}
+
+    <!--[if lt IE 9]><script src="https://cdn.staticfile.org/html5shiv/3.7.0/html5shiv.js"></script><![endif]-->
+
+</head>
+<body class="home home-category" style="transform: none;">
+
+{include file='layout/navmenu'}
+
+<main class="main-content container clearfix" style="height: auto !important; transform: none;">
+    <div class="container">
+        {if !$pass}
+        <div style="margin: 0 auto;max-width:430px;">
+            <div style="margin:15px 15px;">
+                <form method="post" name="search" action="" class="pjaxmain">
+                    <input style="width:60%;background:#fff;display:unset;" class="search-input" value="" placeholder="请输入访问密码：123.." type="text" name="pass" />
+                    <button type="submit" class="showhide-search" />访 问</button>
+                </form>
+            </div>
+        </div>
+        {/if}
+        {if $pass}
+        <div class="row row-position">
+            <div class="col-md-12">
+                {cymini:navigation}
+                <div class="part" id="cate{$vo.id}" >
+                    <p class="tt" id="{$vo.id}">
+                        <i class="fa fa-globe"></i>
+                        <strong>{$vo.name}</strong>
+                    </p>
+                    <div class="items">
+
+                        <div class="row">
+                            {volist name='$vo.nav' id='vo'}
+                            <article class="grid col-xs-6 col-sm-4 col-md-2">
+                                <div class="item">
+                                    <a class="link" target="{$vo.target}" href="{$vo.nav_url}" rel="nofollow">
+                                        <i class="autoleft fa fa-link" title="{$vo.keywords}"></i>
+                                    </a>
+                                    <a class="a" href="{$vo.nav_url}" title="{$vo.nav_name}" target="{$vo.target}">
+                                        <h3>
+                                            {$vo.nav_name}
+                                        </h3>
+                                    </a>
+                                </div>
+                            </article>
+
+                            {if $vo.sun_name}
+                            <article class="grid col-xs-6 col-sm-4 col-md-2">
+                                <div class="item">
+                                    <a class="link" target="{$vo.target}" href="{$vo.sun_url}" rel="nofollow">
+                                        <i class="autoleft fa fa-link" title="{$vo.keywords}"></i>
+                                    </a>
+                                    <a class="a" href="{$vo.sun_url}" title="{$vo.sun_name}" target="{$vo.target}">
+                                        <h3>{$vo.sun_name}</h3>
+                                    </a>
+                                </div>
+                            </article>
+                            {/if}
+                            {/volist}
+                        </div>
+                    </div>
+                </div>
+                {/cymini:navigation}
+            </div>
+        </div>
+        {/if}
+    </div>
+</main>
+
+{include file='layout/footer'}
+
+<script>var cookieDomain = "https://www.itmkk.com/";</script>
+<script src="{$view_path}/static/js/zh-tw.js"></script>
+<script src="{$view_path}/static/js/custom.js"></script>
+
+</body>
+</html>

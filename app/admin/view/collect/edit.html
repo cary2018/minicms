@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{$Think.lang.admin}</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    {include file="public/file_css"}
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-form ">
+    <form class="layui-form layui-form-pane" id="DataForm" lay-filter="DataForm" method="post" onsubmit="return false">
+
+        <div class="layui-tab-item layui-show ">
+            <div class="layui-form-item">
+                <input type="text" name="collect_id" value="{$data.collect_id}" style="display: none;">
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label required">{$Think.lang.collect_name}</label>
+                <div class="layui-input-block">
+                    <input type="text" name="collect_name" lay-verify="required" lay-reqtext="{$Think.lang.requireEmpty}" value="{$data.collect_name}" class="layui-input">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">{$Think.lang.collect_url}</label>
+                <div class="layui-input-block">
+                    <input type="text" name="collect_url" value="{$data.collect_url}" lay-verify="required" lay-reqtext="{$Think.lang.requireEmpty}" class="layui-input">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">{$Think.lang.collect_param}</label>
+                <div class="layui-input-block">
+                    <input type="text" value="{$data.collect_param}" name="collect_param" class="layui-input">
+                </div>
+                <span style="padding-left:120px;color:#ccc;">{$Think.lang.collect_param_tip}</span>
+            </div>
+
+            <div class="layui-form-item" pane>
+                <label class="layui-form-label required">{$Think.lang.collect_type}</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="collect_type" value="1" title="xml" {if $data.collect_type eq 1} checked {/if}>
+                    <input type="radio" name="collect_type" value="2" title="json" {if $data.collect_type eq 2} checked {/if}>
+                </div>
+            </div>
+
+            <div class="layui-form-item" pane>
+                <label class="layui-form-label">{$Think.lang.collect_mid}</label>
+                <div class="layui-input-block">
+                    <input type="radio" lay-filter="collect_mid" name="collect_mid" value="1" title="{$Think.lang.collect_vod}" {if $data.collect_mid eq 1} checked {/if}>
+                    <input type="radio" lay-filter="collect_mid" name="collect_mid" value="2" title="{$Think.lang.collect_article}" {if $data.collect_mid eq 2} checked {/if}>
+                    <input type="radio" lay-filter="collect_mid" name="collect_mid" value="3" title="{$Think.lang.collect_performer}" {if $data.collect_mid eq 3} checked {/if}>
+                    <input type="radio" lay-filter="collect_mid" name="collect_mid" value="4" title="{$Think.lang.collect_role}" {if $data.collect_mid eq 4} checked {/if}>
+                    <input type="radio" lay-filter="collect_mid" name="collect_mid" value="5" title="{$Think.lang.collect_website}" {if $data.collect_mid eq 5} checked {/if}>
+                </div>
+            </div>
+
+            <div class="layui-form-item" pane>
+                <label class="layui-form-label required">{$Think.lang.collect_date_operate}</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="collect_opt" value="0" title="{$Think.lang.collect_insert_update}" {if $data.collect_opt eq 0} checked {/if}>
+                    <input type="radio" name="collect_opt" value="1" title="{$Think.lang.collect_insert}" {if $data.collect_opt eq 1} checked {/if}>
+                    <input type="radio" name="collect_opt" value="2" title="{$Think.lang.collect_update}" {if $data.collect_opt eq 2} checked {/if}>
+                </div>
+                <span style="padding-left:120px;color:#ccc;">{$Think.lang.collect_data_tip}</span>
+            </div>
+
+            <div class="layui-form-item row_filer" pane {if $data.collect_mid neq 1} style="display:none;" {/if}>
+                <label class="layui-form-label required">{$Think.lang.collect_data_opt_tip}</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="collect_filter" value="0" title="{$Think.lang.collect_no_filter}" {if $data.collect_filter eq 0} checked {/if}>
+                    <input type="radio" name="collect_filter" value="1" title="{$Think.lang.collect_insert_update}" {if $data.collect_filter eq 1} checked {/if}>
+                    <input type="radio" name="collect_filter" value="2" title="{$Think.lang.collect_insert}" {if $data.collect_filter eq 2} checked {/if}>
+                    <input type="radio" name="collect_filter" value="3" title="{$Think.lang.collect_update}" {if $data.collect_filter eq 3} checked {/if}>
+                </div>
+            </div>
+            <div class="layui-form-item row_filer" {if $data.collect_mid neq 1} style="display:none;" {/if}>
+                <label class="layui-form-label">{$Think.lang.collect_filter_code}</label>
+                <div class="layui-input-block">
+                    <input type="text" placeholder="{$Think.lang.collect_filter_code_tip}" name="collect_filter_from" value="{$data.collect_filter_from}" class="layui-input">
+                </div>
+            </div>
+
+            <div class="layui-form-item row_filer" {if $data.collect_mid neq 1} style="display:none;" {/if}>
+                <label class="layui-form-label">{$Think.lang.collect_filter_year}</label>
+                <div class="layui-input-block">
+                    <input type="text" placeholder="{$Think.lang.collect_filter_year_tip}" name="collect_filter_year" value="{$data.collect_filter_year}" class="layui-input">
+                </div>
+            </div>
+
+            <div class="layui-form-item row_filer" pane {if $data.collect_mid neq 1} style="display:none;" {/if}>
+                <label class="layui-form-label required">{$Think.lang.collect_images_sync}</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="collect_sync_pic_opt" value="0" title="{$Think.lang.collect_follow_global}" {if $data.collect_filter eq 0} checked {/if}>
+                    <input type="radio" name="collect_sync_pic_opt" value="1" title="{$Think.lang.collect_sync_open}" {if $data.collect_filter eq 1} checked {/if}>
+                    <input type="radio" name="collect_sync_pic_opt" value="2" title="{$Think.lang.collect_sync_close}" {if $data.collect_filter eq 2} checked {/if}>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn layui-btn-normal" lay-submit lay-filter="doSubmit">{$Think.lang.Save}</button>
+                <button type="reset" class="layui-btn layui-btn-normal" >{$Think.lang.database_reset}</button>
+                <button class="layui-btn layui-btn-normal" lay-filter="doSubmit">{$Think.lang.database_test}</button>
+            </div>
+        </div>
+    </form>
+
+</div>
+{include file="public/file_js"}
+<script>
+    layui.use(['form', 'table'], function () {
+        var $ = layui.jquery,
+            form = layui.form,
+            table = layui.table;
+        form.on('radio(collect_mid)',function(data){
+            $('.row_filer').hide();
+            if(data.value=='1'){
+                $('.row_filer').show();
+            }
+        });
+    });
+</script>
+</body>
+</html>

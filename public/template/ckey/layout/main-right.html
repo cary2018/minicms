@@ -1,0 +1,41 @@
+<div id="side" class="sidebar fr mside" style="position: relative; overflow: visible; box-sizing: border-box; min-height: 0px;">
+    <div class="theiaStickySidebar" style="padding-top: 0px; padding-bottom: 0px; position: static;">
+        <div class="widget clearfix wow fadeInDown" id="divContorPanel">
+            <h4 class="widget-title">控制面板</h4>
+            <div class="divContorPanel">
+                <span class="cp-hello">您好,欢迎到访网站!</span>
+                <br />
+                <span class="cp-login"><a href="javascript:;">登录后台</a></span>&nbsp;&nbsp;
+                <span class="cp-vrs"><a href="javascript:;">查看权限</a></span>
+            </div>
+        </div>
+        <div class="widget clearfix wow fadeInDown" id="divPrevious">
+            <h4 class="widget-title">TOP 9</h4>
+            <ul class="divPrevious">
+                {cymini:article num='9' order='views'}
+                <li><a title="{$vo.title}" href="{$vo.temp_archives}?id={$vo.id}" target="{$vo.target}">{$vo.title}</a></li>
+                {/cymini:article}
+            </ul>
+        </div>
+        <div class="widget clearfix wow fadeInDown" id="divTags">
+            <h4 class="widget-title">标签列表</h4>
+            <ul class="divTags">
+                {cymini:tags num='30'}
+                <li>
+                    <a title="{$vo.tag|raw}" href="/index/tags?tag={$vo.tag|raw}">
+                        {$vo.tag}<span class="tag-count"> ({$vo.count})</span>
+                    </a>
+                </li>
+                {/cymini:tags}
+            </ul>
+        </div>
+        <div class="widget clearfix wow fadeInDown" id="divLinkage">
+            <h4 class="widget-title">友情链接</h4>
+            <ul class="divLinkage">
+                {cymini:link }
+                <li><a href="{$vo.link}" target="{$vo.target}" title="{$vo.title}">{$vo.title}</a></li>
+                {/cymini:link}
+            </ul>
+        </div>
+    </div>
+</div>

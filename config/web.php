@@ -5,7 +5,7 @@ return array (
   'web_desc' => '站点描述',
   'web_logo' => 'uploads/images/202408/66ae27b967013.png',
   'web_Copyright' => '<a class="ico-ico" href="http://beian.miit.gov.cn/" rel="nofollow" target="_blank" title="桂ICP备2021006345号">                                    <img src="/images/beian.png" alt="桂ICP备2021006345号">桂ICP备2021006345号                                </a>                                <span class="rt-times">运行时长：0.052秒</span>                                ',
-  'web_Copy' => 'Copyright<i class="fa fa-copyright"></i>                                2015-2019<a href="/">站长自主搭建</a>                                版权所有. 基于<a href="http://www.889mi.com/" rel="nofollow" title="889mi" target="_blank">889mi</a>                                搭建 安全运行<span id="iday">5518</span>天
+  'web_Copy' => 'Copyright<i class="fa fa-copyright"></i>                                2015-2019<a href="/">站长自主搭建</a>                                版权所有. 基于<a href="https://gitee.com/cary10000/CyMini" rel="nofollow" title="CyMini" target="_blank">CyMini</a>                                搭建 安全运行<span id="iday">5518</span>天
 <p id="RunTime"></p>
 <script>
 var myVar=setInterval(function(){myTimer()},1000);
@@ -31,6 +31,8 @@ function  DateDiff(sDate1,  sDate2){    //sDate1和sDate2是2002-12-18格式
   'view_path' => 'itmkk',
   'sys_logo' => 'uploads/images/202406/666042237a547.jpg',
   'open_html' => '0',
+  'web_ico' => 'uploads/images/202410/67187181b38c2.ico',
+  'captcha_close' => '0',
   'web_title' => '暗影',
   'web_footer_title' => '从黑暗中感觉到， 在无助的时候， 在夜里是谁对我说， 别心灰想得太多 全因你的一颗心，  在藏着的承诺， 现实里时常对我说， 你定会冲破一切， 全赖你给我一双手臂， 就算在北风中，  你也总没逃避， 全赖你给我一双手臂， 来为我奉上是最真挚的心， 似风呼应',
   'sys_title' => 'CyMini',
@@ -45,7 +47,7 @@ function  DateDiff(sDate1,  sDate2){    //sDate1和sDate2是2002-12-18格式
   'email_smtp' => 'smtp.163.com',
   'email_account' => 'kkyhyy@163.com',
   'upload_config' => '',
-  'img_type' => 'png,jpg,jpeg,webp,ico,gif,bmp',
+  'img_type' => 'png,jpg,jpeg,webp,ico,gif,bmp,ico',
   'file_type' => 'zip,gz,rar',
   'img_size' => '10',
   'file_size' => '60',

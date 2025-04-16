@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{$Think.lang.admin}</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    {include file="public/file_css"}
+    <style type="text/css">
+        .layui-table-cell{
+            text-align:center;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+        .layui-table img{
+            max-width:100%
+        }
+        .red{color:red;}
+    </style>
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+        <div class="layui-btn-container">
+            <a href="javascript:;" data-id="" class="layui-btn layui-bg-red select_type">{$Think.lang.showAll}</a>
+            {volist name="type" id="vo"}
+            <div class="layui-btn layui-btn-primary layui-border-green">
+                <a href="javascript:;" id="reloadTable" data-id="{$vo.type_id}" class="select_type">{$vo.type_name|raw}</a>
+                <a id="{$param['cjflag']|mac_filter_xss}_{$vo.type_id}" data-ids="1" class="j-select" >
+                    {if $vo.isbind eq 1}
+                    <span class="red">[{$vo.local_type_name}]</span>
+                    {else}
+                    [{:lang('bind')}]
+                    {/if}
+                </a>
+            </div>
+            {/volist}
+        </div>
+
+        <fieldset style="display: none;" id="inputSearch" class="table-search-fieldset">
+            <legend>{$Think.lang.search_info}</legend>
+            <div style="margin: 10px 10px 10px 10px">
+                <form id="searchData" lay-filter="searchData" onsubmit="return false;" class="layui-form layui-form-pane">
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <div class="layui-input-inline">
+                                <input type="text" name="wd" placeholder="{$Think.lang.variable_title}" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <button type="submit" class="layui-btn layui-btn-primary" id="doSearch" lay-submit lay-filter="doSearch"><i class="layui-icon"></i>
+                            {$Think.lang.search}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </fieldset>
+        <!--头部工具栏-->
+        <div id="toolbarDemo" style="display: none;background: #fff;">
+            <span id="FieldUrl" alt="{:url('updateField')}" style="display: none"></span>
+            <span id="SwitchUrl" alt="{:url('switchAt')}" style="display: none"></span>
+            <span id="AddUrl" alt="{:url('add')}" style="display: none"></span>
+            <button class="layui-btn layui-btn-sm layui-btn-blue" data-id="vod_id" data-url="{:url('collectData')}" lay-event="SubmitData"> {:lang('collect_selected')} </button>
+            <a class="layui-btn layui-btn-sm layui-btn-blue todayCollect" href="{:url('collectData')}?{$today}"> {:lang('collect_today')} </a>
+            <a class="layui-btn layui-btn-sm layui-btn-blue allCollect" href="{:url('collectData')}?{$all}"> {:lang('collect_all')} </a>
+            <a class="layui-btn layui-btn-sm layui-bg-blue" href="{:url('/admin/collect')}" > {:lang('return_page')} </a>
+        </div>
+        <!--数据-->
+        <table class="layui-hide" id="DataDemos" lay-filter="DataDemos"></table>
+        <!--操作-->
+        <script type="text/html" id="toolBar">
+            <span id="DelUrl" alt="{:url('delAll')}" style="display: none"></span>
+            <span id="ActionUrl" alt="{:url('edit')}" style="display: none"></span>
+            <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edits">{$Think.lang.edit}</a>
+            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">{$Think.lang.del}</a>
+        </script>
+
+        <div class="selected-type" style="display:none;">
+            <form class="layui-form" id="DataForm" lay-filter="DataForm" method="post" onsubmit="return false">
+                <span id="ActionUrl" alt="{:url('bind')}" style="display:none;"></span>
+                <div class="layui-input-inline">
+                    <input type="hidden" name="ids" id="ids" value="1">
+                    <input type="hidden" name="col" id="col" value="2">
+                    <select name="val">
+                        <option value="">{$Think.lang.DownSelect}</option>
+                        {volist name="tree" id="item"}
+                        <option value="{$item.id}">{$item.p|raw}{$item.name}</option>
+                        {/volist}
+                    </select>
+                </div>
+                <div class="layui-input-inline">
+                    <button class="layui-btn" lay-submit lay-filter="doSave">确认</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{include file="public/file_js"}
+<script>
+    layui.use(['form', 'table'], function () {
+        var $ = layui.jquery,
+            form = layui.form,
+            table = layui.table;
+        var param = '{:url("vod")}?{$url|raw}';
+        table.render({
+            elem: '#DataDemos',
+            toolbar: '#toolbarDemo',
+            url: param,
+            method: 'get',
+            page: true,  //开启分页
+            limit: 10,  //默认10条
+            height: '550', // 最大高度减去其他容器已占有的高度差
+            defaultToolbar: ['filter', 'exports', 'print', {
+                title: '{$Think.lang.search}',
+                layEvent: 'laySearch',
+                icon: 'layui-icon layui-icon-search'
+            }],
+            cols: [[
+                {type: 'numbers'},
+                {type: "checkbox", width: 50},
+                /*{field: 'vod_id', align:"center", width: 80, title: 'ID', sort: true},*/
+                {field: 'vod_name', align:'left',title: '{:lang(\'collect_name\')}'},
+                {field: 'type_name', align: 'center',width:120,title: '{$Think.lang.collect_type}'},
+                {field: 'vod_play_from', align: 'center',width:130,title: '{$Think.lang.collect_mid}'},
+                {field: 'vod_time', align: 'center',width:160,title: '{$Think.lang.updateTime}'},
+            ]],
+        });
+        // 分类筛选
+        $('.select_type').click(function(){
+            let t = $(this).attr('data-id');
+            table.reload('DataDemos', {
+                where: {
+                    t:t,
+                },
+                done:function(res){
+                    let todayUrl = "{:url('collectData')}?"+res.today;
+                    let allUrl = "{:url('collectData')}?"+res.all;
+                    $(".todayCollect").attr('href',todayUrl);
+                    $(".allCollect").attr('href',allUrl);
+                }
+            }, true);
+        });
+
+        $('.j-select').click(function(){
+            var that = $(this);
+            let col = that.attr('id');
+            let ids = that.attr('data-ids');
+            $('#col').val(col);
+            $('#ids').val(ids);
+            // 在此处输入 layer 的任意代码
+            layer.open({
+                type: 1, // page 层类型
+                area: ['300px', '300px'],
+                shade: 0.6, // 遮罩透明度
+                shadeClose: true, // 点击遮罩区域，关闭弹层
+                maxmin: true, // 允许全屏最小化
+                anim: 0, // 0-6 的动画形式，-1 不开启
+                content: $('.selected-type')
+            });
+            //form.render('select');
+        });
+
+        form.on('submit(doSave)',function(obj){
+            let format = obj.form;
+            let formId = $(format).attr('id');
+            let formData =  new FormData($('#'+formId)[0]); //获取整个表单数据
+            let wait = 2000;
+            let ActionUrl = $('#ActionUrl').attr('alt');
+            if(ActionUrl){
+                url = ActionUrl;
+            }
+            //异步发送，把数据提交给后台
+            $.ajax({
+                url: url,
+                type: "POST",
+                data:formData,
+                async:true,  //true发送异步请求,false发送同步请求
+                processData: false,  // 告诉jQuery不要去处理发送的数据
+                contentType: false,   // 告诉jQuery不要去设置Content-Type请求头
+                beforeSend: function(){
+                    var loading = layer.load(1,
+                        {
+                            shade:[0.3,'#000'],
+                            content:'<span class="loadtip">0%</span>',
+                            success: function (layer) {
+                                layer.find('.layui-layer-content').css({
+                                    'padding-top': '40px',
+                                    'width': '100px',
+                                });
+                                layer.find('.loadtip').css({
+                                    'font-size':'20px',
+                                    'margin-left':'0px'
+                                });
+                            }
+                        }
+                    );
+                },
+                xhr: function() {
+                    var xhr = new XMLHttpRequest();
+                    xhr.upload.addEventListener('progress', function(event) {
+                        if (event.lengthComputable) {
+                            //通过设置进度条的宽度达到效果
+                            var percent = Math.round((event.loaded / event.total) * 100);
+                            $('.loadtip').html(percent + '%');//完成进度（文字）
+                            //console.log('loading:'+percent);
+                        }
+                    }, false);
+                    return xhr;
+                },
+                success: function (data) {
+                    let obj = JSON.parse(data);
+                    if(obj.code == 200){
+                        //关闭弹出层
+                        layer.closeAll();
+                        //table.reload("DataDemos");  //重载数据表格
+                        layer.msg(obj.msg,{icon:1,time:wait,shade:0.3});
+                        setTimeout(function(){
+                            // 获得iframe索引
+                            var index = parent.layer.getFrameIndex(window.name);
+                            //关闭当前frame
+                            parent.layer.close(index);
+                            if(obj.data.local_type_name){
+                                $('#'+obj.data.id).html('<span class="red">['+obj.data.local_type_name+']</span>');
+                            }else{
+                                $('#'+obj.data.id).html('[{:lang(\'bind\')}]');
+                            }
+                        },wait);
+                    }else{
+                        layer.closeAll('loading'); //关闭加载层
+                        layer.msg(obj.msg,{icon:2,time:wait,shade:0.3});
+                    }
+                },
+                error: function () {
+                    layer.msg("上传失败！",{icon:2,time:wait,shade:0.3});
+                    $("#imgWait").hide();
+                    layer.closeAll('loading'); //关闭加载层
+                }
+            });
+            return false;
+        });
+
+    });
+</script>
+</body>
+</html>

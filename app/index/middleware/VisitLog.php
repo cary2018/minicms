@@ -25,9 +25,23 @@ class VisitLog
         }else{
             $from = '';
         }
+        $day = strtotime(date('Y-m-d',strtotime('-'. 0 .' day')));
+        $uv = md5($day.uniqid().time());
+        if(GetSe('clientExpTime') != $day || GetCk('guvs') == ''){
+            SetSe('clientExpTime',$day);
+            if(GetCk('guvs') == ''){
+                SetCk('guvs',$uv,86400);
+            }
+        }
+        $guv = GetCk('guvs');
+        if(!$guv){
+            //防止cookie初次访问未生效
+            $guv = $uv;
+        }
         $data = array(
             'clientType'=>ClientType(),
             'ip'=>get_client_ip(),
+            'guv'=>$guv,
             'from_url'=>$from,
             'to_url'=>$url,
             'region' => $region['region'],

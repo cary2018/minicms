@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html xml:lang="zh-CN" lang="zh-CN" class=" " style="transform: none;">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover" />
+    <meta name="renderer" content="webkit" />
+    <meta name="force-rendering" content="webkit" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>{$Think.config.web.web_title}</title>
+    <meta name="description" content="{$Think.config.web.web_desc}" />
+    <meta name="keywords" content="{$Think.config.web.web_key}" />
+    <meta property="og:type" content="index" />
+    <meta property="og:title" content="{$Think.config.web.web_title}" />
+    <meta property="og:image" content="{$Think.config.web.web_logo}" />
+
+    <script src="{$view_path}/static/js/jquery-2.2.4.min.js"></script>
+    <script src="{$view_path}/static/js/zblogphp.js"></script>
+    <script src="{$view_path}/static/js/c_html_js_add.js"></script>
+
+    <script src="{$view_path}/static/js/prism.js" type="text/javascript"></script>
+    <link rel="stylesheet" type="text/css" href="{$view_path}/static/css/prism.css" />
+
+    <script src="{$view_path}/static/layui/layui.js" type="text/javascript"></script>
+    <link rel="stylesheet" type="text/css" href="{$view_path}/static/layui/css/layui.css" />
+    <script src="{$view_path}/static/js/swiper.min.js"></script>
+
+    <link href="{$view_path}/static/css/font-awesome.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="{$view_path}/static/css/swiper.min.css" type="text/css" />
+    <link rel="stylesheet" href="{$view_path}/static/css/animate.css" type="text/css" media="all" />
+    <link rel="stylesheet" href="{$view_path}/static/css/style.css" type="text/css" media="all" />
+    {include file='layout/icon'}
+
+    <!--[if lt IE 9]><script src="https://cdn.staticfile.org/html5shiv/3.7.0/html5shiv.js"></script><![endif]-->
+    <style>
+        .atext{
+            color: hsla(0, 0%, 100%, .9);
+            background-color: rgba(56, 56, 56, 0.6);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 5px 10px;
+            font-size: 14px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+            width: 100%;
+        }
+        .atext a{color: hsla(0, 0%, 100%, .9);}
+    </style>
+</head>
+<body class="home home-index" style="transform: none;">
+
+{include file='layout/navmenu'}
+
+<div class="slide-main clearfix ">
+    <div class="wrapper-ban container ">
+        <div class="main-slider-row clearfix ">
+            <!-- 轮播图 -->
+            <div id="main-slider" class="main-slider fl ">
+                <div class="swiper-container swiper-main swiper-container-initialized swiper-container-horizontal">
+                    <div class="swiper-wrapper " >
+
+                        {cymini:banner }
+                        <div class="swiper-slide swiper-slide-duplicate-active swiper-slide-prev swiper-slide-duplicate-next" >
+                            <a href="{$vo.link}" target="{$vo.target}">
+                                <img src="{$vo.img|ImgPath}" alt="{$vo.title}" />
+                                <span class="swiper-title">
+                                 <span class="badge arc_v3">推荐1</span>
+                                 {$vo.title}
+                                </span>
+                            </a>
+                        </div>
+                        {/cymini:banner}
+
+                    </div>
+                    <div class="swiper-pagination swiper-pagination-clickable swiper-pagination-bullets">
+                        <span class="swiper-pagination-bullet swiper-pagination-bullet-active" tabindex="0" role="button" aria-label="Go to slide 1"></span>
+                    </div>
+                    <div class="swiper-button-next " tabindex="0" role="button" aria-label="Next slide"></div>
+                    <div class="swiper-button-prev " tabindex="0" role="button" aria-label="Previous slide"></div>
+                    <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span>
+                </div>
+            </div>
+            <div class="feature-post fr">
+                <!--<div class="widget clearfix wow fadeInDown" id="divContorPanel">
+                    <h4 class="widget-title">控制面板</h4>
+                    <div class="divContorPanel">
+                        <span class="cp-hello">您好,欢迎到访网站!</span>
+                        <br />
+                        <span class="cp-login"><a href="javascript:;">登录后台</a></span>&nbsp;&nbsp;
+                        <span class="cp-vrs"><a href="javascript:;">查看权限</a></span>
+                    </div>
+                </div>-->
+                {cymini:attrid aid='3' num='2'}
+                <li>
+                    <a href="{$vo.temp_archives}?id={$vo.id}" title="{$vo.title}" target="{$vo.target}">
+                        <img src="/{$vo.articleThumbImg}" title="{$vo.title}" alt="{$vo.title}" />
+                    </a>
+                    <span>
+                        <a style="color:#fff;" title="{$vo.title}" href="{$vo.temp_archives}?id={$vo.id}" target="{$vo.target}">
+                        {$vo.title}
+                        </a>
+                    </span>
+                </li>
+                {/cymini:attrid}
+            </div>
+        </div>
+        <div class="hot-tags">
+            <ul class="clearfix">
+                {cymini:attrid aid='2' num='4'}
+                <li>
+                    <a href="{$vo.temp_archives}?id={$vo.id}" title="{$vo.title}" target="{$vo.target}" rel="nofollow">
+                        <img src="/{$vo.articleThumbImg}" alt="{$vo.title}" style="max-width:275px;max-height:148px;"/>
+                    </a>
+                    <span class="atext">
+                        <a href="{$vo.temp_archives}?id={$vo.id}" title="{$vo.title}" target="{$vo.target}" rel="nofollow">
+                        {$vo.title}
+                        </a>
+                    </span>
+                </li>
+                {/cymini:attrid}
+            </ul>
+        </div>
+        <div class="sytj-tit ">
+            <h2><a href="javascript:;" class="cur">首页推荐</a></h2>
+        </div>
+    </div>
+</div>
+<div id="main" class="index-main clearfix ">
+    <div class="container ">
+        <div class="post-box clearfix ">
+            {cymini:attrid aid='4' num='12'}
+            <article id="list{$vo.id}" class="post-list auto-list clearfix wow fadeInDown">
+                <div class="list-shade"></div>
+                <figure class="list-feaimg">
+                    <a href="{$vo.temp_archives}?id={$vo.id}" title="{$vo.title}" target="{$vo.target}">
+                        <img width="280" height="210" src="/{$vo.articleThumbImg}" class="imgloadinglater" alt="{$vo.title}" rel="nofollow" style="display: inline;" />
+                    </a>
+                </figure>
+                <div class="list-info">
+                    <h3 class="items-title" title="{{item.title}}">
+                        <a href="{$vo.temp_archives}?id={$vo.id}" title="{$vo.title}" target="{$vo.target}">
+                            {$vo.title}
+                        </a>
+                    </h3>
+                    <div class="items-meta">
+                        <span class="badge arc_v4">热文</span>
+                        <span class="meta-view"><i class="fa fa-eye" title="浏览数"></i><em>{$vo.views}</em></span>
+                        <span class="meta-comment"><i class="fa fa-commenting" title="评论数"></i><em>{$vo.feed}</em></span>
+                        <span class="meta-time"><i class="fa fa-clock-o" title="点赞数"></i><em>{$vo.createTime}</em></span>
+                    </div>
+                    <div class="items-user">
+                        <a href="{$vo.temp_archives}?id={$vo.id}" target="{$vo.target}" class="avatar">
+                            <img src="/{$vo.articleThumbImg}" title="/{$vo.articleThumbImg}" />
+                        </a>
+
+                        <span class="catename">
+                            <a class="meta-cate-url" href="{$vo.temp_list}?id={$vo.cid}" target="{$vo.target}">
+                                <em><i class="fa fa-columns"></i>{$vo.name}</em>
+                            </a>
+                        </span>
+                    </div>
+                </div>
+            </article>
+            {/cymini:attrid}
+        </div>
+    </div>
+</div>
+
+<div id="list-main" class="list-main " style="transform: none;">
+    <div class="container clearfix alpha " style="transform: none;">
+        <div class="item-main fl ">
+            <nav class="main-navigation ">
+                <ul class="menu-nav-inline">
+                    <li class="menu-item active "><a lay-on="ajaxGet" id="" href="javascript:;">最新文章</a></li>
+                    {cymini:table where='["isShow","=",1],["id","=",2]'}
+                    <li class="menu-item "><a lay-on="ajaxGet" id="{$vo.id}" href="javascript:;"> {$vo.name}</a></li>
+                    {/cymini:table}
+                    {cymini:table where='["isShow","=",1],["id","=",3]'}
+                    <li class="menu-item "><a lay-on="ajaxGet" id="{$vo.id}" href="javascript:;"> {$vo.name}</a></li>
+                    {/cymini:table}
+                </ul>
+            </nav>
+
+            <div id="pjaxmain" class="auto-side ">
+                <div class="main_random auto-main clearfix ">
+                    <script id="TPL" type="text/html">
+                        {{#  layui.each(d.data, function(index, item){ }}
+                        <article id="list{{item.id}}" class="info-list auto-list clearfix wow fadeInDown" style="visibility: hidden; animation-name: none;">
+                            <figure class="info-thumb">
+                                <a href="{{item.temp_archives}}?id={{item.id}}" title="{{item.title}}" target="{{item.target}}">
+                                    <img width="280" height="210" src="/{{item.articleThumbImg}}" alt="{{item.title}}" />
+                                </a>
+                            </figure>
+                            <div class="info-items">
+                                <div class="info-limit">
+                                    <h3 class="od-2v">
+                                        <a href="{{item.temp_archives}}?id={{item.id}}" title="{{item.title}}" target="{{item.target}}">
+                                            {{item.title}}
+                                        </a>
+                                    </h3>
+                                    <p class="info-desc od-2v">
+                                        {{item.description}}
+                                    </p>
+                                </div>
+                                <div class="info-meta">
+                                    <a class="meta-cate-url" href="{{item.temp_list}}?id={{item.cid}}" >
+                                        <i class="fa fa-dot-circle-o"></i>{{item.name}}
+                                    </a>
+                                    <div class="flex-fill"></div>
+                                    <span class="info-time" title="{{item.createTime}}">
+                                    <i class="fa fa-clock-o"></i>{{item.createTime}}
+                                </span>
+                                    <span class="info-viewnums"><i class="fa fa-eye" title="浏览数"></i>{{item.views}}</span>
+                                    <span class="info-comment"><i class="fa fa-commenting" title="评论数"></i>{{item.feed}}</span>
+                                </div>
+                            </div>
+                        </article>
+                        {{#  }); }}
+                    </script>
+                    <div id="view"></div>
+                </div>
+                <footer class="pagination wow fadeInDown " style="visibility: visible; animation-name: fadeInDown;">
+                    <!--分页-->
+                    <script type="text/html" id="listData"></script>
+                </footer>
+            </div>
+        </div>
+        {include file='layout/main-right'}
+    </div>
+    <div class="container wow fadeInDown">
+        <div class="links-box ">
+            <div class="links-tit ">
+                <h3>友情链接</h3>
+                <span class="linksub">友情链接申请条件百度PR&gt;1（目前暂停申请）</span>
+            </div>
+            <div class="links-li ">
+                {cymini:link }
+                <li><a href="{$vo.link}" target="{$vo.target}" title="{$vo.title}">{$vo.title}</a></li>
+                {/cymini:link}
+            </div>
+        </div>
+    </div>
+</div>
+
+{include file='layout/footer'}
+
+<!---->
+
+<script>var cookieDomain = "https://www.itmkk.com/";</script>
+<script src="{$view_path}/static/js/zh_tw.js"></script>
+
+<script src="{$view_path}/static/js/custom.js"></script>
+<script src="{$view_path}/static/js/wow.min.js"></script>
+<script>
+    layui.use(['table', 'dropdown', 'util','laytpl'], function(){
+        var table = layui.table;
+        var laypage = layui.laypage;
+        var laytpl = layui.laytpl;
+        var util = layui.util;
+
+        // 数据列表
+        table.render({
+            elem: '#listData',
+            url:'api/article',
+            page:true,
+            limit:12,
+            response: {
+                statusCode: 200 // 重新规定成功的状态码为 200，table 组件默认为 0
+            },
+            done:function(res,curr,count,origin){
+                //console.log(res);
+                var getTpl = document.getElementById('TPL').innerHTML; // 获取模板字符
+                var elemView = document.getElementById('view'); // 视图对象
+                // 渲染并输出结果
+                laytpl(getTpl).render(res, function(str){
+                    elemView.innerHTML = str;
+                });
+            }
+        });
+
+        util.on('lay-on',{
+            ajaxGet:function(obj){
+                table.render({
+                    elem: '#listData',
+                    url:'api/article',
+                    where:{
+                        'id':obj[0].id,
+                    },
+                    page:true,
+                    limit:12,
+                    response: {
+                        statusCode: 200 // 重新规定成功的状态码为 200，table 组件默认为 0
+                    },
+                    done:function(res,curr,count,origin){
+                        //console.log(res);
+                        var getTpl = document.getElementById('TPL').innerHTML; // 获取模板字符
+                        var elemView = document.getElementById('view'); // 视图对象
+                        // 渲染并输出结果
+                        laytpl(getTpl).render(res, function(str){
+                            elemView.innerHTML = str;
+                        });
+                    }
+                });
+            }
+        });
+
+
+    });
+    //获取url中的参数
+    function getUrlParams(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+        var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+        if (r != null) return unescape(r[2]); return null; //返回参数值
+    }
+    //获取url参数
+    function getURLParams() {
+        const searchParams = window.location.search.substring(1).split('&');
+        const params = {};
+        for (const param of searchParams) {
+            const [key, value] = param.split('=');
+            params[key] = value;
+        }
+        return params;
+    }
+</script>
+</body>
+</html>

@@ -93,7 +93,7 @@ class System extends BaseController
         $model = new systemModel();
         $arr = [];
         foreach ($data['content'] as $k=>$v){
-            array_push($arr,['id'=>$data['id'][$k],'sys_content'=>$v]);
+            array_push($arr,['id'=>$k,'sys_content'=>$v]);
         }
         $model->saveAll($arr);
         //写入配置文件

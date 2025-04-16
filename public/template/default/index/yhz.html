@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HTML+CSS打造动态网页！90%的人不知道的萤火虫特效秘诀！</title>
+    <style>
+        body,html{
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            background: #000;
+             }
+        .content{
+            position: relative;
+            z-index: 1;
+            color: white;
+            text-align: center;
+            padding-top: 20vh;
+        }
+        .firefly{
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: #ffff00;
+            border-radius: 50%;
+            filter: blur(1px);
+            animation: float 15s infinite ease-in-out, blink 2s infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(100px, 100px); }
+            50% { transform: translate(200px, 0); }
+            75% { transform: translate(100px, -100px); }
+         }
+        @keyframes blink{
+            0%, 100% { opacity: 0.1; }
+            50% { opacity: 1; }
+         }
+    </style>
+</head>
+<body>
+<div class="content">
+    <h1>萤火虫</h1>
+    <p>与萤火虫一起体验神奇的夜晚！</p>
+</div>
+<script>
+    function createFirefly() {
+        const firefly = document.createElement('div');
+        firefly.className = 'firefly';
+        firefly.style.left = `${Math.random() * 100}%`;
+        firefly.style.top = `${Math.random() * 100}%`;
+        firefly.style.animationDelay = `${Math.random() * 15}s, ${Math.random() * 2}s`;
+        document.body.appendChild(firefly);
+    }
+
+    for (let i = 0; i < 50; i++) {
+        createFirefly();
+    }
+</script>
+</body>
+</html>

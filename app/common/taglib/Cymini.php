@@ -107,7 +107,7 @@ class Cymini extends TagLib
             $tag['num'] = 10;
         }
         $parse = '<?php ';
-        $parse .= '$__link__ = pageTable(\'link\',0,' . intval($tag['num']) . ',[\'enable\'=>1]);';
+        $parse .= '$__link__ = pageTable(\'link\',0,' . intval($tag['num']) . ',[\'enable\'=>1]' .',[\'orderSort\'=>\'desc\']);';
         $parse .= '$__LIST__ = $__link__;';
         $parse .= ' ?>';
         $parse .= '{volist name="__LIST__" id="' . $tag['id'] . '" key="'.$tag['key'].'"';

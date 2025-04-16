@@ -32,8 +32,28 @@ class Login extends BaseController
     }
     public function check(){
         $data = request()->param();
+        $url = app('http')->getName().'/'.request()->controller(true).'/'.request()->action();
+        $ip = get_client_ip();
+        $reg = new \Ip2Region();
+        $region = $reg->btreeSearch($ip);
+        $visit = [
+            'username'=>$data['username'],
+            'ip'=>$ip,
+            'region'=>$region['region'],
+            'path'=>$url,
+            'remark'=>'',
+            'createTime'=>time(),
+        ];
         try {
+<<<<<<< HEAD
             validate(LoginValidate::class)->check($data);
+=======
+            if(config('web.captcha_close') === 1){
+                validate(LoginValidate::class)->check($data);
+            }else{
+                validate(LoginValidate::class)->remove('captcha','require')->check($data);
+            }
+>>>>>>> aa9cc7a... 新增视频采集，音乐接口和一些功能优化
             $user = FindTable('admin',[['username','=',$data['username']],['status','=',1],['group_id','=',0]]);
             //生成 token 防止验证失败 token 失效
             $token = request()->buildToken('__token__', 'sha1');
@@ -54,6 +74,8 @@ class Login extends BaseController
             // 验证失败 输出错误信息
             $msg = ['code'=>300,'msg'=>$e->getError(),'token'=>$token];
         }
+        $visit['remark'] = $msg['msg'];
+        SaveAt('weblog',$visit);
         echo json_encode($msg);
     }
     public function logout(){

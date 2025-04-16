@@ -1,0 +1,30 @@
+<div id="side" class="sidebar fr mside" style="position: relative; overflow: visible; box-sizing: border-box; min-height: 0px;">
+    <div class="theiaStickySidebar" style="padding-top: 0px; padding-bottom: 0px; position: static; top: 70px; left: 1042px;">
+        <div class="widget clearfix wow fadeInDown" id="divPrevious">
+            <h4 class="widget-title">TOP 9</h4>
+            <ul class="divPrevious">
+                {cymini:article num='9' order='views'}
+                <li><a title="{$vo.title}" href="{$vo.temp_archives}?id={$vo.id}" target="{$vo.target}">{$vo.title}</a></li>
+                {/cymini:article}
+            </ul>
+        </div>
+        <div class="widget clearfix wow fadeInDown" id="divComments">
+            <h4 class="widget-title">最新留言</h4>
+            <ul class="divComments">
+                {cymini:feedback}
+                <li class="img" style="text-overflow:ellipsis;white-space:nowrap;overflow:hidden;">
+                    <a href="{$vo.temp_archives}?id={$vo.aid}#cmt{$vo.id}" title="{$vo.msg} @ {$vo.createTime}">{$vo.msg|raw}</a>
+                </li>
+                {/cymini:feedback}
+            </ul>
+        </div>
+        <div class="widget clearfix wow fadeInDown" id="divTags">
+            <h4 class="widget-title">标签列表</h4>
+            <ul class="divTags">
+                {cymini:tags num='30'}
+                <li><a title="{$vo.tag}" href="/index/tags?tag={$vo.tag}">{$vo.tag}<span class="tag-count"> ({$vo.count})</span></a></li>
+                {/cymini:tags}
+            </ul>
+        </div>
+    </div>
+</div>

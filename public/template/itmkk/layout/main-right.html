@@ -1,0 +1,189 @@
+<div class="side fr mside" style="position: relative; overflow: visible; box-sizing: border-box; min-height: 0px; height: auto !important;">
+    <div class="theiaStickySidebar" style="padding-top: 0px; padding-bottom: 0px; position: static; height: auto !important; top: 20px; left: 1042.56px;">
+        <section class="widget_avatar">
+            <div class="widget_user" style="background-image: url({$view_path}/static/images/aside-author-bg.png);">
+                <div class="user-bgif">
+                    {if !$member}
+                    <img title="..." src="/images/default.jpg" alt="..." height="80" width="80" />
+                    {else /}
+                    <img title="..." src="{$member.thumbImg|ImgPath}" alt="..." height="80" width="80" />
+                    {/if}
+                    <div class="name ">
+                        {if !$member}
+                        <h3><a href="javascript:;" rel="nofollow" title="QQ联系我：373889161">散修（夜游）<span class="autlv aut-1 vs-level">V</span></a></h3>
+                        <p id="pcs" title="站长提供个人/企业网站建设_制作，功能定制，bug修复（373889161@qq.com）">站长提供个人/企业网站建设_制作，功能定制，bug修复（373889161@qq.com）</p>
+                        {else /}
+                        <h3>
+                            <a href="javascript:;" rel="nofollow" title="QQ联系我：373889161">
+                            {if $member.nickname}{$member.nickname}{else /}{$member.username}{/if}
+                            <span class="autlv aut-1 vs-level">V</span>
+                            </a>
+                        </h3>
+                        <p>{$member.remark}</p>
+                        {/if}
+
+                    </div>
+                </div>
+            </div>
+            <div class="webinfo">
+                <div class="item">
+                    <span class="num" title="文章总数：{cymini:total}">{cymini:total}</span>
+                    <span>文章数</span>
+                </div>
+                <div class="item">
+                    <span class="num" title="评论总数：{cymini:total table='feedback' }">{cymini:total table='feedback'}</span>
+                    <span>评论数</span>
+                </div>
+                <div class="item">
+                    <span class="num" title="浏览总数：{cymini:sum}">{cymini:sum}</span>
+                    <span>浏览数</span>
+                </div>
+            </div>
+        </section>
+        <section class="widget" id="side_countdown" style="visibility: visible; animation-name: fadeInDown;">
+            <h3 class="widget-title">时过境迁</h3>
+            <ul class="widget-box side_countdown">
+                <div class="item" id="dayProgress">
+                    <div class="title">
+                        今日已经过去
+                        <span>0</span>小时
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar">
+                            <div class="progress-inner progress-inner-1" style="width: 71%;"></div>
+                        </div>
+                        <div class="progress-percentage">
+                            71%
+                        </div>
+                    </div>
+                </div>
+                <div class="item" id="weekProgress">
+                    <div class="title">
+                        这周已经过去
+                        <span>0</span>天
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar">
+                            <div class="progress-inner progress-inner-2" style="width: 42%;"></div>
+                        </div>
+                        <div class="progress-percentage">
+                            42%
+                        </div>
+                    </div>
+                </div>
+                <div class="item" id="monthProgress">
+                    <div class="title">
+                        本月已经过去
+                        <span>0</span>天
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar">
+                            <div class="progress-inner progress-inner-3" style="width: 40%;"></div>
+                        </div>
+                        <div class="progress-percentage">
+                            40%
+                        </div>
+                    </div>
+                </div>
+                <div class="item" id="yearProgress">
+                    <div class="title">
+                        今年已经过去
+                        <span>0</span>个月
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar">
+                            <div class="progress-inner progress-inner-4" style="width: 50%;"></div>
+                        </div>
+                        <div class="progress-percentage">
+                            50%
+                        </div>
+                    </div>
+                </div>
+            </ul>
+        </section>
+        <section class="widget wow fadeInDown" id="side_con" style="visibility: visible; animation-name: fadeInDown;">
+            <h3 class="widget-title">热门文章</h3>
+            <ul class="widget-box side_con">
+                {cymini:article num='5' order='views'}
+                <li>
+                    <div class="hotcom-img">
+                        <a href="{$vo.temp_archives}?id={$vo.id}" title="{$vo.title}" target="{$vo.target}">
+                            <img src="/{$vo.articleThumbImg}" alt="{$vo.title}" />
+                        </a>
+                    </div>
+                    <div class="hotcom-left">
+                        <a href="{$vo.temp_archives}?id={$vo.id}" title="{$vo.title}" target="{$vo.target}">
+                            <h4 class="hot-com-title">
+                                <span class="num{$key}">{$key}</span>{$vo.title}
+                            </h4>
+                        </a>
+                        <div class="hot-com-clock">
+                            浏览量：{$vo.views}
+                        </div>
+                    </div>
+                </li>
+                {/cymini:article}
+            </ul>
+        </section>
+        <section class="widget wow fadeInDown" id="side_random" style="visibility: visible; animation-name: fadeInDown;">
+            <h3 class="widget-title">随机推荐</h3>
+            <ul class="widget-box side_random">
+                {cymini:rand num='6'}
+                <li class="r-item">
+                    <div class="r-item-wrap">
+                        <a class="r-thumb" href="{$vo.temp_archives}?id={$vo.id}" target="{$vo.target}">
+                            <img width="480" height="300" src="/{$vo.articleThumbImg}" alt="{$vo.title}" />
+                        </a>
+                        <h4 class="r-title">
+                            <a href="{$vo.temp_archives}?id={$vo.id}" title="{$vo.title}" target="{$vo.target}">
+                                {$vo.title}
+                            </a>
+                        </h4>
+                    </div>
+                </li>
+                {/cymini:rand}
+            </ul>
+        </section>
+        <section class="widget wow fadeInDown" id="side_hot" style="visibility: visible; animation-name: fadeInDown;">
+            <h3 class="widget-title">热门推荐</h3>
+            <ul class="widget-box side_hot">
+                {cymini:attrid aid='2' num='3'}
+                <div class="list-media">
+                    <a class="media-content" href="{$vo.temp_archives}?id={$vo.id}" title="{$vo.title}" target="{$vo.target}" style="background-image:url(/{$vo.articleThumbImg})"><span class="list-overlay"></span></a>
+                    <div class="list-content">
+                        <a href="{$vo.temp_archives}?id={$vo.id}" class="list-title h-2x">{$vo.title}</a>
+                        <p class="list-footer"><span class="text-read">{$vo.views} 阅读 ，</span><time class="d-inline-block">
+                            {$vo.month}-{$vo.day}</time></p>
+                    </div>
+                </div>
+                {/cymini:attrid}
+            </ul>
+        </section>
+        <section class="widget wow fadeInDown" id="divTags" style="visibility: visible; animation-name: fadeInDown;">
+            <h3 class="widget-title">标签列表</h3>
+            <ul class="widget-box divTags">
+                {cymini:tags num='20'}
+                <li class="divTags6">
+                    <a title="{$vo.tag}" href="/index/tags?tag={$vo.tag}">{$vo.tag}<span class="tag-count"> ({$vo.count})</span></a>
+                </li>
+                {/cymini:tags}
+            </ul>
+        </section>
+    </div>
+</div>
+<script>
+    setInterval(function() {
+        //alert('ddd');
+        $.ajax({
+            url:"https://api.cenguigui.cn/api/djt/api/?format=json&charset=utf-8",
+            dataType:"json",
+            type:"get",
+            async : false,
+            cache : false,
+            success:function(res){
+                $("#pcs").attr('title',res.data.content)
+                $("#pcs").text(res.data.content);
+            },
+        })
+    }, 10000);
+</script>

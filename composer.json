@@ -31,7 +31,9 @@
         "workerman/phpsocket.io": "^2.0",
         "topthink/think-captcha": "^3.0",
         "zzstudio/think-addons": "^2.0",
-        "chamilo/pclzip": "^2.8"
+        "chamilo/pclzip": "^2.8",
+        "overtrue/pinyin": "^4.1",
+        "metowolf/meting": "^1.5"
     },
     "require-dev": {
         "symfony/var-dumper": "^4.2",

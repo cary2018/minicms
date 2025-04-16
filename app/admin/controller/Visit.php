@@ -36,8 +36,12 @@ class Visit extends BaseController
         $size = $data['limit']?$data['limit']:10;
         $start = $data['page']?$data['page']:0;
         $where = [];
+        $group = '';
         if(array_key_exists('data',$data)){
             foreach ($data['data'] as $k=>$v){
+                if(!$v['value']){
+                    continue;
+                }
                 if($v['name'] == 'range'){
                     if($v['value']){
                         $atime = explode(' ~ ',$v['value']);
@@ -45,13 +49,18 @@ class Visit extends BaseController
                         $et = strtotime($atime[1]);
                         $where[] = ['createTime','between',[$st,$et]];
                     }
+                }
+                if($v['name'] == 'guv'){
+                    if($v['value']){
+                        $group = $v['value'];
+                    }
                 }else{
                     $where[] = [$v['name'],'like','%'.$v['value'].'%'];
                 }
             }
         }
-        $list = pageTable('visit',$start,$size,$where);
-        $count = CountTable('visit',$where);
+        $list = pageTable('visit',$start,$size,$where,['id'=>'desc'],$group);
+        $count = CountTable('visit',$where,'',$group);
         foreach ($list as &$v){
             $v['createTime'] = date('Y-m-d H:i:s',$v['createTime']);
         }

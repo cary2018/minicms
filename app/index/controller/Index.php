@@ -1,4 +1,5 @@
 <?php
+
 namespace app\index\controller;
 
 use app\index\BaseController;
@@ -12,6 +13,7 @@ class Index extends BaseController
         /*hook('show', ['id'=>1]);
         hook('testhook', ['id'=>1]);
         die;*/
+
         return ViewHtml();
     }
 }

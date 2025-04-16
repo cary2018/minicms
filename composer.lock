@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2a737aebf8a32c535de6b1d56ca7a13a",
+    "content-hash": "d69b560cdfeb8521663a63e2198fab1d",
     "packages": [
         {
             "name": "chamilo/pclzip",
@@ -271,6 +271,145 @@
                 }
             ],
             "time": "2023-08-03T07:14:11+00:00"
+        },
+        {
+            "name": "metowolf/meting",
+            "version": "v1.5.11",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/metowolf/Meting.git",
+                "reference": "a88a1dffca16ae32f20cf009d7b65bfa1e9cdbad"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/metowolf/Meting/zipball/a88a1dffca16ae32f20cf009d7b65bfa1e9cdbad",
+                "reference": "a88a1dffca16ae32f20cf009d7b65bfa1e9cdbad",
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-openssl": "*",
+                "php": ">=5.4.0"
+            },
+            "suggest": {
+                "ext-bcmath": "Required to use BC Math calculate RSA.",
+                "ext-openssl": "Required to use OpenSSL encrypt params."
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Metowolf\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "metowolf",
+                    "email": "i@i-meto.com",
+                    "homepage": "https://i-meto.com"
+                }
+            ],
+            "description": "A powerful music API framework to accelerate development.",
+            "homepage": "https://github.com/metowolf/Meting",
+            "keywords": [
+                "lightweight",
+                "lighty",
+                "music api",
+                "php music"
+            ],
+            "support": {
+                "issues": "https://github.com/metowolf/Meting/issues",
+                "source": "https://github.com/metowolf/Meting"
+            },
+            "time": "2021-07-19T11:53:12+00:00"
+        },
+        {
+            "name": "overtrue/pinyin",
+            "version": "4.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/overtrue/pinyin.git",
+                "reference": "4d0fb4f27f0c79e81c9489e0c0ae4a4f8837eae7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/overtrue/pinyin/zipball/4d0fb4f27f0c79e81c9489e0c0ae4a4f8837eae7",
+                "reference": "4d0fb4f27f0c79e81c9489e0c0ae4a4f8837eae7",
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
+            },
+            "require": {
+                "php": ">=7.1"
+            },
+            "require-dev": {
+                "brainmaestro/composer-git-hooks": "^2.7",
+                "friendsofphp/php-cs-fixer": "^2.16",
+                "phpunit/phpunit": "~8.0"
+            },
+            "type": "library",
+            "extra": {
+                "hooks": {
+                    "pre-commit": [
+                        "composer test",
+                        "composer fix-style"
+                    ],
+                    "pre-push": [
+                        "composer test",
+                        "composer check-style"
+                    ]
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/const.php"
+                ],
+                "psr-4": {
+                    "Overtrue\\Pinyin\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "overtrue",
+                    "email": "anzhengchao@gmail.com",
+                    "homepage": "http://github.com/overtrue"
+                }
+            ],
+            "description": "Chinese to pinyin translator.",
+            "homepage": "https://github.com/overtrue/pinyin",
+            "keywords": [
+                "Chinese",
+                "Pinyin",
+                "cn2pinyin"
+            ],
+            "support": {
+                "issues": "https://github.com/overtrue/pinyin/issues",
+                "source": "https://github.com/overtrue/pinyin/tree/4.1.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/overtrue",
+                    "type": "github"
+                }
+            ],
+            "time": "2023-04-27T10:17:12+00:00"
         },
         {
             "name": "phpmailer/phpmailer",

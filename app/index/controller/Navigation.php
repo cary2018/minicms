@@ -30,7 +30,8 @@ class Navigation extends BaseController
             $data = array();
             $msg = ['code'=>300,'message'=>'访问密码错误！','data'=>$data,'acc'=>$pass];
         }
-        $acc =  GetSe('access_navigation');
+        //$acc =  GetSe('access_navigation');
+        $acc =  '1';
         View::assign('pass',$acc);
         return ViewHtml();
     }

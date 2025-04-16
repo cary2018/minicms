@@ -94,18 +94,16 @@ class Collection extends BaseController
         if(isset($host['host']) && $host['host'] == 'mp.weixin.qq.com'){
             $text = str_replace('data-src','src',$text);
         }
+
         if(!$data['content']){
-            $imgArr = array();
+
             if($cdata['download']==1){
                 $imgUrl = getImgList($text);
-                foreach ($imgUrl[1] as $kk=>$vv){
-                    $newUrl = fileUrl($vv,$data['url']);
-                    $newImg = DownloadFile($newUrl,$path,'',0);
-                    $imgArr[$kk] = '/'.$newImg['save_path'];
-                    ob_flush();flush();
-                    sleep(1);//防止图片未采集完程序提前结束
-                }
-                $text = str_replace($imgUrl[1],$imgArr,$text);
+
+                $reImgUrl = fileUrl($imgUrl[1],$data['url']);
+                $imgArr = BatchDownLoadFiles($reImgUrl,$path);
+
+                $text = str_replace($imgUrl[1],$imgArr['imgArr'],$text);
             }
             $data['content'] = $text;
         }
@@ -216,7 +214,7 @@ class Collection extends BaseController
         if(!$data){
             die(lang('data_error'));
         }
-        $imgArr = array();
+
         $cons = array();
         $lent = count($html);
         $script = replace_msg();
@@ -242,19 +240,16 @@ class Collection extends BaseController
             }
             if($data['download']==1){
                 $imgUrl = getImgList($text);
+
+                $reImgUrl = fileUrl($imgUrl[1],$data['url']);
+                $imgArr = BatchDownLoadFiles($reImgUrl,$path);
+
                 foreach ($imgUrl[1] as $kk=>$vv){
-                    for ($ci=1;$ci<=1000;$ci++){
-                        echo str_repeat(' ', 10);
-                    }
-                    $newUrl = fileUrl($vv,$data['url']);
-                    $newImg = DownloadFile($newUrl,$path,'',1);
-                    $imgArr[$kk] = '/'.$newImg['save_path'];
                     $cimg++;
                     echo sprintf($script, $potion, $potion, $i.'/'.$lent.lang('collection_success').$r.lang('collection_img').$cimg);
                     output_buffer();
-                    sleep(1);//防止图片未采集完程序提前结束
                 }
-                $text = str_replace($imgUrl[1],$imgArr,$text);
+                $text = str_replace($imgUrl[1],$imgArr['imgArr'],$text);
             }
             if($v['content']=='' && $v['status']==0){
                 $new = array(

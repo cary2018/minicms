@@ -29,11 +29,11 @@
                         <div class="layui-inline">
                             <label class="layui-form-label">{$Think.lang.siteName}</label>
                             <div class="layui-input-inline">
-                                <input type="text" name="nav_name" autocomplete="off" class="layui-input">
+                                <input lay-verify="required" lay-reqtext="{$Think.lang.siteNameEmpty}" type="text" name="nav_name" autocomplete="off" class="layui-input">
                             </div>
                             <label class="layui-form-label required">{$Think.lang.category}</label>
                             <div class="layui-input-inline">
-                                <select name="cid" lay-verify="required" lay-reqtext="{$Think.lang.selectCategory}" layui.formselect>
+                                <select name="cid" layui.formselect>
                                     <option value="">{$Think.lang.DownSelect}</option>
                                     {volist name="tree" id="item"}
                                     <option value="{$item.id}" >{$item.p|raw}{$item.name}</option>
@@ -55,7 +55,7 @@
             <span id="SwitchUrl" alt="{:url('switchAt')}" style="display: none"></span>
             <span id="AddUrl" alt="{:url('add')}" style="display: none"></span>
             <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="adds"> {$Think.lang.add} </button>
-            <!--<button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="delete"> 删除 </button>-->
+            <button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="delete"> {$Think.lang.batchDel} </button>
         </div>
         <!--数据-->
         <table class="layui-hide" id="DataDemos" lay-filter="DataDemos"></table>
@@ -90,7 +90,7 @@
                 icon: 'layui-icon layui-icon-search'
             }],
             cols: [[
-                /*{type: "checkbox", width: 50},*/
+                {type: "checkbox", width: 50},
                 {field: 'id', align:"center", width: 80, title: 'ID', sort: true},
                 {field: 'nav_name', align: 'center',templet:function(d){
                         let name = '';

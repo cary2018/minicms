@@ -31,16 +31,14 @@ class Callback extends BaseController
             //$pid = [1=>23,11=>15,2=>16,8=>17,9=>18,10=>5];
             $path = '/download_img/'.date('Ymd');
             $text = $data['content'];
-            $imgArr = array();
+
             $imgUrl = getImgList($text);
             if ($imgUrl[1]){
-                foreach ($imgUrl[1] as $kk=>$vv){
-                    $newUrl = fileUrl($vv,$data['url']);
-                    $newImg = DownloadFile($newUrl,$path,'',1);
-                    $imgArr[$kk] = '/'.$newImg['save_path'];
-                    sleep(1);//防止图片未采集完程序提前结束
-                }
-                $text = str_replace($imgUrl[1],$imgArr,$text);
+
+                $reImgUrl = fileUrl($imgUrl[1],$data['url']);
+                $imgArr = BatchDownLoadFiles($reImgUrl,$path);
+
+                $text = str_replace($imgUrl[1],$imgArr['imgArr'],$text);
             }
             $arr = [
                 'cid'=>$data['cid'],

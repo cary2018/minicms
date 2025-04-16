@@ -69,6 +69,18 @@ layui.use(['jquery','layer','iconPickerFa','form','table','laydate'], function (
 					layer.close(index);
 				});
 				break;
+<<<<<<< HEAD
+=======
+			case 'SubmitData':
+				let that = $(this);
+				let id = that.attr('data-id');
+				let url = that.attr('data-url');
+				for(let i = 0;i<data.length;i++){
+					arr_id.push(data[i][id]); //ar_id 是数据表唯一id
+				}
+				ChangeData(arr_id,url);
+				break;
+>>>>>>> aa9cc7a... 新增视频采集，音乐接口和一些功能优化
 			case 'batchRecycle':
 				for(let i = 0;i<data.length;i++){
 					arr_id.push(data[i][fileName]); //ar_id 是数据表唯一id

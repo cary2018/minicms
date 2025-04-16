@@ -1,0 +1,96 @@
+<div class="side fr mside" style="height: auto !important; position: relative; overflow: visible; box-sizing: border-box; min-height: 0px;">
+    <div class="theiaStickySidebar" style="padding-top: 0px; padding-bottom: 0px; position: static; top: 20px; left: 1042.56px;">
+        <section class="widget wow fadeInDown" id="divPrevious" style="visibility: visible; animation-name: fadeInDown;">
+            <h3 class="widget-title">最近发表</h3>
+            <ul class="widget-box divPrevious">
+                {cymini:article num='6'}
+                <div class="side_new">
+                    <div class="side_new_dot"></div>
+                    <div class="side_new_inner">
+                        <div class="side-new-title">
+                            <a href="{$vo.temp_archives}?id={$vo.id}" title="{$vo.title}" target="{$vo.target}">{$vo.title}</a>
+                        </div>
+                        <div class="side-new-time">
+                            <em>{$vo.name}</em>
+                            <span class="spot"></span>{$vo.createTime}
+                        </div>
+                    </div>
+                </div>
+                {/cymini:article}
+            </ul>
+        </section>
+        <section class="widget wow fadeInDown" id="side_con" style="visibility: visible; animation-name: fadeInDown;">
+            <h3 class="widget-title">热门文章</h3>
+            <ul class="widget-box side_con">
+                {cymini:article num='5' order='views'}
+                <li>
+                    <div class="hotcom-img">
+                        <a href="{$vo.temp_archives}?id={$vo.id}" title="{$vo.title}" target="{$vo.target}">
+                            <img src="/{$vo.articleThumbImg}" alt="{$vo.title}" />
+                        </a>
+                    </div>
+                    <div class="hotcom-left">
+                        <a href="{$vo.temp_archives}?id={$vo.id}" title="{$vo.title}" target="{$vo.target}">
+                            <h4 class="hot-com-title">
+                                <span class="num{$key}">{$key}</span>{$vo.title}
+                            </h4>
+                        </a>
+                        <div class="hot-com-clock">
+                            浏览量：{$vo.views}
+                        </div>
+                    </div>
+                </li>
+                {/cymini:article}
+            </ul>
+        </section>
+        <section class="widget wow fadeInDown" id="divComments" style="visibility: visible; animation-name: fadeInDown;">
+            <h3 class="widget-title">最新留言</h3>
+            <ul class="widget-box divComments">
+                {cymini:feedback num='6'}
+                <li class="side-new-comments"> <strong></strong><b></b>
+                    <div class="newComments-info">
+                        <div class="newComments-deanxz">
+                            <a href="{$vo.temp_archives}?id={$vo.aid}#cmt{$vo.id}" title="用户昵称：{$vo.username}" target="{$vo.target}">
+                                <img alt="用户昵称：{$vo.username}" src="/images/default.jpg" />
+                            </a>
+                        </div>
+                        <div class="newComments-text">
+                            <a href="{$vo.temp_archives}?id={$vo.aid}#cmt{$vo.id}" target="{$vo.target}" title="{$vo.article}">{$vo.msg|raw}</a>
+                        </div>
+                        <div class="newComments-mary" title="留言时间：{$vo.createTime}">
+                            <em title="用户昵称：{$vo.username}">{$vo.username}</em>
+                            <span class="spot"></span>{$vo.createTime}
+                        </div>
+                    </div>
+                </li>
+                {/cymini:feedback}
+            </ul>
+        </section>
+        <section class="widget wow fadeInDown" id="side_hot" style="visibility: visible; animation-name: fadeInDown;">
+            <h3 class="widget-title">热门推荐</h3>
+            <ul class="widget-box side_hot">
+                {cymini:attrid aid='2' num='3'}
+                <div class="list-media">
+                    <a class="media-content" href="{$vo.temp_archives}?id={$vo.id}" title="{$vo.title}" target="{$vo.target}" style="background-image:url(/{$vo.articleThumbImg})"><span class="list-overlay"></span></a>
+                    <div class="list-content">
+                        <a href="{$vo.temp_archives}?id={$vo.id}" class="list-title h-2x">{$vo.title}</a>
+                        <p class="list-footer"><span class="text-read">{$vo.views} 阅读 ，</span>
+                            <time class="d-inline-block">{$vo.month}-{$vo.day}</time>
+                        </p>
+                    </div>
+                </div>
+                {/cymini:attrid}
+            </ul>
+        </section>
+        <section class="widget wow fadeInDown" id="divTags" style="visibility: visible; animation-name: fadeInDown;">
+            <h3 class="widget-title">标签列表</h3>
+            <ul class="widget-box divTags">
+                {cymini:tags num='20'}
+                <li class="divTags6">
+                    <a title="{$vo.tag}" href="/index/tags?tag={$vo.tag}">{$vo.tag}<span class="tag-count"> ({$vo.count})</span></a>
+                </li>
+                {/cymini:tags}
+            </ul>
+        </section>
+    </div>
+</div>

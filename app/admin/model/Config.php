@@ -41,7 +41,7 @@ class Config extends Model
             }
             if($data['sys_type']=='file'){
                 $img = FindTable('config',[['id','=',$data['id']]]);
-                if(file_exists($img['sys_content'])){
+                if(file_exists($img['sys_content']) && $data['sys_content']!=$img['sys_content']){
                     unlink($img['sys_content']);
                 }
             }

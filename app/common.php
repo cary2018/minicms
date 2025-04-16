@@ -2,6 +2,7 @@
 // 应用公共文件
 use think\facade\Cache;
 use think\facade\Session;
+use think\facade\Cookie;
 use think\facade\Config;
 use think\facade\Db;
 use PHPMailer\PHPMailer\Exception;
@@ -178,6 +179,31 @@ function GetSe($name){
  */
 function DelSe($name){
     Session::delete($name);
+}
+
+/**
+ * @param string $name cookie名
+ * @param string $value  cookie值
+ * @param int $expire 过期时间
+ * 设置cookie
+ */
+function SetCk($name,$value,$expire=3600){
+    Cookie::set($name,$value,$expire);
+}
+
+/**
+ * @param string $name
+ * 获取cookie
+ */
+function GetCk($name){
+    return Cookie::get($name,'');
+}
+/**
+ * @param string $name
+ * 删除cookie
+ */
+function DelCk($name){
+    Cookie::delete($name);
 }
 
 /**
@@ -365,11 +391,12 @@ function FindTable($table,$where = [],$order=['id'=>'desc']){
  * @param $table
  * @param array $where
  * @param string $alias
+ * @param string $group
  * @return int
  * 返回表总数据数
  */
-function CountTable($table, $where=[],$alias=''){
-    return Db::name($table)->alias($alias)->where($where)->count();
+function CountTable($table, $where=[],$alias='',$group=''){
+    return Db::name($table)->alias($alias)->where($where)->group($group)->count();
 }
 
 /**
@@ -399,19 +426,38 @@ function getNav(){
     }
     return $data;
 }
+
+function vodType($n){
+    $arr = [
+        '1'=>'xml',
+        '2'=>'json',
+    ];
+    return $arr[$n];
+}
+function vodMid($n){
+    $arr = [
+        '1'=>'视频',
+        '2'=>'文章',
+        '3'=>'演员',
+        '4'=>'角色',
+        '5'=>'网站',
+    ];
+    return $arr[$n];
+}
 /**
  * @param string $table  表名
  * @param int $start  起始页
  * @param int $size   显示数量
  * @param array $where  条件
  * @param string[] $order  排序
+ * @param string $group  分组
  * @throws \think\db\exception\DataNotFoundException
  * @throws \think\db\exception\DbException
  * @throws \think\db\exception\ModelNotFoundException
  *
  */
-function pageTable($table,$start=0,$size=10,$where=[],$order=['id'=>'desc']){
-    return Db::name($table)->where($where)->order($order)->page($start,$size)->select()->toArray();
+function pageTable($table,$start=0,$size=10,$where=[],$order=['id'=>'desc'],$group=''){
+    return Db::name($table)->where($where)->group($group)->order($order)->page($start,$size)->select()->toArray();
 }
 
 function joinTable($table,$table2,$start=0,$size=10,$where=[],$order=['id'=>'desc']){
@@ -432,6 +478,479 @@ function AllTable($table,$where=[],$order=['id'=>'desc']){
 }
 function AllTables($table,$where=[],$number=10,$order=['id'=>'desc']){
     return Db::name($table)->where($where)->order($order)->limit($number)->select()->toArray();
+}
+
+function mac_day($t,$f='',$c='#FF0000')
+{
+    if(empty($t)) { return ''; }
+    if(is_numeric($t)){
+        $t = date('Y-m-d H:i:s',$t);
+    }
+    $now = date('Y-m-d',time());
+    if($f=='color' && strpos(','.$t,$now)>0){
+        return '<font color="' .$c. '">' .$t. '</font>';
+    }
+    return  $t;
+}
+
+function mac_filter_tags($input)
+{
+    $replacements = array('{:', '<script', '<iframe', '<frameset', '<object', 'onerror');
+
+    // Create a function to perform filtering
+    $filter = function($value) use ($replacements) {
+        return str_ireplace($replacements, '*', $value);
+    };
+
+    // Check if the input is an array or a single value
+    if (is_array($input)) {
+        // Filter each element if it is not numeric
+        return array_map(function($item) use ($filter) {
+            return !is_numeric($item) ? $filter($item) : $item;
+        }, $input);
+    }
+
+    // Filter single value if it is not numeric
+    return !is_numeric($input) ? $filter($input) : $input;
+}
+
+
+function mac_buildregx($regstr,$regopt)
+{
+    return '/'.str_replace('/','\/',$regstr).'/'.$regopt;
+}
+
+function mac_echo($str)
+{
+    echo $str.'<br>';
+    ob_flush();flush();
+}
+
+/**
+ * 采集是否开启
+ */
+function isCollectEnabled()
+{
+    $config = config('maccms');
+    // 未设置时，默认关闭
+    if (!isset($config['app']['vod_search_optimise'])) {
+        return false;
+    }
+    $list = explode('|', $config['app']['vod_search_optimise']);
+    return in_array('collect', $list);
+}
+
+function mac_txt_explain($txt, $decode = false)
+{
+    $txtarr = explode('#',$txt);
+    $data=[];
+    foreach($txtarr as $v){
+        if (stripos($v, '=') === false) {
+            continue;
+        }
+        list($from, $to) = explode('=', $v, 2);
+        if ($decode === true && stripos($from, '&') !== false && stripos($from, ';') !== false) {
+            $from = html_entity_decode($from, ENT_QUOTES, 'UTF-8');
+        }
+        if ($decode === true && stripos($to, '&') !== false && stripos($to, ';') !== false) {
+            $to = html_entity_decode($to, ENT_QUOTES, 'UTF-8');
+        }
+        $data['from'][] = $from;
+        $data['to'][] = $to;
+    }
+    return $data;
+}
+
+function get_array_unique_id_list($list, $need_sort = false) {
+    $list = array_unique($list);
+    $list = array_map('intval', $list);
+    $list = array_filter($list);
+    $list = array_values($list);
+    $need_sort && sort($list);
+    return $list;
+}
+
+function mac_array_filter($arr,$str)
+{
+    if(!is_array($arr)){
+        $arr = explode(',',$arr);
+    }
+    $arr = array_filter($arr);
+    if(empty($arr)){
+        return false;
+    }
+    //方式一
+    $new_str = str_replace($arr,'*',$str);
+    //$badword1 = array_combine($arr,array_fill(0,count($arr),'*'));
+    //$new_str = strtr($str, $badword1);
+    return $new_str != $str;
+}
+
+function mac_txt_merge($txt,$str,$config=0)
+{
+    if(empty($str)){
+        return $txt;
+    }
+    if($config !='0') {
+        if (mb_strlen($str) > 2) {
+            $str = str_replace([lang('slice')], [''], $str);
+        }
+        if (mb_strlen($str) > 2) {
+            $str = str_replace([lang('drama')], [''], $str);
+        }
+    }
+    $txt = mac_format_text($txt);
+    $str = mac_format_text($str);
+    $arr1 = explode(',',$txt);
+    $arr2 = explode(',',$str);
+    $arr = array_merge($arr1,$arr2);
+    return join(',',array_unique( array_filter($arr)));
+}
+
+function mac_format_text($str, $allow_space = false)
+{
+    $finder = array('/', '，', '|', '、', ',,', ',,,');
+    if ($allow_space === false) {
+        $finder[] = ' ';
+    }
+    return str_replace($finder, ',', $str);
+}
+
+function mac_rep_pse_syn($psearr,$txt)
+{
+    if(empty($txt)){ $txt=""; }
+    if(is_array($psearr['from']) && is_array($psearr['to'])){
+        $txt = str_replace($psearr['from'],$psearr['to'],$txt);
+    }
+    return $txt;
+}
+
+function mac_substring($str, $lenth, $start=0)
+{
+    $len = strlen($str);
+    $r = array();
+    $n = 0;
+    $m = 0;
+
+    for($i=0;$i<$len;$i++){
+        $x = substr($str, $i, 1);
+        $a = base_convert(ord($x), 10, 2);
+        $a = substr( '00000000 '.$a, -8);
+
+        if ($n < $start){
+            if (substr($a, 0, 1) == 0) {
+            }
+            else if (substr($a, 0, 3) == 110) {
+                $i += 1;
+            }
+            else if (substr($a, 0, 4) == 1110) {
+                $i += 2;
+            }
+            $n++;
+        }
+        else{
+            if (substr($a, 0, 1) == 0) {
+                $r[] = substr($str, $i, 1);
+            }else if (substr($a, 0, 3) == 110) {
+                $r[] = substr($str, $i, 2);
+                $i += 1;
+            }else if (substr($a, 0, 4) == 1110) {
+                $r[] = substr($str, $i, 3);
+                $i += 2;
+            }else{
+                $r[] = ' ';
+            }
+            if (++$m >= $lenth){
+                break;
+            }
+        }
+    }
+    return  join('',$r);
+}
+
+function mac_filter_xss($str)
+{
+    return trim(htmlspecialchars(strip_tags($str), ENT_QUOTES));
+}
+
+function mac_like_arr($s)
+{
+    $tmp = explode(',',$s);
+    $like_arr = [];
+    foreach($tmp as $v){
+        $like_arr[] = '%'.$v.'%';
+    }
+    return $like_arr;
+}
+
+function mac_get_tag($title,$content){
+    $url = base64_decode('aHR0cDovL2FwaS5kcGxheWVyc3RhdGljLmNvbQ==').'/keyword/index?name='.rawurlencode($title).'&txt='.rawurlencode($title).rawurlencode(mac_substring(strip_tags($content),200));
+    $data = mac_curl_get($url);
+    $json = @json_decode($data,true);
+    if($json){
+        if($json['code']==1){
+            return implode(',',$json['data']);
+        }
+    }
+    return false;
+}
+
+function mac_rep_pse_rnd($psearr,$txt,$id=0)
+{
+    if(empty($psearr)){
+        return $txt;
+    }
+    $i=count($psearr);
+    if(empty($txt)){
+        if(empty($id)){
+            $r = mt_rand(0,$i-1);
+        }
+        else{
+            $r = $id % $i;
+        }
+        $res= $psearr[$r];
+    }
+    else{
+        if(empty($id)){
+            $id = crc32($txt);
+        }
+        $j=mb_strpos($txt,"<br>");
+        $k=mb_strlen($txt);
+        if($j==0){ $j=mb_strpos($txt,"<br/>"); }
+        if($j==0){ $j=mb_strpos($txt,"<br />"); }
+        if($j==0){ $j=mb_strpos($txt,"</p>"); }
+        if($j==0){ $j=mb_strpos($txt,"。"); }
+        if($j==0){ $j=mb_strpos($txt,"！"); }
+        if($j==0){ $j=mb_strpos($txt,"!"); }
+        if($j==0){ $j=mb_strpos($txt,"？"); }
+        if($j==0){ $j=mb_strpos($txt,"?"); }
+        if($j>0){
+            $res= mac_substring($txt,$j-1) . $psearr[$id % $i] . mac_substring($txt,$k-$j,$j);
+        }
+        else{
+            $res= $psearr[$id % $i]. $txt;
+        }
+    }
+    return $res;
+}
+
+/**
+ * 获取结果Id列表
+ */
+function getResultIdList($search_word, $search_field, $word_multiple = false)
+{
+    $search_word = trim($search_word);
+    $search_word = str_replace(',,', '', $search_word);
+    if (strlen($search_word) == 0 || strlen($search_field) == 0) {
+        return [];
+    }
+    // 如果包含多个关键词，使用递归处理
+    if ($word_multiple === true) {
+        $id_list = [];
+        $search_word_exploded = explode(',', $search_word);
+        foreach ($search_word_exploded as $search_word) {
+            $id_list += getResultIdList($search_word, $search_field);
+        }
+        $id_list = array_unique($id_list);
+        return $id_list;
+    }
+    $search_key = md5($search_word . '@' . $search_field);
+    $where = ['search_key' => $search_key];
+    $search_row = Db::name('vod_search')->where($where)->field("search_result_ids, search_hit_count")->find();
+    if (empty($search_row)) {
+        $where_vod = [];
+        $where_vod[$search_field] = ['LIKE', '%' . $search_word . '%'];
+        $id_list = Db::name('Vod')->where($where_vod)->order("vod_id ASC")->column("vod_id");
+        $id_list = is_array($id_list) ? $id_list : [];
+        SaveAt('vod_search',[
+            'search_key'           => $search_key,
+            'search_word'          => mb_substr($search_word, 0, 128),
+            'search_field'         => mb_substr($search_field, 0, 64),
+            'search_hit_count'     => 1,
+            'search_last_hit_time' => time(),
+            'search_update_time'   => time(),
+            'search_result_count'  => count($id_list),
+            'search_result_ids'    => join(',', $id_list),
+        ]);
+    } else {
+        $id_list = explode(',', (string)$search_row['search_result_ids']);
+        $id_list = array_filter($id_list);
+        Db::name('vod_search')->where($where)->update([
+            'search_hit_count'     => $search_row['search_hit_count'] + 1,
+            'search_last_hit_time' => time(),
+        ]);
+    }
+    $id_list = array_map('intval', $id_list);
+    $id_list = empty($id_list) ? [0] : $id_list;
+    return $id_list;
+}
+
+// xss过滤、长度裁剪
+function formatDataBeforeDb($data)
+{
+    $filter_fields = [
+        'vod_name'           => 255,
+        'vod_sub'            => 255,
+        'vod_en'             => 255,
+        'vod_color'          => 6,
+        'vod_tag'            => 100,
+        'vod_class'          => 255,
+        'vod_pic'            => 1024,
+        'vod_pic_thumb'      => 1024,
+        'vod_pic_slide'      => 1024,
+        'vod_pic_screenshot' => 65535,
+        'vod_actor'          => 255,
+        'vod_director'       => 255,
+        'vod_writer'         => 100,
+        'vod_behind'         => 100,
+        'vod_blurb'          => 255,
+        'vod_remarks'        => 100,
+        'vod_pubdate'        => 100,
+        'vod_serial'         => 20,
+        'vod_tv'             => 30,
+        'vod_weekday'        => 30,
+        'vod_area'           => 20,
+        'vod_lang'           => 10,
+        'vod_year'           => 10,
+        'vod_version'        => 30,
+        'vod_state'          => 30,
+        'vod_author'         => 60,
+        'vod_jumpurl'        => 150,
+        'vod_tpl'            => 30,
+        'vod_tpl_play'       => 30,
+        'vod_tpl_down'       => 30,
+        'vod_duration'       => 10,
+        'vod_reurl'          => 255,
+        'vod_rel_vod'        => 255,
+        'vod_rel_art'        => 255,
+        'vod_pwd'            => 10,
+        'vod_pwd_url'        => 255,
+        'vod_pwd_play'       => 10,
+        'vod_pwd_play_url'   => 255,
+        'vod_pwd_down'       => 10,
+        'vod_pwd_down_url'   => 255,
+        'vod_play_from'      => 255,
+        'vod_play_server'    => 255,
+        'vod_play_note'      => 255,
+        'vod_down_from'      => 255,
+        'vod_down_server'    => 255,
+        'vod_down_note'      => 255,
+    ];
+    foreach ($filter_fields as $field => $length) {
+        if (!isset($data[$field])) {
+            continue;
+        }
+        $data[$field] = mac_filter_xss($data[$field]);
+        $data[$field] = mb_substr($data[$field], 0, $length);
+    }
+    return $data;
+}
+
+//重建重名缓存表
+function createRepeatCache(){
+    $prefix = Config::get('database.connections.mysql.prefix');
+    Db::execute('DROP TABLE IF EXISTS ' . $prefix . 'vod_repeat');
+    Db::execute('CREATE TABLE `' . $prefix . 'vod_repeat` (`id1` int unsigned DEFAULT NULL, `name1` varchar(255) NOT NULL DEFAULT \'\') ENGINE=InnoDB');
+    Db::execute('ALTER TABLE `' . $prefix . 'vod_repeat` ADD INDEX `name1` (`name1`(100))');
+    Db::execute('INSERT INTO `' . $prefix . 'vod_repeat` (SELECT min(vod_id)as id1,vod_name as name1 FROM ' .
+        $prefix . 'vod GROUP BY name1 HAVING COUNT(name1)>1)');
+    SetCaChe('vod_repeat_table_created_time',time());
+}
+
+/**
+ * 检查更新搜索结果
+ */
+function checkAndUpdateTopResults($vod, $force = false)
+{
+    static $list;
+    $updateTopCount = 50000;
+    if (empty($vod['vod_id'])) {
+        return;
+    }
+    if (is_null($list)) {
+        $cach_name = 'vod_search_top_result_v2_' . $updateTopCount;
+        $list = $force ? [] : GetCache($cach_name);
+        if (empty($list)) {
+            $list = Db::name('vod_search')->field("search_key, search_word, search_field")->order("search_hit_count DESC, search_last_hit_time DESC")->limit("0," . $updateTopCount)->select();
+            $force === false && Cache::set($cach_name, $list, count($list) < ($updateTopCount / 10) ? 3600 : 86400);
+            clearOldResult();
+        }
+    }
+    $time_now = time();
+    foreach ($list as $row) {
+        foreach (explode('|', $row['search_field']) as $field) {
+            if (!isset($vod[$field]) || strlen($vod[$field]) == 0) {
+                continue;
+            }
+            if (stripos($vod[$field], $row['search_word']) === false) {
+                continue;
+            }
+            Db::execute("UPDATE `" . config('database.prefix') . 'vod_search' . "` SET 
+                    search_update_time='{$time_now}',
+                    search_result_count=search_result_count+1,
+                    search_result_ids=CONCAT(search_result_ids,',','{$vod['vod_id']}')
+                WHERE search_key='{$row['search_key']}'");
+        }
+    }
+}
+
+/**
+ * 获取结果缓存的分钟数，后台配置覆盖默认值
+ */
+function getResultCacheMinutes($config = []) {
+    // 默认14天
+    $minutes = 20160;
+    $config = $config ?: config('maccms');
+    if (isset($config['app']['vod_search_optimise_cache_minutes']) && (int)$config['app']['vod_search_optimise_cache_minutes'] > 0) {
+        $minutes = (int)$config['app']['vod_search_optimise_cache_minutes'];
+    }
+    return $minutes;
+}
+
+/**
+ * 清理老的数据
+ */
+function clearOldResult($force = false)
+{
+    // 清理多久前的
+    $clear_seconds = getResultCacheMinutes() * 60;
+    // 设置间隔，每天最多清理1次
+    $cach_name = 'interval_vs_clear_old_v1_' . $clear_seconds;
+    $cache_data = GetCache($cach_name);
+    if ($force === false && !empty($cache_data)) {
+        return;
+    }
+    Cache::set($cach_name, 1, min($clear_seconds, 86400));
+    // vod_actor在采集的时候可提高效率，暂不清理
+    $where = [
+        'search_field'       => ['neq', 'vod_actor'],
+        'search_update_time' => ['lt', time() - $clear_seconds],
+    ];
+    // 后台强制清理时，都清掉
+    if ($force === true) {
+        unset($where['search_field']);
+    }
+    Db::name('vod_search')->where($where)->delete();
+}
+
+function mac_jump($url,$sec=0)
+{
+    echo '<script>setTimeout(function (){location.href="'.$url.'";},'.($sec*1000).');</script><span>'.lang('pause').''.$sec.''.lang('continue_in_second').'  >>>  </span><a href="'.$url.'" >'.lang('browser_jump').'</a><br>';
+}
+
+function vod_xml_replace($url)
+{
+    $array_url = array();
+    $arr_ji = explode('#',str_replace('||','//',$url));
+    foreach($arr_ji as $key=>$value){
+        $urlji = explode('$',$value);
+        if( count($urlji) > 1 ){
+            $array_url[$key] = $urlji[0].'$'.trim($urlji[1]);
+        }else{
+            $array_url[$key] = trim($urlji[0]);
+        }
+    }
+    return implode('#',$array_url);
 }
 
 /**
@@ -845,7 +1364,7 @@ function FCurl_post($url, $param = array(), $filename = '', $wait = 30,$method =
     curl_setopt_array($curl, array(
         CURLOPT_URL => $url,
         CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => "",
+        CURLOPT_ENCODING => "gzip",
         CURLOPT_MAXREDIRS => 10,
         CURLOPT_TIMEOUT => $wait,
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
@@ -873,6 +1392,146 @@ function FCurl_post($url, $param = array(), $filename = '', $wait = 30,$method =
         'output' => $response,
         'error' => $err,
     ];
+}
+
+function GetCurl($url,$param=[]){
+    $param = http_build_query($param);
+    $url = $url.'?'.$param;
+    $ch = curl_init();
+    curl_setopt_array($ch, [
+        CURLOPT_URL => $url,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_SSL_VERIFYPEER => false, // 测试时关闭SSL验证
+        CURLOPT_SSL_VERIFYHOST => 0,
+        CURLOPT_FOLLOWLOCATION => true, // 跟随重定向
+        CURLOPT_HTTPHEADER => [
+            'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+            'Referer: http://www.kuwo.cn/',
+            'Accept: application/json, text/plain, */*',
+        ]
+    ]);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $err = curl_error($ch);
+
+    curl_close($ch);
+
+
+    if ($httpCode == 200) {
+        if (!empty($response)) {
+            return [
+                'response_code' => $httpCode,
+                'output' => $response,
+                'error' => $err,
+            ];
+        } else {
+            echo "请求成功但返回内容为空，请检查参数或接口限制。";
+        }
+    } else {
+        echo "请求失败，HTTP状态码：{$httpCode}";
+    }
+}
+
+/**
+ * @param $originalUrl
+ * @return string
+ * 酷我播放地址转换
+ */
+function transformUrl($originalUrl) {
+    $parts = parse_url($originalUrl);
+
+    if (!isset($parts['host'])) {
+        return $originalUrl; // 如果URL中没有host部分，直接返回原URL
+    }
+
+    $host = $parts['host'];
+    $pos = strpos($host, '.');
+
+    if ($pos !== false) {
+        $newHost = substr_replace($host, '-', $pos, 1);
+    } else {
+        $newHost = $host; // 没有点则无需替换
+    }
+
+    // 重建URL
+    $newUrl = $parts['scheme'] . '://' . $newHost;
+
+    if (isset($parts['port'])) {
+        $newUrl .= ':' . $parts['port'];
+    }
+    if (isset($parts['path'])) {
+        $newUrl .= $parts['path'];
+    }
+    if (isset($parts['query'])) {
+        //$newUrl .= '?' . $parts['query'];
+    }
+    if (isset($parts['fragment'])) {
+        //$newUrl .= '#' . $parts['fragment'];
+    }
+    return $newUrl;
+}
+
+/**
+ * @param $originalUrl
+ * @return string
+ * 酷我图片地址转换
+ */
+function ImgFormUrl($originalUrl) {
+    $parsed = parse_url($originalUrl);
+    if (!isset($parsed['host'])) return $originalUrl;
+
+    // 分割主机名
+    $hostParts = explode('.', $parsed['host']);
+    $length = count($hostParts);
+
+    // 检查是否为 [任意前缀].kuwo.cn 结构
+    if ($length >= 3 && $hostParts[$length-2] === 'kuwo' && $hostParts[$length-1] === 'cn') {
+        // 保留第一个前缀和最后两个部分（kuwo.cn）
+        $newHost = $hostParts[0] . '.kuwo.cn';
+        $parsed['host'] = $newHost;
+    }
+
+    // 重建URL
+    $scheme = isset($parsed['scheme']) ? $parsed['scheme'] . '://' : '';
+    $host = $parsed['host'];
+    $path = isset($parsed['path']) ? $parsed['path'] : '';
+    $query = isset($parsed['query']) ? '?' . $parsed['query'] : '';
+    $fragment = isset($parsed['fragment']) ? '#' . $parsed['fragment'] : '';
+
+    return "$scheme$host$path$query$fragment";
+}
+/**
+ * 将秒数（含小数）格式化为 MM:SS.cc 时间格式
+ * @param float $totalSeconds 总秒数（如 249.15 代表 4分9秒15百分秒）
+ * @return string 格式化后的时间字符串（如 "04:09.15"）
+ * @throws InvalidArgumentException 输入非数字或负数时抛出异常
+ */
+function formatTime($totalSeconds) {
+    // 参数校验：确保输入合法
+    if (!is_numeric($totalSeconds)) {
+        throw new InvalidArgumentException("输入必须为数值");
+    }
+    if ($totalSeconds < 0) {
+        throw new InvalidArgumentException("时间不能为负数");
+    }
+
+    // 将总秒数转换为整型百分秒（四舍五入到最近的百分秒）
+    $totalCentiseconds = (int)round($totalSeconds * 100);
+
+    // 分解为分钟、剩余百分秒、秒和百分秒
+    $minutes = (int)($totalCentiseconds / 6000);          // 1分钟 = 6000百分秒
+    $remainingCentiseconds = $totalCentiseconds % 6000;   // 剩余不足1分钟的部分
+    $seconds = (int)($remainingCentiseconds / 100);       // 转换为整秒
+    $centiseconds = $remainingCentiseconds % 100;         // 剩余百分秒
+
+    // 格式化为两位数补零的字符串
+    return sprintf(
+        "%02d:%02d.%03d",
+        $minutes,
+        $seconds,
+        $centiseconds
+    );
 }
 /**
  * @param string $url   要需下载的文件地址
@@ -972,6 +1631,119 @@ function DownloadFile($url, $save_dir = '', $filename = '', $type = 0) {
         );
     }
 }
+
+/**
+ * @param array $urls
+ * @param string $saveDir
+ * @param int $concurrency
+ * @return array
+ * @throws Exception
+ * 批量下载文件
+ */
+function BatchDownLoadFiles(array $urls, string $saveDir = './downloads/', int $concurrency = 5): array
+{
+    // 初始化参数
+    $ext = ['gif', 'jpg', 'jpeg', 'bmp', 'png', 'webp', 'zip', 'gz'];
+    $results = [];
+
+    // 创建保存目录
+    if (!file_exists($saveDir) && !mkdir($saveDir, 0777, true)) {
+        throw new Exception("无法创建目录: $saveDir");
+    }
+
+    $mh = curl_multi_init();
+    $handles = [];
+    $active = null;
+
+    // 初始化批处理句柄
+    foreach ($urls as $i => $url) {
+        $url = trim($url);
+        if (empty($url)) {
+            $results[$i] = ['code' => 400, 'error' => 'URL为空'];
+            continue;
+        }
+
+        // 解析文件名
+        $parsed = parse_url($url);
+        $path = $parsed['path'] ?? '';
+        $query = $parsed['query'] ?? '';
+
+        // 处理微信特殊格式
+        if (isset($parsed['host']) && $parsed['host'] === 'mmbiz.qpic.cn') {
+            parse_str($query, $queryParams);
+            $extType = $queryParams['wx_fmt'] ?? 'jpg';
+            $filename = 'WeChat_' . md5($url) . '.' . $extType;
+        } else {
+            $filename = basename($path) ?: md5($url) . '.dat';
+        }
+
+        $savePath = rtrim($saveDir, '/') . '/' . $filename;
+
+        // 跳过已存在文件
+        if (file_exists($savePath)) {
+            $results['imgArr'][$i] = '/'.$savePath;
+            $results[$i] = ['code' => 200, 'file' => $savePath, 'status' => 'exists'];
+            continue;
+        }
+
+        // 验证文件扩展名
+        $fileExt = pathinfo($savePath, PATHINFO_EXTENSION);
+        if (!in_array(strtolower($fileExt), $ext)) {
+            $results[$i] = ['code' => 403, 'error' => '文件类型禁止下载'];
+            continue;
+        }
+
+        // 初始化CURL
+        $fp = fopen($savePath, 'w+');
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_FILE => $fp,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_CONNECTTIMEOUT => 10,
+            CURLOPT_USERAGENT => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
+        ]);
+
+        curl_multi_add_handle($mh, $ch);
+        $handles[$i] = ['ch' => $ch, 'fp' => $fp, 'path' => $savePath];
+    }
+
+    // 执行并发下载
+    do {
+        $status = curl_multi_exec($mh, $active);
+        if ($active) {
+            curl_multi_select($mh, 0.1);
+        }
+    } while ($active && $status == CURLM_OK);
+
+    // 处理结果
+    foreach ($handles as $i => $handle) {
+        $httpCode = curl_getinfo($handle['ch'], CURLINFO_HTTP_CODE);
+        $error = curl_error($handle['ch']);
+        fclose($handle['fp']);
+
+        if ($httpCode === 200 && filesize($handle['path']) > 0) {
+            //压缩图片
+            ImgCompress($handle['path']);
+            $results['imgArr'][$i] = '/'.$handle['path'];
+            $results[$i] = ['code' => 200, 'file' => $handle['path'], 'size' => filesize($handle['path'])];
+        } else {
+            @unlink($handle['path']);
+            $results[$i] = [
+                'code' => $httpCode ?: 500,
+                'error' => $error ?: '下载失败',
+                'url' => $urls[$i]
+            ];
+        }
+
+        curl_multi_remove_handle($mh, $handle['ch']);
+        curl_close($handle['ch']);
+    }
+
+    curl_multi_close($mh);
+    return $results;
+}
 /**
  * @param $data
  * @param $url
@@ -1027,7 +1799,6 @@ function ImgCompress($src,$percent=1){
     list($width, $height, $type, $attr) = getimagesize($src);		//获取图片信息
     /**-----------------------------------------------------------------------------------------------------*/
     //对imagecreatefrom 系列函数进行拼接从文件或 URL 载入一幅图像，成功返回图像资源，失败则返回一个空字符串
-
     $func = "imagecreatefrom" . $typearr[$type - 1];
     $image = @$func($src);
     /**-----------------------------------------------------------------------------------------------------*/
@@ -1186,7 +1957,7 @@ function ArrTree($table,$pid=0,$p_id = 'pid',$id = 'id',$level=0)
     foreach($arr as $v){
         if($v[$p_id] == $pid){
             $v['lv'] = $level;
-            $tree[] = $v;
+            $tree[$v['id']] = $v;
             ArrTree($table,$v[$id],$p_id,$id,$level+1);
         }
     }
@@ -1305,7 +2076,9 @@ function compressImage($sourcePath, $destinationPath, $quality) {
 function navApi(){
     $cate = GetMenu('category',[['isShow','=',1]],'id',['orderSort'=>'desc']);
     $nav = MdaTree($cate);
+    $type = ArrTree('category');
     SetCaChe('NavMenu',$nav);
+    SetCaChe('type_list',$type);
 }
 
 /**
@@ -1335,29 +2108,70 @@ function AreaList(){
 }
 
 /**
+ * @param string $dir
  * @throws \think\db\exception\DataNotFoundException
  * @throws \think\db\exception\DbException
  * @throws \think\db\exception\ModelNotFoundException
  * 更新配置文件
  */
-function putFile(){
+function putFile($dir = 'web.php'){
     $data = GetMenu('config');
     $arr = [];
     foreach($data as $v){
         $arr[$v['sys_variable']] = $v['sys_content'];
     }
-    $path = config_path().'web.php';
+    $path = config_path().$dir;
     $str = "<?php \r\n".'return '.var_export($arr,true).';';
     file_put_contents($path,$str);
 }
 
 /**
+ * @param string $dir
+ * @param $content
+ */
+function putConfig($content,$dir='bind.php'){
+    $path = config_path().$dir;
+    $str = "<?php \r\n".'return '.var_export($content,true).';';
+    file_put_contents($path,$str);
+}
+/**
+ * @param string $dir
+ * @throws \think\db\exception\DataNotFoundException
+ * @throws \think\db\exception\DbException
+ * @throws \think\db\exception\ModelNotFoundException
+ * 生成站群配置文件
+ */
+function putDomain($dir = 'domain.php'){
+    $data = AllTable('domain');
+    $arr = [];
+    foreach ($data as $item){
+        $domain = $item['web_domain'];
+        unset($item['web_domain']);
+        $arr[$domain] = $item;
+    }
+    $path = config_path().$dir;
+    $str = "<?php \r\n".'return '.var_export($arr,true).';';
+    file_put_contents($path,$str);
+}
+
+/**
+ * @param $from
+ * @param $url
+ * @return false|string[]
+ * 播放数组与播放地址交换
+ */
+function combinePlayData($from, $url) {
+    return array_combine(explode('$$$', $from), explode('$$$', $url));
+}
+
+/**
  * @param $table
  * @param $data
+ * @return int|string
  * 保存数据
  */
 function SaveAt($table,$data){
-    Db::name($table)->save($data);
+    return Db::name($table)->save($data);
 }
 
 /**
@@ -1442,7 +2256,9 @@ function UploadImg($name,$thumb = 1,$path='',$newWid=350, $newHei=350){
                 $saveName[$k]['code'] = 200;
                 $saveName[$k]['msg'] = lang('upload_success');
                 //压缩图片
-                ImgCompress($saveName[$k]['img'],1);
+                if($ext != 'ico'){
+                    ImgCompress($saveName[$k]['img'],1);
+                }
                 //生成缩略图
                 if($thumb){
                     $saveName[$k]['thumb'] = imgZip($saveName[$k]['img'],$path,$newWid,$newHei);
@@ -1463,15 +2279,40 @@ function UploadImg($name,$thumb = 1,$path='',$newWid=350, $newHei=350){
             ];
             return $msg;
         }
-
     } else {
         if(isset($_FILES[$name]) && $_FILES[$name]['error'] === UPLOAD_ERR_OK) {
             // 获取上传文件
             $files = request()->file($name);
             $saveName['img'] = \think\facade\Filesystem::disk('public')->putFile( $paths, $files,'uniqid');
             $saveName['img'] = 'uploads/'.$saveName['img'];
+            //获取文件后缀
+            $ext = $files->extension();
+            //判断文件上传类型
+            if(!in_array($ext,$imgArr)){
+                $msg = [
+                    'code'=>200,
+                    'ident'=>1,
+                    'msg'=>lang('upload_type_error').$fileType,
+                    'result'=>'',
+                ];
+                return $msg;
+            }
+            //获取文件大小
+            $Size = $files->getSize();
+            //判断文件上传大小
+            if($Size > $fileSize){
+                $msg = [
+                    'code'=>200,
+                    'ident'=>1,
+                    'msg'=>lang('upload_size_error').$fileSize,
+                    'result'=>'',
+                ];
+                return $msg;
+            }
             //压缩图片
-            ImgCompress($saveName['img'],1);
+            if($ext != 'ico'){
+                ImgCompress($saveName['img'],1);
+            }
             //生成缩略图
             if($thumb){
                 $saveName['thumb'] = imgZip($saveName['img'],$path,$newWid,$newHei);
@@ -1738,7 +2579,8 @@ function cut_html($html, $start, $end) {
         }
         $arr = array();
         foreach ($list as $kk=>$vv){
-            $html = str_replace(array("\r", "\n"), "",file_get_contents($vv));
+            $cdtexts = GetCurl($vv);
+            $html = str_replace(array("\r", "\n"), "",$cdtexts['output']);
             $start = str_replace(array("\r", "\n"), "", $start);
             $end = str_replace(array("\r", "\n"), "", $end);
             $html = explode(trim($start), $html);
@@ -1754,7 +2596,8 @@ function cut_html($html, $start, $end) {
         }
         return $str;
     }else{
-        $html = str_replace(array("\r", "\n"), "", file_get_contents($html));
+        $cdtext = GetCurl($html);
+        $html = str_replace(array("\r", "\n"), "", $cdtext['output']);
         $start = str_replace(array("\r", "\n"), "", $start);
         $end = str_replace(array("\r", "\n"), "", $end);
         $html = explode(trim($start), $html);
@@ -1805,12 +2648,26 @@ function replace_sg($html) {
  * 返回绝对地址路径 例：htt://www.demo.com/img/test.jpg
  */
 function fileUrl($path,$url){
-    $urls = parse_url($path);
-    if(!isset($urls['scheme']) && !isset($urls['host'])){
-        $nurl = parse_url($url);
-        $imgUrl = $nurl['scheme'].'://'.$nurl['host'].$path;
+    $imgUrl = [];
+    if(is_array($path)){
+        foreach ($path as $kk=>$vv){
+            //图片地址
+            $urls = parse_url($vv);
+            if(!isset($urls['scheme']) && !isset($urls['host'])){
+                $nurl = parse_url($vv);
+                $imgUrl[$kk] = $nurl['scheme'].'://'.$nurl['host'].$vv;
+            }else{
+                $imgUrl[$kk] = $vv;
+            }
+        }
     }else{
-        $imgUrl = $path;
+        $urls = parse_url($path);
+        if(!isset($urls['scheme']) && !isset($urls['host'])){
+            $nurl = parse_url($url);
+            $imgUrl[] = $nurl['scheme'].'://'.$nurl['host'].$path;
+        }else{
+            $imgUrl[] = $path;
+        }
     }
     return $imgUrl;
 }
@@ -2171,9 +3028,9 @@ function isbot($tmp){
 function ClientType(){
     // 判断蜘蛛
     $bot = isbot($_SERVER['HTTP_USER_AGENT']);
+    //蜘蛛不存在
+    $msg = "未知";
     if(!$bot) {
-        //蜘蛛不存在
-        $msg = "未知";
         if(stripos($_SERVER['HTTP_ACCEPT'], 'text/html') !== false){
             //可能是真实浏览器
             $msg = "访客";

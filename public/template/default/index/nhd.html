@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>霓虹灯文字效</title>
+    <style>
+         @import url('https://fonts.googleapis.com/css2?family=Akshar&family=Pacifico&family=Tapestry&family=Ubuntu&display=swap');
+
+          body {
+             background-color: #222222;
+             overflow: hidden;
+          }
+
+          .center {
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             height: 100vh;
+          }
+
+          a {
+             font-family: 'Pacifico', cursive;
+             font-size: 7em;
+
+             animation: neon 2s ease-in-out infinite alternate;
+             color: white;
+          }
+
+          @keyframes neon {
+             from {
+                  text-shadow: 0 0 2px #fff, 0 0 4px #fff, 0 0 6px #fff, 0 0 8px #44D0FE,
+               0 0 10px #44D0FE, 0 0 12px #44D0FE, 0 0 14px #44D0FE, 0 0 16px #44D0FE;
+              }
+              to {
+                  text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff, 0 0 20px #44D0FE,
+               0 0 30px #44D0FE, 0 0 35px #44D0FE, 0 0 40px #44D0FE, 0 0 45px #44D0FE;
+              }
+          }
+    </style>
+</head>
+<body>
+<div class='center'>
+    <a>Yellow</a>
+</div>
+</body>
+</html>

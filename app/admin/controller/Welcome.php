@@ -25,10 +25,9 @@ class Welcome extends BaseController
         $today_end=mktime(0,0,0,date('m'),date('d')+1,date('Y'))-1;
         $where = [['createTime','between',[$today_start,$today_end]]];
         $todayCount = CountTable('visit',$where);
-        $views =  CountTable('visit');
+        $todayGuv = CountTable('visit',$where,'','guv');
+        $todayIp = CountTable('visit',$where,'','ip');
         $article =  CountTable('article');
-        $nav =  CountTable('navigation');
-        $feed =  CountTable('feedback');
         $sql = 'SELECT VERSION() AS version';
         $version = Db::query($sql);
         $mysql = $version[0]['version'];
@@ -51,10 +50,9 @@ class Welcome extends BaseController
             $updateSql = ['code'=>'200','msg'=>lang('update_sql_success')];
         }
         View::assign('today',$todayCount);
-        View::assign('views',$views);
+        View::assign('todayGuv',$todayGuv);
+        View::assign('todayIp',$todayIp);
         View::assign('article',$article);
-        View::assign('nav',$nav);
-        View::assign('feed',$feed);
         View::assign('mysql',$mysql);
         View::assign('update',$update);
         View::assign('updatesql',$updateSql);

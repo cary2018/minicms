@@ -42,7 +42,7 @@ class Navigation extends BaseController
             foreach ($data['data'] as $k=>$v){
                 if($v['name'] == 'nav_name'){
                     $where[] = [$v['name'],'like','%'.$v['value'].'%'];
-                }else{
+                }else if($v['value'] != ''){
                     $where[] = [$v['name'],'=',$v['value']];
                 }
             }
@@ -115,7 +115,7 @@ class Navigation extends BaseController
     }
     public function delAll(){
         $id = request()->param('data');
-        $data = Db::name('navigation')->where('id',$id)->find();
+        $data = Db::name('navigation')->where('id','in',$id)->select()->toArray();
         if($data){
             Db::name('navigation')->delete($id);
             $msg = ['code'=>200,'msg'=>lang('delete_message')];
