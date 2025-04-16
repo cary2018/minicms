@@ -46,18 +46,6 @@ abstract class BaseController
     {
         $this->app     = $app;
         $this->request = $this->app->request;
-<<<<<<< HEAD
-
-        // 指定要读取的目录
-        $directory = 'template/'.Cfg('view_path').'/';
-        // 配置模板路径
-        View::config(['view_path' =>$directory ]);
-
-        //echo Cfg('view_path');
-        $templateDir = '/'.$directory;
-        View::assign('view_path',$templateDir);
-=======
->>>>>>> aa9cc7a... 新增视频采集，音乐接口和一些功能优化
         $member = GetSe('MemberCenter');
         if($member){
             if(!$member['thumbImg']){

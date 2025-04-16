@@ -179,10 +179,6 @@ return [
     'data_count_article'=>'文章统计',
     'data_count_nav'=>'导航统计',
     'data_list'=>'导航列表',
-<<<<<<< HEAD
-    'data_count_today'=>'访问总数 / 今日访问',
-=======
->>>>>>> aa9cc7a... 新增视频采集，音乐接口和一些功能优化
     'data_count_feed'=>'评论统计',
     'data_quick'=>'快捷入口',
     'back_menu'=>'后台菜单',
