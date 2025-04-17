@@ -14,13 +14,12 @@
 namespace app\api\controller;
 
 
-use app\api\BaseController;
+use app\api\MusicController;
 use Metowolf\Meting;
 header('Access-Control-Allow-Origin: *');
-class Music extends BaseController
+class Music extends MusicController
 {
     public function index(){
-
         /**
          *
          * [

@@ -3,12 +3,15 @@
         <div class="footer-fill">
             <div class="footer-column">
                 <div class="footer-menu">
-                    .....
+                    <span class="rt-sql">访问量：{cymini:total table="visit" where='[]'}次</span>
+                    |
+                    <span class="rt-sql">今日访问量：{cymini:totalCount table="visit" }次</span>
                 </div>
                 <div class="footer-copyright text-xs">
                     {$Think.config.web.web_Copyright|raw}
-                    <span class="rt-sql">访问量：{cymini:total table="visit" where='[]'}次</span>
+
                 </div>
+
             </div>
         </div>
         <div class="footer-hidden-xs">
