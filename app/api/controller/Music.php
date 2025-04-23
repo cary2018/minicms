@@ -369,6 +369,7 @@ class Music extends MusicController
          *
          * http://mobi.kuwo.cn/mobi.s?f=web&source=kwplayer_ar_5.1.0.0_B_jiakong_vh.apk&type=convert_url_with_sign&rid=169877&br=320kmp3
          *
+         * http://nmobi.kuwo.cn/mobi.s?f=web&source=kwplayerhd_ar_4.3.0.8_tianbao_T1A_qirui.apk&type=convert_url_with_sign&rid=171873696&br=320kmp3
          * acc 普通音质 ACC
             wma 普通音质 WMA
             ogg 标准音质 ogg
@@ -383,11 +384,15 @@ class Music extends MusicController
         $url = 'http://mobi.kuwo.cn/mobi.s';
         $param = [
             'f'=>'web',
-            'source'=>'kwplayer_ar_5.1.0.0_B_jiakong_vh.apk',
+            'source'=>'kwplayerhd_ar_4.3.0.8_tianbao_T1A_qirui.apk',
             'type'=>'convert_url_with_sign',
             'rid'=>$id,
             'br'=>'320kmp3'
         ];
+        if($type && $type == 6){
+            $param['br'] = '';
+            $param['format'] = 'flac';
+        }
         $data = GetCurl($url,$param);
         if($data['response_code']==200){
             $result = json_decode($data['output']);
@@ -399,27 +404,6 @@ class Music extends MusicController
                     $result = json_decode($data['output']);
                     $des = $result->data;
                 }
-                $path = parse_url($des->url);
-                $hostMappings = [
-                    'lx.sycdn.kuwo.cn' => '/lx-play-kuwo-music',
-                    'lv.sycdn.kuwo.cn' => '/lv-play-kuwo-music',
-                    'np.sycdn.kuwo.cn' => '/np-play-kuwo-music',
-                    'er.sycdn.kuwo.cn' => '/er-play-kuwo-music',
-                    'sx.sycdn.kuwo.cn' => '/sx-play-kuwo-music',
-                    'rc.sycdn.kuwo.cn' => '/rc-play-kuwo-music',
-                    'ra.sycdn.kuwo.cn' => '/ra-play-kuwo-music',
-                    'lw.sycdn.kuwo.cn' => '/lw-play-kuwo-music',
-                    'ek.sycdn.kuwo.cn' => '/ek-play-kuwo-music',
-                    'ri.sycdn.kuwo.cn' => '/ri-play-kuwo-music',
-                    'nf.sycdn.kuwo.cn' => '/nf-play-kuwo-music',
-                    'sl.sycdn.kuwo.cn' => '/sl-play-kuwo-music',
-                    're.sycdn.kuwo.cn' => '/re-play-kuwo-music',
-                    'sk.sycdn.kuwo.cn' => '/sk-play-kuwo-music',
-                    'eu.sycdn.kuwo.cn' => '/eu-play-kuwo-music',
-                    'lo.sycdn.kuwo.cn' => '/lo-play-kuwo-music',
-                    'rb.sycdn.kuwo.cn' => '/rb-play-kuwo-music',
-                    'gj.sycdn.kuwo.cn' => '/gj-play-kuwo-music',
-                ];
                 $reUrl = transformUrl($des->url);
                 //$urls = $hostMappings[$path['host']].$path['path'];
                 return redirect($reUrl);

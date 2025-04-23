@@ -49,7 +49,7 @@ function  DateDiff(sDate1,  sDate2){    //sDate1和sDate2是2002-12-18格式
   'sys_logo' => 'uploads/images/202406/666042237a547.jpg',
   'open_html' => '0',
   'web_ico' => 'uploads/images/202410/67187181b38c2.ico',
-  'captcha_close' => '1',
+  'captcha_close' => '0',
   'web_title' => '暗影',
   'web_footer_title' => '从黑暗中感觉到， 在无助的时候， 在夜里是谁对我说， 别心灰想得太多 全因你的一颗心，  在藏着的承诺， 现实里时常对我说， 你定会冲破一切， 全赖你给我一双手臂， 就算在北风中，  你也总没逃避， 全赖你给我一双手臂， 来为我奉上是最真挚的心， 似风呼应',
   'sys_title' => 'CyMini',
