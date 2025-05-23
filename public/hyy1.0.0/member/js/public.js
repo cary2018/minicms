@@ -47,7 +47,7 @@ layui.use(['jquery','layer','form','table','laydate'], function () {
                     layer.close(index);
                 });
                 break;
-            case 'ChangeData':
+            case 'ChangData':
                 let fieldName = $(this).attr('field');
                 if(!fieldName){
                     fieldName = 'id';

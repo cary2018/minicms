@@ -4,7 +4,7 @@ return array (
   'web_key' => '站点关键字',
   'web_desc' => '站点描述',
   'web_logo' => 'uploads/images/202408/66ae27b967013.png',
-  'web_Copyright' => '<a class="ico-ico" href="http://beian.miit.gov.cn/" rel="nofollow" target="_blank" title="桂ICP备2021006345号">                                    <img src="/images/beian.png" alt="桂ICP备2021006345号">桂ICP备2021006345号                                </a>                                <span class="rt-times">运行时长：0.052秒</span>今日访问量：{cymini:totalCount table="visit" }次                                ',
+  'web_Copyright' => '<a class="ico-ico" href="http://beian.miit.gov.cn/" rel="nofollow" target="_blank" title="桂ICP备2021006345号">                                    <img src="/images/beian.png" alt="桂ICP备2021006345号">桂ICP备2021006345号                                </a>                                <span class="rt-times">运行时长：0.052秒</span>         ',
   'web_Copy' => 'Copyright<i class="fa fa-copyright"></i>                                2015-2019<a href="/">站长自主搭建</a>                                版权所有. 基于<a href="https://gitee.com/cary10000/CyMini" rel="nofollow" title="CyMini" target="_blank">CyMini</a>
 <p id="RunTime"></p>
 <script>

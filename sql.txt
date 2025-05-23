@@ -128,6 +128,26 @@ create table cy_config(
     sys_remark varchar(255) not null comment'备注',
     sys_type varchar(20) not null comment'字段类型'
 )engine=MyIsam charset=utf8;
+CREATE TABLE `cy_collect` (
+  `collect_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `collect_name` varchar(30) NOT NULL DEFAULT '' COMMENT '资源名称',
+  `collect_web` varchar(160) NOT NULL DEFAULT '' COMMENT '官方网站',
+  `collect_url` varchar(255) NOT NULL DEFAULT '' COMMENT '接口地址',
+  `collect_type` tinyint(1) unsigned NOT NULL DEFAULT '1' COMMENT '接口类型',
+  `collect_mid` tinyint(1) unsigned NOT NULL DEFAULT '1' COMMENT '资源类型',
+  `collect_appid` varchar(30) NOT NULL DEFAULT '' COMMENT '',
+  `collect_appkey` varchar(30) NOT NULL DEFAULT '',
+  `collect_param` varchar(100) NOT NULL DEFAULT '' COMMENT '附加参数',
+  `collect_filter` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '地址过滤',
+  `collect_filter_from` varchar(255) NOT NULL DEFAULT '' COMMENT '过滤代码',
+  `collect_filter_year` varchar(255) NOT NULL DEFAULT '' COMMENT '采集时，过滤年份',
+  `collect_opt` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '数据操作',
+  `collect_sync_pic_opt` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '同步图片选项，0-跟随全局，1-开启，2-关闭',
+   createTime int not null default 0 COMMENT'创建时间',
+   updateTime int not null default 0 COMMENT'创建时间',
+  PRIMARY KEY (`collect_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+alter table cy_collect add collect_web varchar(160) not null default '' COMMENT'官方网站' after collect_name;
 //广告横幅
 create table cy_banner(
     id int primary key auto_increment,
@@ -239,6 +259,19 @@ CREATE TABLE `cy_collection_content` (
   KEY `cid` (`cid`),
   KEY `status` (`status`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='采集数据暂存表';
+//定时任务
+create table cy_timing(
+    id int primary key auto_increment,
+    name varchar(60) not null default '' comment'名称',
+    remark varchar(60) not null default '' comment'备注',
+    type varchar(60) not null default '' comment'类型',
+    param varchar(150) not null default '' comment'参数',
+    weeks varchar(200) not null default '' comment'执行周期',
+    hours varchar(300) not null default '' comment'执行时间',
+    status tinyint(1) not null default 0 comment'状态',
+    updateTime int not null default 0 comment'最近执行时间',
+    createTime int not null default 0 comment'添加时间'
+)ENGINE=MyISAM CHARSET=utf8;
 //tag标签
 create table cy_taglist(
     id int primary key auto_increment,
@@ -292,6 +325,8 @@ alter table cy_category add keywords varchar(300) not null comment'关键字';
 alter table cy_category add description varchar(300) not null comment'描述';
 alter table cy_category add iconfont varchar(30) not null default '' comment'icon图标' after keywords;
 alter table cy_category add share tinyint(1) not null default 0 comment'会员共享' after isShow;
+alter table cy_category add type tinyint(1) not null default 0 comment'类型' after pid;
+alter table cy_category add pinyin varchar(60) not null default '' comment'拼音' after name;
 //文章属性
 CREATE TABLE `cy_attribute` (
   `id` int(11) NOT NULL AUTO_INCREMENT,

@@ -42,7 +42,7 @@
     <span id="DelUrl" alt="{:url('delAll')}" style="display: none"></span>
     <span id="FieldUrl" alt="{:url('updateField')}" style="display: none"></span>
     <span id="JumpUrl" alt="{:url('add')}" style="display: none"></span>
-    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="product">{$Think.lang.AddSub}</a>
+    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="ajaxJson" action="{:url('add')}?id={{d.id}}">{$Think.lang.AddSub}</a>
     <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edits">{$Think.lang.edit}</a>
     <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">{$Think.lang.del}</a>
 </script>
@@ -73,12 +73,10 @@
                 page: false,
                 cols: [[
                     {type: 'numbers'},
-                    {field: 'name', minWidth: 150, title: '{$Think.lang.CategoryName}'},
-                    {field: 'iconfont', title: '{$Think.lang.iconfont}',edit:'true'},
-                    {field: 'outUrl', title: '{$Think.lang.LinkAddress}',edit:'true'},
+                    {field: 'name', minWidth: 180, title: '{$Think.lang.CategoryName}'},
                     {field: 'temp_list',width:120, title: '{$Think.lang.templateList}',edit:'true'},
                     {field: 'temp_archives',width:120, title: '{$Think.lang.templateArticle}',edit:'true'},
-                    {field: 'target', width: 100, align: 'center',title: '{$Think.lang.TarGet}'},
+                    {field: 'type', width: 100, align: 'center',title: '{:lang("type")}'},
                     {field: 'orderSort', width: 80, align: 'center',edit:true, title: '{$Think.lang.OrderSort}'},
                     {
                         field: 'isShow', width: 100, align: 'center', templet: function (d) {
@@ -87,7 +85,7 @@
                             } else {
                                 return '<input type="checkbox" name="isShow" value="'+d.id+'" lay-skin="switch" lay-filter="switchTest" lay-text="{$Think.lang.Enable}|{$Think.lang.Disable}"> ';
                             }
-                        }, title: '{$Think.lang.IsEnable}'
+                        }, title: '{$Think.lang.status}'
                     },
                     {
                         field: 'isUrl', width: 100, align: 'center', templet: function (d) {

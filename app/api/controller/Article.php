@@ -69,7 +69,7 @@ class Article extends BaseController
         $size = request()->param('limit')?request()->param('limit'):12;
         $start = request()->param('page')?request()->param('page'):0;
         $where = [['a.status','=',1],['a.recycle','=',0]];
-        $field = 'a.id,a.title,a.author,a.articleThumbImg,a.createTime,a.updateTime,a.keywords,a.views,a.click,b.name,b.target,b.temp_list,b.temp_archives';
+        $field = 'a.id,a.title,a.author,a.articleThumbImg,a.createTime,a.updateTime,a.keywords,a.description,a.views,a.click,b.name,b.target,b.temp_list,b.temp_archives';
         $list = Db::name('article')->alias('a')->leftJoin('category'.' b','b.id=a.cid')->field($field)->where($where)->order(['a.views'=>'desc'])->page($start,$size)->select()->toArray();
         foreach ($list as &$v){
             $v['month'] = date('m',$v['createTime']);
@@ -89,7 +89,7 @@ class Article extends BaseController
         if($key){
             $where[] = ['a.title','like','%'.trim($key).'%'];
         }
-        $field = 'a.id,a.title,a.author,a.articleThumbImg,a.createTime,a.updateTime,a.keywords,a.views,b.name,b.target,b.temp_list,b.temp_archives,count(c.id) as feed';
+        $field = 'a.id,a.cid,a.title,a.author,a.attrId,a.articleThumbImg,a.createTime,a.updateTime,a.keywords,a.description,a.views,a.click,b.name,b.target,b.temp_list,b.temp_archives,count(c.id) as feed';
         $list = Db::name('article')->alias('a')->join('category'.' b ','b.id= a.cid')->leftJoin('feedback'.' c ','c.aid=a.id')->field($field)->where($where)->group('a.id, a.title, b.name')->order(['a.id'=>'desc'])->page($start,$size)->select()->toArray();
         $count = CountTable('article',$where,'a');
         foreach ($list as &$v){

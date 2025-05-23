@@ -16,7 +16,7 @@ namespace app\api\controller;
 
 use app\api\MusicController;
 use Metowolf\Meting;
-header('Access-Control-Allow-Origin: *');
+//header('Access-Control-Allow-Origin: *');
 class Music extends MusicController
 {
     public function index(){
@@ -58,7 +58,6 @@ class Music extends MusicController
         parse_str($str,$param);
         $kw = GetCurl($url,$param);
         if($kw['response_code'] == 200){
-
             echo $kw['output'];
             die;
         }else{
@@ -447,6 +446,114 @@ class Music extends MusicController
             echo '请求失败。。。';
         }
     }
+    public function downMusic(){
+        $id = request()->param('id');
+        $type = request()->param('type');
+        $url = 'http://nmobi.kuwo.cn/mobi.s';
+        $param = [
+            'f'=>'web',
+            'source'=>'kwplayerhd_ar_4.3.0.8_tianbao_T1A_qirui.apk',
+            'type'=>'convert_url_with_sign',
+            'rid'=>$id,
+            'br'=>'320kmp3'
+        ];
+        if($type && $type == 6){
+            $param['br'] = '';
+            $param['format'] = 'flac';
+        }
+        $data = GetCurl($url,$param);
+        if($data['response_code']==200){
+            $result = json_decode($data['output']);
+            if($result->code == 200){
+                $des = $result->data;
+                if($des->bitrate < 320){
+                    $param['br'] = '128kmp3';
+                    $data = GetCurl($url,$param);
+                    $result = json_decode($data['output']);
+                    $des = $result->data;
+                }
+                $path = parse_url($des->url);
+                $reUrl = transformUrl($des->url);
+                //echo $reUrl;
+                //return $reUrl;
+                //return redirect($reUrl);
+            }
+        }
+
+        $song = 'http://m.kuwo.cn/newh5/singles/songinfoandlrc';
+        $info = [
+            'musicId'=>$id,//歌曲id
+            'httpsStatus'=>1,
+            'reqId'=>'969ba290-4b49-11eb-8db2-ebd372233623',
+        ];
+        $data = GetCurl($song,$info);
+        $fileName = uniqid();
+        if($data['response_code']==200){
+            $result = json_decode($data['output']);
+            if($result->status == 200){
+                $sogInfo = $result->data->songinfo;
+                $fileName = $sogInfo->songName.'-'.$sogInfo->artist;
+            }else{
+                echo $result->msg;
+            }
+        }else{
+            echo '请求失败。。。';
+        }
+
+        $url = 'http://mobi.kuwo.cn/mobi.s';
+        $param = [
+            'f'=>'web',
+            'source'=>'kwplayerhd_ar_4.3.0.8_tianbao_T1A_qirui.apk',
+            'type'=>'convert_url_with_sign',
+            'rid'=>$id,
+            'br'=>'320kmp3'
+        ];
+        if($type && $type == 6){
+            $param['br'] = '';
+            $param['format'] = 'flac';
+        }
+        $data = GetCurl($url,$param);
+        if($data['response_code']==200){
+            $result = json_decode($data['output']);
+            if($result->code == 200){
+                $des = $result->data;
+                if($des->bitrate < 320){
+                    $param['br'] = '128kmp3';
+                    $data = GetCurl($url,$param);
+                    $result = json_decode($data['output']);
+                    $des = $result->data;
+                }
+                $reUrl = transformUrl($des->url);
+
+                // 获取扩展名
+                $pathInfo = pathinfo(parse_url($reUrl, PHP_URL_PATH)); // 改用parse_url获取可靠扩展名
+                $extension = $pathInfo['extension'] ?? 'mp3';
+                $fileName = $fileName.'.'.$extension;
+                //隐藏远程文件地址，速度慢
+                SecureDownload($reUrl,$fileName);
+            }else{
+                return '获取数据失败！！！---';
+            }
+        }else{
+            return '获取数据失败！！！';
+        }
+    }
+    public function toSize($size){
+        $dw = 'Bytes';
+        if($size > pow(2 , 30)){
+            $size = round($size/pow(2,30),2);
+            $dw = ' GB';
+        }else if($size > pow(2,20)){
+            $size = round($size/pow(2,20),2);
+            $dw = ' MB';
+        }else if($size > pow(2,10)){
+            $size = round($size/pow(2,10),2);
+            $dw = ' KB';
+        }else{
+            $dw = ' Bytes';
+        }
+        return $size.($dw);
+    }
     public function kwpurl(){
         $id = request()->param('id');
         $type = request()->param('type');
@@ -468,6 +575,7 @@ class Music extends MusicController
         }else{
             echo '请求失败。。。';
         }
+        
     }
     public function test(){
         $param = request()->param();

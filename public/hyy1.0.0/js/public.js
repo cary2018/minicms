@@ -45,6 +45,10 @@ layui.use(['jquery','layer','iconPickerFa','form','table','laydate'], function (
 		if(!fileName){
 			fileName = 'id';
 		}
+		let actionUrl = $(this).attr('action');
+		if(!actionUrl){
+			actionUrl = 'Change';
+		}
 		let arr_id = new Array();
 		switch(obj.event){
 			case 'add':
@@ -63,7 +67,7 @@ layui.use(['jquery','layer','iconPickerFa','form','table','laydate'], function (
 				for(let i = 0;i<data.length;i++){
 					arr_id.push(data[i][fileName]); //ar_id 是数据表唯一id
 				}
-				console.log(obj);
+				// console.log(obj);
 				layer.confirm('确定删除吗?', function(index){
 					DelData(arr_id);  //执行批量删除
 					layer.close(index);
@@ -83,10 +87,6 @@ layui.use(['jquery','layer','iconPickerFa','form','table','laydate'], function (
 				let fieldName = $(this).attr('field');
 				if(!fieldName){
 					fieldName = 'id';
-				}
-				let actionUrl = $(this).attr('action');
-				if(!actionUrl){
-					actionUrl = 'Change';
 				}
 				let confirm = $(this).attr('title');
 				if(!confirm){
@@ -151,6 +151,17 @@ layui.use(['jquery','layer','iconPickerFa','form','table','laydate'], function (
 			}
 		});
 	});
+	function JumpPage(url,title='信息'){
+		layer.open({
+			type:2,
+			title:title,
+			shade:0,
+			shadeClose: true,
+			maxmin:true,
+			content:url,
+			area:[$(window).width()+'px',$(window).height() +'px']
+		})
+	}
 	function importSelect(ids=''){
 		let JumpUrl = $('#JumpUrl').attr('alt');
 		let JumpParam = $('#JumpParam').attr('alt');
@@ -171,7 +182,7 @@ layui.use(['jquery','layer','iconPickerFa','form','table','laydate'], function (
 			area:[$(window).width()*0.9+'px',$(window).height() - 50+'px']
 		})
 	}
-	var url='saveAt';
+	let url='saveAt';
 	//打开添加页面（弹出当前元素）
 	function openAdd(){
 		parent.layer.open({
@@ -339,191 +350,189 @@ layui.use(['jquery','layer','iconPickerFa','form','table','laydate'], function (
 	}
 
 	//工具条事件  编辑 + 删除
-	table.on('tool(DataDemos)', function(obj){ //注：tool 是工具条事件名，test 是 table 原始容器的属性 lay-filter="对应的值"
+	// 封装获取配置的函数
+	function getConfig(key, defaultValue) {
+		const $elem = $('#' + key);
+		return $elem.length ? $elem.attr('alt') || defaultValue : defaultValue;
+	}
+	//注：tool 是工具条事件名，test 是 table 原始容器的属性 lay-filter="对应的值"
+	table.on('tool(DataDemos)', function(obj) {
 		var nowActItem = obj; //获得当前行数据
-		var data = obj.data; //获得当前行数据
-		var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
-		if(layEvent === 'del'){ //删除
-			layer.confirm('确定操作吗?', function(index){
-				let fileName = $('#FieldName').attr('alt');
-				if(!fileName){
-					fileName = 'id';
-				}
-				DelData(data[fileName]); //执行删除操作
-				layer.close(index);
-			});
-		} else if(layEvent === 'recycle'){ //还原
-			layer.confirm('确定操作吗?', function(index){
-				let fileName = $('#FieldName').attr('alt');
-				if(!fileName){
-					fileName = 'id';
-				}
-				let recycleUrl = $('#recycleUrl').attr('alt');
-				DelData(data[fileName],recycleUrl); //执行还原操作
-				layer.close(index);
-			});
-		} else if(layEvent === 'optimize'){ //优化
-			layer.confirm('确定操作吗?', function(index){
-				let name = $('#optimize').attr('field');
-				let url = $('#optimize').attr('action');
-				if(!name){
-					name = 'id';
-				}
-				if(!url){
-					url = 'optimize';
-				}
-				DelData(data[name],url); //提交后台执行操作
-				layer.close(index);
-			});
-		} else if(layEvent === 'repair'){ //修复
-			layer.confirm('确定操作吗?', function(index){
-				let name = $('#repair').attr('field');
-				let url = $('#repair').attr('action');
-				if(!name){
-					name = 'id';
-				}
-				if(!url){
-					url = 'repair';
-				}
-				DelData(data[name],url); //提交后台执行操作
-				layer.close(index);
-			});
-		} else if(layEvent === 'edit'){ //编辑
-			openEdit(data);
-		}else if(layEvent === 'edits'){
-			//console.log(obj);
-			let FieldName = $('#FieldName').attr('alt');
-			let title = $('#ActionUrl').attr('title');
-			let ActionUrl = $('#ActionUrl').attr('alt');
-			if(!FieldName){
-				FieldName = 'id';
-			}
-			if(!ActionUrl){
-				ActionUrl = 'edit';
-			}
-			if(!title){
-				title = '编辑'
-			}
-			let ids=data[FieldName];
-			parent.layer.open({
-				type: 2,
-				title: title,
-				fix: false, //不固定
-				maxmin: true,
-				shadeClose: true,
-				shade:0.4,
-				area:[$(window).width()*0.9+'px',$(window).height() - 50+'px'],
-				content: ActionUrl+'?id='+ids,
-				end : function() {
-					//关闭弹框后触发
-					table.reload("DataDemos");  //重载数据表格
-				}
-			})
-		} else if(layEvent === 'product'){
-			let FieldName = $('#FieldName').attr('alt');
-			let JumpUrl = $('#JumpUrl').attr('alt');
-			let title = $('#JumpUrl').attr('title');
-			if(!FieldName){
-				FieldName = 'id';
-			}
-			if(!title){
-				title = '编辑';
-			}
-			if(!JumpUrl){
-				JumpUrl = 'product';
-			}
-			let ids=data[FieldName];
-			parent.layer.open({
-				type: 2,
-				title: title,
-				fix: false, //不固定
-				maxmin: true,
-				shadeClose: true,
-				shade:0.4,
-				area:[$(window).width()*0.9+'px',$(window).height() - 50+'px'],
-				content: JumpUrl+'?id='+ids,
-				end : function() {
-					//关闭弹框后触发
-					//alert('触发关闭事件');
-					table.reload("DataDemos");  //重载数据表格
-				}
-			})
-		} else if(layEvent === 'ajaxJson'){
-			let FieldName = $('#FieldName').attr('alt');
-			let JsonUrl = $('#JsonUrl').attr('alt');
-			if(!FieldName){
-				FieldName = 'id';
-			}
-			let ids=data[FieldName];
-			let wait=1000;
-			//异步发送，把数据提交给php
-			$.ajax({
-				url: JsonUrl+'?id='+ids,
-				type: "GET",
-				async:true,  //true发送异步请求,false发送同步请求
-				processData: false,  // 告诉jQuery不要去处理发送的数据
-				contentType: false,   // 告诉jQuery不要去设置Content-Type请求头
-				beforeSend: function(){
-					var loading = layer.load(1,{shade:[0.3,'#000']});
-				},
-				success: function (data) {
-					//权限不足
-					let ob = typeof data;
-					if(ob == 'object'){
-						if(data.code == 0){
-							layer.closeAll();
-							layer.msg(data.msg,{icon:5,time:wait,shade:0.3});
+		const data = obj.data; //获得当前行数据
+		const layEvent = obj.event;
+		const fileName = getConfig('FieldName', 'id');
+		let title = $(this).attr('title');
+		let url = $(this).attr('data-url');
+		let actionUrl = $(this).attr('action');
+		switch (layEvent) {
+			case 'del':
+			case 'recycle':
+				handleDeleteRecycle(obj, layEvent);
+				break;
+			case 'optimize':
+			case 'repair':
+				handleMaintenance(layEvent, data);
+				break;
+			case 'edit':
+				openEdit(data);
+				break;
+			case 'edits':
+				openEditLayer(data, fileName, 'edit');
+				break;
+			case 'JumpPage':
+				JumpPage(actionUrl,title);
+				break;
+			case 'collect':
+				layer.confirm('使用多窗口采集，可以多次打开，<br>' +
+					'多开窗口实现快速采集全部资源，<br>' +
+					'也可作为断点采集，指定从某一页开始采集。',
+					{
+						icon:3,
+						btn: ['使用多窗口采集', '使用单线程采集'] //按钮
+					}, function(){
+					layer.closeAll();
+					layer.prompt({
+						formType: 0,
+						title: '请输入页码（从第几页开始采集）',
+						btnAlign: 'c',
+						yes: function(index, layero){
+							// 获取文本框输入的值
+							var value = layero.find(".layui-layer-input").val();
+							let newUrl = updatePageParamLegacy(actionUrl,value);
+							//新窗口打开链接
+							window.open(newUrl, "_blank");
 						}
-					}
-					let obj = JSON.parse(data);
-					if(obj.code == 200){
-						//关闭弹出层
-						layer.closeAll();
-						//无刷更新字段信息
-						let fieldValue = {notice_msg:obj.notice_msg,or_puser:obj.or_puser,remarks:obj.remarks,notice_remarks:obj.notice_remarks,status:obj.status,pay_time:obj.pay_time};
-						nowActItem.update(fieldValue);
-						//table.reload("DataDemos");  //重载数据表格
-						layer.msg(obj.msg,{icon:1,time:wait,shade:0.3});
-						setTimeout(function(){
-							if(obj.jump_url){
-								//跳转地址存在执行跳转
-								location.href = obj.jump_url;
-							}else{
-								// 获得iframe索引
-								var index = parent.layer.getFrameIndex(window.name);
-								//关闭当前frame
-								parent.layer.close(index);
-							}
-						},wait);
-
-					}else{
-						layer.closeAll('loading'); //关闭加载层
-						$('input[name="__token__"]').val(obj.token);//更新token防止失效
-						layer.msg(obj.msg,{icon:2,time:wait,shade:0.3});
-					}
-				},
-				error: function () {
-					layer.msg("上传失败！",{icon:2,time:wait,shade:0.3});
-					$("#imgWait").hide();
-					layer.closeAll('loading'); //关闭加载层
+					});
+				}, function(){
+                    //新窗口打开链接
+                    window.open(actionUrl, "_blank");
+				});
+				break;
+			case 'timing':
+				layer.confirm('请选择定时采集当天数据还是本周数据？<br>',
+					{
+						icon:3,
+						btn: ['定时采集当天', '定时采集本周','取消']
+					}, function(){
+						Timing(url+'&name=采集当日：'+title);
+						layer.alert('保存成功! 这里只是添加了任务；<br>' +
+							'任务不会自动运行，帮助手册内有详细教程<br>' +
+							'在系统设置的“定时任务配置”中查看任务');
+					}, function(){
+						Timing(actionUrl+'&name=采集本周：'+title);
+						layer.alert('保存成功! 这里只是添加了任务；<br>' +
+							'任务不会自动运行，帮助手册内有详细教程<br>' +
+							'在系统设置的“定时任务配置”中查看任务');
+					});
+				break;
+			case 'ajaxJson':
+				handleAjaxRequest(actionUrl,title);
+				break;
+			case 'product':
+				let FieldName = $('#FieldName').attr('alt');
+				let JumpUrls = $('#JumpUrls').attr('alt');
+				if(!FieldName){
+					FieldName = 'id';
 				}
-			});
-			return false;
-		} else if(layEvent === 'products'){
-			let FieldName = $('#FieldName').attr('alt');
-			let JumpUrls = $('#JumpUrls').attr('alt');
-			if(!FieldName){
-				FieldName = 'id';
-			}
-			if(!JumpUrls){
-				JumpUrls = 'product';
-			}
-			let ids=data[FieldName];
-			location.href = JumpUrls+'?id='+ids;
-		}else if(layEvent === 'LAYTABLE_TIPS'){
-			layer.msg('Hi，头部工具栏扩展的右侧图标。');
+				if(!JumpUrls){
+					JumpUrls = 'product';
+				}
+				let ids=data[FieldName];
+				location.href = JumpUrls+'?id='+ids;
+				break;
+			case 'LAYTABLE_TIPS':
+				layer.msg('Hi，头部工具栏扩展的右侧图标。');
+				break;
 		}
 	});
+	function Timing(url){
+		$.ajax({
+			url: url,
+			type: "GET",
+			success: function (data) {},
+			error: function () {
+				layer.msg("上传失败！",{icon:2,time:2000,shade:0.3});
+				$("#imgWait").hide();
+				layer.closeAll('loading'); //关闭加载层
+			}
+		});
+	}
+
+	function updatePageParamLegacy(url, newPage) {
+		// 分割基础路径和查询参数
+		var parts = url.split('?');
+		var baseUrl = parts[0];
+		var query = parts[1] || '';
+
+		// 解析查询参数
+		var params = query.split('&').reduce(function (acc, pair) {
+			var [key, value] = pair.split('=');
+			if (key) acc[key] = value || '';
+			return acc;
+		}, {});
+
+		// 更新page参数
+		params['page'] = encodeURIComponent(newPage);
+
+		// 重新拼接查询字符串
+		var newQuery = Object.keys(params)
+			.map(function (key) {
+				return key + '=' + params[key];
+			})
+			.join('&');
+
+		return baseUrl + (newQuery ? '?' + newQuery : '');
+	}
+	// 维护操作（优化/修复）的统一处理函数
+	function handleMaintenance(layEvent, data) {
+		let actionType = layEvent === 'optimize' ? '优化' : '修复'; // 根据事件类型设置操作名称
+		let actionElem = layEvent === 'optimize' ? $('#optimize') : $('#repair'); // 获取对应DOM元素
+
+		layer.confirm(`确定执行${actionType}操作吗？`, function(index) {
+			let fieldName = actionElem.attr('field') || 'id'; // 动态获取字段名，默认id
+			let actionUrl = actionElem.attr('action') || layEvent; // 动态获取接口URL，默认与事件同名
+			DelData(data[fieldName], actionUrl); // 调用统一的删除/提交方法
+			layer.close(index);
+		});
+	}
+	// 自定义AJAX请求处理函数
+	function handleAjaxRequest(url, fieldName) {
+		parent.layer.open({
+			type: 2,
+			title: fieldName,
+			fix: false, //不固定
+			maxmin: true,
+			shadeClose: true,
+			shade:0.4,
+			area:[$(window).width()*0.9+'px',$(window).height() - 50+'px'],
+			content: url,
+			end: () => table.reload("DataDemos")
+		});
+	}
+	function handleDeleteRecycle(obj, action) {
+		layer.confirm('确定操作吗?', function(index) {
+			const url = action === 'recycle' ? getConfig('recycleUrl', 'recycle') : undefined;
+			DelData(obj.data[getConfig('FieldName', 'id')], url);
+			layer.close(index);
+		});
+	}
+
+	function openEditLayer(data, fieldName, action) {
+		const title = getConfig('ActionUrl', '编辑');
+		const url = getConfig('ActionUrl', action);
+		parent.layer.open({
+			type: 2,
+			title: title,
+			fix: false, //不固定
+			maxmin: true,
+			shadeClose: true,
+			shade:0.4,
+			area:[$(window).width()*0.9+'px',$(window).height() - 50+'px'],
+			content: `${url}?id=${data[fieldName]}`,
+			end: () => table.reload("DataDemos")
+		});
+	}
+
 	//添加节点
 	$("#addDown").on('click',function (obj) {
 		let ms = $(this).parent('div').html();

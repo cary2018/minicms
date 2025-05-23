@@ -22,8 +22,8 @@ use think\facade\View;
 class Article extends BaseController
 {
     public function index(){
-        $tree = GetMenu('category',[['share','=',1]]);
-        $read = GetCache('readArticle');
+        $tree = GetMenu('category',[['share','=',1],['type','=',0]]);
+        $read = config('common');
         foreach ($tree as $k=>$v){
             $level = $v['level']-1;
             if( $level > 1){
@@ -32,7 +32,7 @@ class Article extends BaseController
                 $tree[$k]['p']='';
             }
         }
-        View::assign('read',$read);
+        View::assign('read',$read['read']);
         View::assign('tree',$tree);
         return view();
     }
@@ -55,10 +55,10 @@ class Article extends BaseController
         }
         $count = CountTable('article',$where);
         $list = joinTable('article','category',$start,$size,$where);
-        $str = GetCache('readArticle');
+        $str = config('common');
         foreach ($list as &$v){
-            $v['status1'] = $str[0];
-            $v['status2'] = $str[1];
+            $v['status1'] = $str['read'][0];
+            $v['status2'] = $str['read'][1];
             $v['createTime'] = date('Y-m-d H:i:s',$v['createTime']);
             $v['updateTime'] = date('Y-m-d H:i:s',$v['updateTime']);
         }
@@ -66,8 +66,8 @@ class Article extends BaseController
         echo json_encode($arr);
     }
     public function add(){
-        $tree = GetMenu('category',[['share','=',1]]);
-        $read = GetCache('readArticle');
+        $tree = GetMenu('category',[['share','=',1],['type','=',0]]);
+        $read = config('common');
         foreach ($tree as $k=>$v){
             $level = $v['level']-1;
             if( $level > 1){
@@ -77,16 +77,16 @@ class Article extends BaseController
             }
         }
         View::assign('tree',$tree);
-        View::assign('read',$read);
+        View::assign('read',$read['read']);
         return View();
     }
 
     public function edit(){
         $id = request()->param('id');
         $data = Db::name('article')->where('id',$id)->find();
-        $tree = GetMenu('category',[['share','=',1]]);
+        $tree = GetMenu('category',[['share','=',1],['type','=',0]]);
         $soft = AllTable('software',[['aid','=',$id]]);
-        $read = GetCache('readArticle');
+        $read = config('common');
         foreach ($tree as $k=>$v){
             $level = $v['level']-1;
             if( $level > 1){
@@ -98,7 +98,7 @@ class Article extends BaseController
         View::assign('data',$data);
         View::assign('tree',$tree);
         View::assign('soft',$soft);
-        View::assign('read',$read);
+        View::assign('read',$read['read']);
         return View();
     }
 

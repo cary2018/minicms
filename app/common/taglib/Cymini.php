@@ -80,11 +80,18 @@ class Cymini extends TagLib
         if(empty($tag['key'])){
             $tag['key'] = 'key';
         }
+        if(empty($tag['type'])){
+            $tag['type'] = 0;
+        }
         $parse = '<?php ';
-        $parse .= '$__navmenu__ = GetCache(\'NavMenu\');';
+        $parse .= '$__navmenu__ = NavMenu('.intval($tag['type']).');';
         $parse .= '$__LIST__ = $__navmenu__;';
         $parse .= ' ?>';
-        $parse .= '{volist name="__LIST__" id="' . $tag['id'] . '" key="'.$tag['key'].'"}';
+        $parse .= '{volist name="$__LIST__" id="' . $tag['id'] . '" key="'.$tag['key'].'"';
+        if(!empty($tag['type'])){
+            $parse .= ' type="'.$tag['type'].'"';
+        }
+        $parse .= '}';
         $parse .= $content;
         $parse .= '{/volist}';
         return $parse;
@@ -406,7 +413,7 @@ class Cymini extends TagLib
         $today_start=mktime(0,0,0,date('m'),date('d'),date('Y'));
         $today_end=mktime(0,0,0,date('m'),date('d')+1,date('Y'))-1;
         if(empty($tag['where'])){
-            $tag['where'] = "[['createTime','between',[$today_start,$today_end]]]";
+            $tag['where'] = "[['createTime','between',[mktime(0,0,0,date('m'),date('d'),date('Y')),mktime(0,0,0,date('m'),date('d')+1,date('Y'))-1]]]";
         }
         $parse = '<?php ';
         $parse .= '$__totals__ = CountTable("'.$tag['table'].'",'.$tag['where'].');';

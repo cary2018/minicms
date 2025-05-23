@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{$Think.lang.link_list}</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    {include file="public/file_css"}
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-form layuimini-form">
+    <form class="layui-form layuimini-form" id="DataForm" lay-filter="DataForm" method="post" onsubmit="return false">
+        <div class="layui-form-item">
+            <input type="text" name="id" value="" style="display: none;">
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">{:lang('position_name')}</label>
+            <div class="layui-input-inline">
+                <input type="text" name="name" lay-verify="required" lay-reqtext="{:lang('requireEmpty')}" value="" class="layui-input">
+            </div>
+            <label class="layui-form-label">{:lang('type')}</label>
+            <div class="layui-input-inline">
+                <select name="type" lay-verify="required" lay-reqtext="{$Think.lang.selectCategory}" layui.formselect>
+
+                    <option value="collect" >{:lang('collect_auto')}</option>
+
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">{:lang('Remark')}</label>
+            <div class="layui-input-block">
+                <input type="text" name="remark" value="" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">{:lang('collect_param')}</label>
+            <div class="layui-input-block">
+                <input type="text" name="param" value="" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">{:lang('exec_week')}</label>
+            <div class="layui-input-block role-list-form">
+                <input type="checkbox" name="weeks[]" class="layui-checkbox" lay-skin="primary" value="1" title="{:lang('monday')}" >
+                <input type="checkbox" name="weeks[]" class="layui-checkbox" lay-skin="primary" value="2" title="{:lang('tuesday')}" >
+                <input type="checkbox" name="weeks[]" class="layui-checkbox" lay-skin="primary" value="3" title="{:lang('wednesday')}" >
+                <input type="checkbox" name="weeks[]" class="layui-checkbox" lay-skin="primary" value="4" title="{:lang('thursday')}" >
+                <input type="checkbox" name="weeks[]" class="layui-checkbox" lay-skin="primary" value="5" title="{:lang('friday')}" >
+                <input type="checkbox" name="weeks[]" class="layui-checkbox" lay-skin="primary" value="6" title="{:lang('saturday')}" >
+                <input type="checkbox" name="weeks[]" class="layui-checkbox" lay-skin="primary" value="0" title="{:lang('sunday')}" >
+
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">{:lang('exec_hours')}</label>
+            <div class="layui-input-block role-list-form">
+                <input type="checkbox" name="hours[]" class="layui-checkbox" lay-skin="primary" value="00" title="00" >
+                <input type="checkbox" name="hours[]" class="layui-checkbox" lay-skin="primary" value="01" title="01" >
+                <input type="checkbox" name="hours[]" class="layui-checkbox" lay-skin="primary" value="02" title="02" >
+                <input type="checkbox" name="hours[]" class="layui-checkbox" lay-skin="primary" value="03" title="03" >
+                <input type="checkbox" name="hours[]" class="layui-checkbox" lay-skin="primary" value="04" title="04" >
+                <input type="checkbox" name="hours[]" class="layui-checkbox" lay-skin="primary" value="05" title="05" >
+                <input type="checkbox" name="hours[]" class="layui-checkbox" lay-skin="primary" value="06" title="06" >
+                <input type="checkbox" name="hours[]" class="layui-checkbox" lay-skin="primary" value="07" title="07" >
+                <input type="checkbox" name="hours[]" class="layui-checkbox" lay-skin="primary" value="08" title="08" >
+                <input type="checkbox" name="hours[]" class="layui-checkbox" lay-skin="primary" value="09" title="09" >
+                <input type="checkbox" name="hours[]" class="layui-checkbox" lay-skin="primary" value="10" title="10" >
+                <input type="checkbox" name="hours[]" class="layui-checkbox" lay-skin="primary" value="11" title="11" >
+                <input type="checkbox" name="hours[]" class="layui-checkbox" lay-skin="primary" value="12" title="12" >
+                <input type="checkbox" name="hours[]" class="layui-checkbox" lay-skin="primary" value="13" title="13" >
+                <input type="checkbox" name="hours[]" class="layui-checkbox" lay-skin="primary" value="14" title="14" >
+                <input type="checkbox" name="hours[]" class="layui-checkbox" lay-skin="primary" value="15" title="15" >
+                <input type="checkbox" name="hours[]" class="layui-checkbox" lay-skin="primary" value="16" title="16" >
+                <input type="checkbox" name="hours[]" class="layui-checkbox" lay-skin="primary" value="17" title="17" >
+                <input type="checkbox" name="hours[]" class="layui-checkbox" lay-skin="primary" value="18" title="18" >
+                <input type="checkbox" name="hours[]" class="layui-checkbox" lay-skin="primary" value="19" title="19" >
+                <input type="checkbox" name="hours[]" class="layui-checkbox" lay-skin="primary" value="20" title="20" >
+                <input type="checkbox" name="hours[]" class="layui-checkbox" lay-skin="primary" value="21" title="21" >
+                <input type="checkbox" name="hours[]" class="layui-checkbox" lay-skin="primary" value="22" title="22" >
+                <input type="checkbox" name="hours[]" class="layui-checkbox" lay-skin="primary" value="23" title="23" >
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">{:lang('IsEnable')}</label>
+            <div class="layui-input-inline">
+                <input type="radio" name="status" value="1" title="{$Think.lang.Enable}" checked >
+                <input type="radio" name="status" value="0" title="{$Think.lang.Disable}" >
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button type="button" class="layui-btn layui-btn-normal formCheckAll" lay-filter="formCheckAll" >{:lang('check_all')}</button>
+                <button type="button" class="layui-btn layui-btn-normal formCheckOther" lay-filter="formCheckOther">{:lang('check_other')}</button>
+                <button class="layui-btn layui-bg-red" lay-submit lay-filter="doSubmit">{:lang('Save')}</button>
+                <button type="reset" class="layui-btn " >{:lang('btn_reset')}</button>
+            </div>
+        </div>
+    </form>
+
+</div>
+{include file="public/file_js"}
+<script type="text/javascript">
+
+    layui.use(['form', 'layer'], function () {
+        // 操作对象
+        var form = layui.form
+            , layer = layui.layer
+            , $ = layui.jquery;
+
+        // 验证
+        form.verify({
+            show: function (value) {
+                if (value == "") {
+                    return "{:lang('name_empty')}";
+                }
+            }
+        });
+
+        $('.formCheckAll').click(function(){
+            var child = $('.role-list-form').find('input');
+            /* 自动选中子节点 */
+            child.each(function(index, item) {
+                item.checked = true;
+            });
+            form.render('checkbox');
+        });
+        $('.formCheckOther').click(function(){
+            var child = $('.role-list-form').find('input');
+            /* 自动选中子节点 */
+            child.each(function(index, item) {
+                item.checked = (item.checked  ? false : true);
+            });
+            form.render('checkbox');
+        });
+
+    });
+</script>
+</body>
+</html>

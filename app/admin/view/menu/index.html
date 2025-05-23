@@ -42,7 +42,7 @@
     <span id="DelUrl" alt="{:url('delAll')}" style="display: none"></span>
     <span id="FieldUrl" alt="{:url('updateField')}" style="display: none"></span>
     <span id="JumpUrl" alt="{:url('add')}" style="display: none"></span>
-    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="product">{$Think.lang.AddSub}</a>
+    <a class="layui-btn layui-btn-normal layui-btn-xs" action="{:url('add')}?id={{d.id}}" lay-event="JumpPage">{$Think.lang.AddSub}</a>
     <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edits">{$Think.lang.edit}</a>
     <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">{$Think.lang.del}</a>
 </script>

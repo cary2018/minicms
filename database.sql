@@ -21,6 +21,7 @@ alter table cy_visit add guv varchar(60) not null default '' comment'访客标�
 CREATE TABLE `cy_collect` (
   `collect_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `collect_name` varchar(30) NOT NULL DEFAULT '' COMMENT '资源名称',
+  `collect_web` varchar(160) NOT NULL DEFAULT '' COMMENT '官方网站',
   `collect_url` varchar(255) NOT NULL DEFAULT '' COMMENT '接口地址',
   `collect_type` tinyint(1) unsigned NOT NULL DEFAULT '1' COMMENT '接口类型',
   `collect_mid` tinyint(1) unsigned NOT NULL DEFAULT '1' COMMENT '资源类型',

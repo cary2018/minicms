@@ -14,7 +14,8 @@
 {:token()}
 
 //-----------------------导航菜单----------------------------
-{cymini:navmenu}
+type                     #显示菜单类型 默认0
+{cymini:navmenu type='1'}
 {$vo.isUrl?$vo.outUrl:$vo.temp_list}
 {$vo.temp_list}         #列表模板
 {$vo.isUrl}             #是否启用外链

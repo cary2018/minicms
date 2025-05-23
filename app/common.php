@@ -128,11 +128,11 @@ function PasswordVerify($np,$op)
 /**
  * @param string $name  缓存名
  * @param array $data  数据
- * @param int $outTime  有效时间
+ * @param int $outTime  有效时间（天）
  * 设置缓存
  */
-function SetCaChe($name,$data,$outTime = 30){
-    $outTime = (3600*3600)*$outTime;
+function SetCaChe($name,$data,$outTime = 130){
+    $outTime = 86400*$outTime;
     Cache::set($name, $data, $outTime);
 }
 
@@ -288,7 +288,7 @@ function GetMenu($table='menu',$where=[],$field='id',$order=[]){
  * @throws \think\db\exception\ModelNotFoundException
  * 设置菜单缓存
  */
-function SetMenu($name='Menu',$outTime = 30){
+function SetMenu($name='Menu',$outTime = 360){
     $menuList = caheMenu();
     $index = FindTable('menu',[['ident','=',1]]);
     $tree = GetTree($menuList,0);
@@ -1434,6 +1434,46 @@ function GetCurl($url,$param=[]){
 }
 
 /**
+ * @param $url
+ * @param $fileName
+ * 隐藏远程下载地址
+ */
+function SecureDownload($url,$fileName){
+    // 获取文件大小（推荐方法二选一）
+    try {
+        // 方法1：get_headers
+        $headers = get_headers($url, true);
+        $fileSize = $headers['Content-Length'] ?? new Exception("未找到文件大小");
+
+        // 方法2：cURL（若方法1失效）
+        // $fileSize = getRemoteFileSizeCurl($url);
+    } catch (Exception $e) {
+        // 备用方案：下载前1MB验证
+        $context = stream_context_create(['http' => ['header' => 'Range: bytes=0-10240']]);
+        $partial = file_get_contents($url, false, $context);
+        $fileSize = strlen($partial);
+    }
+
+    // 设置响应头
+    header('Content-Transfer-Encoding: binary');
+    header('Content-Type: audio/*');
+    header('Content-Length: ' . $fileSize);
+    header('Content-Disposition: attachment; filename="'.rawurlencode($fileName).'"; filename*=UTF-8\'\''.$fileName);
+    header('Cache-Control: no-cache');
+    ob_clean();
+    flush();
+
+    // 流式输出（避免内存溢出）
+    $chunkSize = 1024 * 1024; // 1MB分块
+    $handle = fopen($url, 'rb');
+    while (!feof($handle)) {
+        echo fread($handle, $chunkSize);
+        ob_flush();
+        flush();
+    }
+    fclose($handle);
+}
+/**
  * @param $originalUrl
  * @return string
  * 酷我播放地址转换
@@ -1828,7 +1868,44 @@ function ImgCompress($src,$percent=1){
     //销毁给定的变量
     unset($image);
 }
+function ImgCompressGIF($src, $percent = 1) {
+    ini_set('memory_limit', '512M');  // 提升内存限制
 
+    // 检查Imagick扩展
+    if (!extension_loaded('imagick')) {
+        throw new Exception('Imagick扩展未安装，需安装ImageMagick');
+    }
+
+    $imagick = new \Imagick();
+    $imagick->readImage($src);  // 读取动态GIF所有帧
+    $imagick = $imagick->coalesceImages();  // 合并所有帧为统一尺寸
+
+    // 逐帧处理
+    foreach ($imagick as $frame) {
+        // 透明通道处理（兼容PNG/GIF）
+        if ($frame->getImageAlphaChannel()) {
+            $frame->setImageBackgroundColor('transparent');
+            $frame->setImageAlphaChannel(\Imagick::ALPHACHANNEL_ACTIVATE);
+        }
+
+        // 压缩参数设置
+        $frame->resizeImage(
+            intval($frame->getImageWidth() * $percent),
+            intval($frame->getImageHeight() * $percent),
+            \Imagick::FILTER_LANCZOS,  // 高质量缩放
+            1
+        );
+        $frame->setImageCompressionQuality(80);  // 质量压缩
+        $frame->quantizeImage(256, \Imagick::COLORSPACE_RGB, 0, false, false);  // 减少颜色深度
+    }
+
+    // 优化图层并保存
+    $imagick = $imagick->optimizeImageLayers();  // 删除冗余像素
+    $imagick->writeImages($src, true);  // 保留动画特性
+
+    $imagick->clear();
+    unset($imagick);
+}
 
 /**
  *
@@ -1942,7 +2019,7 @@ function MdaTree($arr,$pid=0,$pids = 'pid',$id='id',$level=0){
     return $tree;
 }
 /**
- * @param $table
+ * @param $data
  * @param int $pid
  * @param string $p_id
  * @param string $id
@@ -1950,15 +2027,13 @@ function MdaTree($arr,$pid=0,$pids = 'pid',$id='id',$level=0){
  * @return array
  * 返回分类下的所有子分类 （一级数组）
  */
-function ArrTree($table,$pid=0,$p_id = 'pid',$id = 'id',$level=0)
-{
-    $arr = Db::name($table)->select()->toArray();
+function ArrTree($data,$pid=0,$p_id = 'pid',$id = 'id',$level=0){
     static $tree = array();
-    foreach($arr as $v){
+    foreach($data as $v){
         if($v[$p_id] == $pid){
             $v['lv'] = $level;
             $tree[$v['id']] = $v;
-            ArrTree($table,$v[$id],$p_id,$id,$level+1);
+            ArrTree($data,$v[$id],$p_id,$id,$level+1);
         }
     }
     return $tree;
@@ -2067,18 +2142,58 @@ function compressImage($sourcePath, $destinationPath, $quality) {
     $image->writeImage($destinationPath);
     $image->destroy();
 }
+//更新导航菜单分类缓存
+function UpdateMenu(){
+    $type = config('common');
+    foreach ($type['type'] as $k=>$v){
+        //多维数据
+        $cate = GetMenu('category',[['isShow','=',1],['type','=',$k]],'id',['orderSort'=>'desc']);
+        $nav = MdaTree($cate);
+        SetCaChe('NavMenu_'.$k,$nav);
+        //一维数组
+        $data = Db::name('category')->where([['type','=',$k]])->select()->toArray();
+        $arrType = ArrTree($data);
+        SetCaChe('VodMen_'.$k,$arrType);
+    }
+}
 /**
+ * @param int $type
+ * @return mixed
  * @throws \think\db\exception\DataNotFoundException
  * @throws \think\db\exception\DbException
  * @throws \think\db\exception\ModelNotFoundException
- * 设置 api 导航菜单缓存
  */
-function navApi(){
-    $cate = GetMenu('category',[['isShow','=',1]],'id',['orderSort'=>'desc']);
-    $nav = MdaTree($cate);
-    $type = ArrTree('category');
-    SetCaChe('NavMenu',$nav);
-    SetCaChe('type_list',$type);
+function NavMenu($type = 0){
+    //导航菜单
+    $str = GetCache('NavMenu_'.$type);
+    if(empty($str)){
+        $cate = GetMenu('category',[['isShow','=',1],['type','=',$type]],'id',['orderSort'=>'desc']);
+        $nav = MdaTree($cate);
+        SetCaChe('NavMenu_'.$type,$nav);
+        $str = GetCache('NavMenu_'.$type);
+    }
+
+    return $str;
+}
+
+/**
+ * @param int $type
+ * @return mixed
+ * @throws \think\db\exception\DataNotFoundException
+ * @throws \think\db\exception\DbException
+ * @throws \think\db\exception\ModelNotFoundException
+ * 菜单分类(一维数组)
+ */
+function VodMen($type=1){
+    $str = GetCache('VodType_'.$type);
+    if(empty($str)){
+        //视频分类
+        $data = Db::name('category')->where([['type','=',$type]])->select()->toArray();
+        $arrType = ArrTree($data);
+        SetCaChe('VodMen_'.$type,$arrType);
+        $str = GetCache('VodMen_'.$type);
+    }
+    return $str;
 }
 
 /**

@@ -48,10 +48,10 @@ class Collect extends BaseController
         $baseParams = [
             'ac'=>'',
             'h'=>'',
-            't'=>'',
+            /*'t'=>'',
             'ids'=>'',
             'wd'=>'',
-            'page'=>0,
+            'page'=>0,*/
         ];
 
         // 初始化跳转配置
@@ -61,25 +61,29 @@ class Collect extends BaseController
             'week' => ['ac' => 'cj', 'h' => 168],
             'cjAll' => ['ac' => 'cj'],
         ];
-
+        //ac=cj&h=24&cjflag=dyttzy&cjurl=http%3A%2F%2Fcaiji.dyttzyapi.com%2Fapi.php%2Fprovide%2Fvod%2Ffrom%2Fdyttm3u8%2Fat%2Fjson%2F
+        $pinyin = new Pinyin();
         foreach ($list as &$v) {
             // 公共参数
             $commonParams = [
-                'cjflag' => md5($v['collect_url']),
+                'cjflag' => $pinyin->abbr($v['collect_name']),
                 'cjurl' => $v['collect_url'],
-                'type' => $v['collect_type'],
+                /*'type' => $v['collect_type'],
                 'mid' => $v['collect_mid'],
                 'opt' => $v['collect_opt'],
                 'sync_pic_opt' => $v['collect_sync_pic_opt'],
                 'filter' => $v['collect_filter'],
                 'filter_from' => $v['collect_filter_from'],
                 'filter_year' => $v['collect_filter_year'],
-                'param' => base64_encode($v['collect_param'])
+                'param' => base64_encode($v['collect_param'])*/
             ];
 
             // 为每个类型合并公共参数
             foreach ($types as $key => $params) {
                 // 如果 h 值为空，使用基准参数中的默认值
+                if($key=='week'){
+                    $commonParams['cjflag'] = $commonParams['cjflag'].'week';
+                }
                 $v[$key] = http_build_query(array_merge($baseParams,$params, $commonParams));
             }
 
@@ -135,13 +139,18 @@ class Collect extends BaseController
         $today = $param;
         $all = $param;
         //分类
-        $type_list = GetCache('type_list');
+        $type_list = VodMen();
 
         if (!empty($param['pg'])) {
             $param['page'] = $param['pg'];
             unset($param['pg']);
         }
-
+        $keys = ['mid'];
+        foreach ($keys as $key) {
+            if (!array_key_exists($key, $param)) {
+                $param[$key] = '';
+            }
+        }
         if ($param['mid'] == '' || $param['mid'] == '1') {
             $today['ac'] = 'cj';
             $today['h'] = 24;
@@ -150,7 +159,7 @@ class Collect extends BaseController
             $all['h'] = '';
             $all = http_build_query($all);
             $strParam = http_build_query($param);
-            $tree = GetMenu('category');
+            $tree = GetMenu('category',[['type','=',1]]);
             foreach ($tree as $k=>$v){
                 $level = $v['level']-1;
                 if( $level > 1){
@@ -162,7 +171,6 @@ class Collect extends BaseController
             $model = new Model();
             $res = $model->vod($param);
             $bind_list = config('bind');
-
             foreach($res['type'] as $k=>$v){
                 $key = $param['cjflag'] . '_' . $v['type_id'];
                 $res['type'][$k]['isbind'] = 0;
@@ -173,7 +181,10 @@ class Collect extends BaseController
                 if( $local_id>0 ){
                     $res['type'][$k]['isbind'] = 1;
                     $res['type'][$k]['local_type_id'] = $local_id;
-                    $type_name = $type_list[$local_id]['name'];
+                    $type_name = '';
+                    if(array_key_exists($local_id,$type_list)){
+                        $type_name = $type_list[$local_id]['name'];
+                    }
                     if(empty($type_name)){
                         $type_name = lang('unknown_type');
                     }
@@ -186,6 +197,8 @@ class Collect extends BaseController
             View::assign('today',$today);
             View::assign('all',$all);
             View::assign('url',$strParam);
+            View::assign('page',$res['page']['page']);
+            View::assign('limit',$res['page']['pagesize']);
             return view();
         } elseif ($param['mid'] == '2') {
             return $this->art($param);
@@ -198,6 +211,67 @@ class Collect extends BaseController
         elseif ($param['mid'] == '5') {
             return $this->website($param);
         }
+    }
+
+    public function bindType(){
+        $param = request()->param();
+        $tree = GetMenu('category',[['type','=',1]]);
+        foreach ($tree as $k=>$v){
+            $level = $v['level']-1;
+            if( $level > 1){
+                $tree[$k]['p'] = str_repeat("&nbsp;&nbsp;&nbsp;",$level).'|--';
+            }else{
+                $tree[$k]['p']='';
+            }
+        }
+        //视频分类
+        $type_list = VodMen();
+        $model = new Model();
+        $res = $model->vod($param);
+        $config = config('bind');
+        $table = AllTable('category',[['type','=',1]]);
+        // 创建name到id的映射
+        $categoryMap = array_column($table ?: [], 'id', 'name');
+        // 处理绑定
+        foreach ($res['type'] as $val) {
+            if (empty($val['type_name']) || empty($val['type_id'])) {
+                continue; // 跳过无效数据
+            }
+            $configKey = ($param['cjflag'] ?? 'default') . '_' . $val['type_id'];
+            if(!array_key_exists($configKey,$config)){
+                $config[$configKey] = $categoryMap[$val['type_name']] ?? null;
+            }
+        }
+        $config = array_filter($config);
+        putConfig($config);
+
+        //$bind_list = config('bind');
+        foreach($res['type'] as $k=>$v){
+            $key = $param['cjflag'] . '_' . $v['type_id'];
+            $res['type'][$k]['isbind'] = 0;
+            if(!array_key_exists($key,$config)){
+                $config[$key] = '';
+            }
+
+            $local_id = intval($config[$key]);
+            if( $local_id>0 ){
+                $res['type'][$k]['isbind'] = 1;
+                $res['type'][$k]['local_type_id'] = $local_id;
+                $type_name = '';
+                if(array_key_exists($local_id,$type_list)){
+                    $type_name = $type_list[$local_id]['name'];
+                }
+                if(empty($type_name)){
+                    $type_name = lang('unknown_type');
+                }
+                $res['type'][$k]['local_type_name'] = $type_name;
+            }
+        }
+
+        View::assign('tree',$tree);
+        View::assign('type',$res['type']);
+        View::assign('param',$param);
+        return view();
     }
 
     public function vod()
@@ -264,11 +338,49 @@ class Collect extends BaseController
         return view();
     }
 
+    public function timing(){
+        $data = request()->param();
+        $name = $data['name'];
+        unset($data['name']);
+        $param = http_build_query($data);
+        $arr = [
+            'name'=>$data['cjflag'],
+            'remark'=>$name,
+            'status'=>1,
+            'type'=>'collect',
+            'param'=>$param,
+        ];
+        $weeks = array_merge(
+            range(1,6), // 周一到周六
+            [0]         // 周日
+        );
+        $arr['weeks'] = json_encode($weeks);
+        $hours = array_map(
+            fn($h) => sprintf("%02d", $h),
+            range(0,23)
+        );
+        $arr['hours'] = json_encode($hours);
+        $result = FindTable('timing',[['name','=',$data['cjflag']]]);
+        if(empty($result)){
+            SaveAt('timing',$arr);
+        }else{
+            $arr['id'] = $result['id'];
+            SaveAt('timing',$arr);
+        }
+        $newArray = [];
+        $originalArray = AllTable('timing');
+        foreach ($originalArray as $item) {
+            $key = md5($item['name']);       // 获取当前元素的 name 值
+            $newArray[$key] = $item;    // 以 name 为键，存储整个子数组
+        }
+        putConfig($newArray,'timing.php');
+    }
+
     public function bind(){
         $param = request()->param();
         $col = $param['col'];
         $val = $param['val'];
-        $ids = $param['ids'];
+        //$ids = $param['ids'];
         if(!empty($col)){
             $config = config('bind');
             $config[$col] = intval($val);

@@ -23,65 +23,30 @@
 <body>
 <div class="layuimini-container">
     <div class="layuimini-main">
-        <div class="layui-btn-container">
-            <a href="javascript:;" data-id="" class="layui-btn layui-bg-red select_type">{$Think.lang.showAll}</a>
+
+        <blockquote class="layui-elem-quote layui-quote-nm">
+            自动绑定分类
+        </blockquote>
+
             {volist name="type" id="vo"}
-            <div class="layui-btn layui-btn-primary layui-border-green">
-                <a href="javascript:;" id="reloadTable" data-id="{$vo.type_id}" class="select_type">{$vo.type_name|raw}</a>
+
+                <a href="javascript:;" class="select_type">{$vo.type_name|raw}</a> ==》
                 <a id="{$param['cjflag']|mac_filter_xss}_{$vo.type_id}" data-ids="1" class="j-select" >
                     {if $vo.isbind eq 1}
-                    <span class="red">[{$vo.local_type_name}]</span>
+                    <span class="red">[{$vo.local_type_name}]{:lang('collect_auto_success')}</span>
                     {else}
-                    [{:lang('bind')}]
+                    [{:lang('bind')}]{:lang('collect_auto_fail')}
                     {/if}
                 </a>
-            </div>
+        <hr class="layui-border-orange">
             {/volist}
-        </div>
 
-        <fieldset style="display: none;" id="inputSearch" class="table-search-fieldset">
-            <legend>{$Think.lang.search_info}</legend>
-            <div style="margin: 10px 10px 10px 10px">
-                <form id="searchData" lay-filter="searchData" onsubmit="return false;" class="layui-form layui-form-pane">
-                    <div class="layui-form-item">
-                        <div class="layui-inline">
-                            <div class="layui-input-inline">
-                                <input type="text" name="wd" placeholder="{$Think.lang.variable_title}" autocomplete="off" class="layui-input">
-                            </div>
-                        </div>
-                        <div class="layui-inline">
-                            <button type="submit" class="layui-btn layui-btn-primary" id="doSearch" lay-submit lay-filter="doSearch"><i class="layui-icon"></i>
-                            {$Think.lang.search}</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </fieldset>
-        <!--头部工具栏-->
-        <div id="toolbarDemo" style="display: none;background: #fff;">
-            <span id="FieldUrl" alt="{:url('updateField')}" style="display: none"></span>
-            <span id="SwitchUrl" alt="{:url('switchAt')}" style="display: none"></span>
-            <span id="AddUrl" alt="{:url('add')}" style="display: none"></span>
-            <button class="layui-btn layui-btn-sm layui-btn-blue" data-id="vod_id" data-url="{:url('collectData')}" lay-event="SubmitData"> {:lang('collect_selected')} </button>
-            <a class="layui-btn layui-btn-sm layui-btn-blue todayCollect" href="{:url('collectData')}?{$today}"> {:lang('collect_today')} </a>
-            <a class="layui-btn layui-btn-sm layui-btn-blue allCollect" href="{:url('collectData')}?{$all}"> {:lang('collect_all')} </a>
-            <a class="layui-btn layui-btn-sm layui-bg-blue" href="{:url('/admin/collect')}" > {:lang('return_page')} </a>
-        </div>
-        <!--数据-->
-        <table class="layui-hide" id="DataDemos" lay-filter="DataDemos"></table>
-        <!--操作-->
-        <script type="text/html" id="toolBar">
-            <span id="DelUrl" alt="{:url('delAll')}" style="display: none"></span>
-            <span id="ActionUrl" alt="{:url('edit')}" style="display: none"></span>
-            <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edits">{$Think.lang.edit}</a>
-            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">{$Think.lang.del}</a>
-        </script>
 
         <div class="selected-type" style="display:none;">
             <form class="layui-form" id="DataForm" lay-filter="DataForm" method="post" onsubmit="return false">
                 <span id="ActionUrl" alt="{:url('bind')}" style="display:none;"></span>
                 <div class="layui-input-inline">
-                    <input type="hidden" name="ids" id="ids" value="1">
+                    <!--<input type="hidden" name="ids" id="ids" value="1">-->
                     <input type="hidden" name="col" id="col" value="2">
                     <select name="val">
                         <option value="">{$Think.lang.DownSelect}</option>
@@ -109,34 +74,7 @@
         var $ = layui.jquery,
             form = layui.form,
             table = layui.table;
-        var param = '{:url("vod")}?{$url|raw}';
-        table.render({
-            elem: '#DataDemos',
-            toolbar: '#toolbarDemo',
-            url: param,
-            method: 'get',
-            page: {
-                prev:'上一页',
-                next:'下一页',
-                layout: ['count','prev', 'page', 'next','limit'],
-            },  //开启分页
-            limit: {$limit},
-            height: '550', // 最大高度减去其他容器已占有的高度差
-            defaultToolbar: ['filter', 'exports', 'print', {
-                title: '{$Think.lang.search}',
-                layEvent: 'laySearch',
-                icon: 'layui-icon layui-icon-search'
-            }],
-            cols: [[
-                {type: 'numbers'},
-                {type: "checkbox", width: 50},
-                /*{field: 'vod_id', align:"center", width: 80, title: 'ID', sort: true},*/
-                {field: 'vod_name', align:'left',title: '{:lang(\'collect_name\')}'},
-                {field: 'type_name', align: 'center',width:120,title: '{$Think.lang.collect_type}'},
-                {field: 'vod_play_from', align: 'center',width:130,title: '{$Think.lang.collect_mid}'},
-                {field: 'vod_time', align: 'center',width:160,title: '{$Think.lang.updateTime}'},
-            ]],
-        });
+
         // 分类筛选
         $('.select_type').click(function(){
             let t = $(this).attr('data-id');
@@ -223,19 +161,19 @@
                 success: function (data) {
                     let obj = JSON.parse(data);
                     if(obj.code == 200){
-                        //关闭弹出层
-                        layer.closeAll();
+                        //关闭所有弹出层
+                        //layer.closeAll();
                         //table.reload("DataDemos");  //重载数据表格
                         layer.msg(obj.msg,{icon:1,time:wait,shade:0.3});
                         setTimeout(function(){
                             // 获得iframe索引
                             var index = parent.layer.getFrameIndex(window.name);
                             //关闭当前frame
-                            parent.layer.close(index);
+                            layer.closeAll();
                             if(obj.data.local_type_name){
-                                $('#'+obj.data.id).html('<span class="red">['+obj.data.local_type_name+']</span>');
+                                $('#'+obj.data.id).html('<span class="red">['+obj.data.local_type_name+']{:lang(\'collect_auto_success\')}</span>');
                             }else{
-                                $('#'+obj.data.id).html('[{:lang(\'bind\')}]');
+                                $('#'+obj.data.id).html('[{:lang(\'bind\')}]{:lang(\'collect_auto_fail\')}');
                             }
                         },wait);
                     }else{

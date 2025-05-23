@@ -32,6 +32,23 @@
                                 <input type="text" name="title" placeholder="{$Think.lang.variable_title}" autocomplete="off" class="layui-input">
                             </div>
 
+                            <div class="layui-input-inline">
+                                <select name="status" layui.formselect>
+                                    <option value="">{$Think.lang.DownSelect}</option>
+
+                                    <option value="00" >66666</option>
+
+                                </select>
+                            </div>
+
+                            <div class="layui-input-inline">
+                                <select name="cid" layui.formselect>
+                                    <option value="">{$Think.lang.DownSelect}</option>
+
+                                    <option value="11" >1111</option>
+
+                                </select>
+                            </div>
                         </div>
 
                         <div class="layui-inline">
@@ -53,24 +70,14 @@
         </div>
         <!--数据-->
         <table class="layui-hide" id="DataDemos" lay-filter="DataDemos"></table>
-
-        <!--采集选项-->
-        <script type="text/html" id="collect_select">
-
-            <a class="layui-btn  layui-btn-radius layui-btn-xs layui-bg-blue" lay-event="JumpPage" title="{:lang('collect_bind')}" action="{:url('bindType')}?{{d.jump}}">{:lang('collect_bind')}</a>
-            <a class="layui-btn  layui-btn-radius layui-btn-xs layui-bg-blue" lay-event="timing" title="{{d.collect_name}}" data-url="{:url('timing')}?{{d.today}}" action="{:url('timing')}?{{d.week}}">{$Think.lang.collect_time}</a>
-            <a class="layui-btn  layui-btn-radius layui-btn-xs layui-bg-blue" lay-event="JumpPage" title="{:lang('collect_today')}{{d.collect_name}}" action="{:url(\'collectData\')}?{{d.today}}">{$Think.lang.collect_today}</a>
-            <a class="layui-btn  layui-btn-radius layui-btn-xs layui-bg-blue" lay-event="JumpPage" title="{:lang('collect_week')}{{d.collect_name}}" action={:url(\'collectData\')}?{{d.week}}>{$Think.lang.collect_week}</a>
-            <a class="layui-btn  layui-btn-radius layui-btn-xs layui-bg-blue" lay-event="collect" title="{:lang('collect_all')}{{d.collect_name}}" action={:url(\'collectData\')}?{{d.cjAll}}>{$Think.lang.collect_all}</a>
-
-        </script>
         <!--操作-->
         <script type="text/html" id="toolBar">
+
             <span id="DelUrl" alt="{:url('delAll')}" style="display: none"></span>
             <span id="ActionUrl" alt="{:url('edit')}" style="display: none"></span>
-            <span id="FieldName" alt="collect_id" style="display: none"></span>
-            <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edits">{$Think.lang.edit}</a>
-            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">{$Think.lang.del}</a>
+            <a class="layui-btn layui-btn-normal layui-btn-xs" href="{:url('/api/timing')}?key={{d.key}}" target="_blank">{:lang('btn_test')}</a>
+            <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edits">{:lang('edit')}</a>
+            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">{:lang('del')}</a>
         </script>
 
     </div>
@@ -97,18 +104,21 @@
             }],
             cols: [[
                 {type: "checkbox", width: 50},
-                {field: 'collect_id', align:"center", width: 80, title: 'ID', sort: true},
-                {field: 'collect_name', align: 'center',width:150,title: '{$Think.lang.collect_name}',templet:function(d){
-                        return '<a href="{:url(\'api\')}?'+d.jump+'">'+d.collect_name+'</a>'
-                    }},
-                {field: 'collect_type', align: 'center',width:100,title: '{$Think.lang.collect_type}'},
-                {field: 'collect_mid', align: 'center',width:100,title: '{$Think.lang.collect_mid}'},
-                {field: 'collect_web', align: 'center',width:100,title: '{$Think.lang.collect_web_zy}',templet:function(d){
-                        return '<a href="'+d.collect_web+'" title="'+d.collect_web+'" target="_blank">{:lang("collect_web")}</a>'
-                    }},
-                {field: 'views', align: 'center',title: '{$Think.lang.collect_select}',toolbar:"#collect_select"},
-                /*{field: 'createTime', align: 'center',title: '{$Think.lang.createTime}'},*/
-                {fixed:'right',title: '{$Think.lang.operate}', width: 120, toolbar: '#toolBar', align: "center"}
+                {field: 'id', align:"center", width: 80, title: 'ID', sort: true},
+                {field: 'name', align: 'center',title: '{$Think.lang.position_name}'},
+                {field: 'remark', align: 'center',title: '{$Think.lang.Remark}'},
+                {field: 'type', align: 'center',title: '{$Think.lang.type}'},
+                {field: 'updateTime', align: 'center',title: '{:lang("updateTime")}'},
+                {
+                    field: 'status', width: 120, align: 'center', templet: function (d) {
+                        if (d.status == 1) {
+                            return '<input type="checkbox" name="status" value="'+d.id+'" lay-skin="switch" lay-filter="switchTest" lay-text="{:lang('Enable')}|{:lang('Disable')}" checked> ';
+                        } else {
+                            return '<input type="checkbox" name="status" value="'+d.id+'" lay-skin="switch" lay-filter="switchTest" lay-text="{:lang('Enable')}|{:lang('Disable')}"> ';
+                        }
+                    }, title: '{$Think.lang.status}'
+                },
+                {fixed:'right',title: '{$Think.lang.operate}', width: 200, toolbar: '#toolBar', align: "center"}
             ]],
         });
     });

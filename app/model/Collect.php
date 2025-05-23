@@ -22,6 +22,16 @@ class Collect extends Model
 {
     public function vod($param)
     {
+        if(!array_key_exists('type',$param)){
+            $data = $this->vod_json($param);
+
+            if($data['code'] == 1){
+                return $data;
+            }
+            else{
+                return $this->vod_xml($param);
+            }
+        }
         if($param['type'] == '1'){
             return $this->vod_xml($param);
         }
@@ -42,6 +52,12 @@ class Collect extends Model
 
     public function vod_xml($param,$html='')
     {
+        $keys = ['t', 'page', 'ids', 'wd', 'ac', 'h', 'rday','param'];
+        foreach ($keys as $key) {
+            if (!array_key_exists($key, $param)) {
+                $param[$key] = '';
+            }
+        }
         $url_param = [
             'ac' => $param['ac'],
             't' => $param['t'],
@@ -66,14 +82,22 @@ class Collect extends Model
         else{
             $url .='&';
         }
+
         $url .= http_build_query($url_param). base64_decode($param['param']);
+
         $result = $this->checkCjUrl($url);
         if ($result['code'] > 1) {
             return $result;
         }
-        $html = FCurl_post($url,[],'','','GET');
+        $html = GetCurl($param['cjurl'],$url_param);
+
         //$html = mac_curl_get($url);
-        $html = $html['output'];
+        if($html['response_code'] == 200){
+            $html = $html['output'];
+        }else{
+            $html = '';
+        }
+
         if(empty($html)){
             return ['code'=>1001, 'msg'=>lang('get_html_err') . ', url: ' . $url];
         }
@@ -107,7 +131,6 @@ class Collect extends Model
             'url' => $url
         ];
 
-        //$type_list = GetCache('NavMenu');
         $bind_list = config('bind');
 
 
@@ -195,6 +218,12 @@ class Collect extends Model
 
     public function vod_json($param)
     {
+        $keys = ['t', 'page', 'ids', 'wd', 'ac', 'h', 'rday','param'];
+        foreach ($keys as $key) {
+            if (!array_key_exists($key, $param)) {
+                $param[$key] = '';
+            }
+        }
         $url_param = [
             'ac' => $param['ac'],
             't' => $param['t'],
@@ -244,7 +273,6 @@ class Collect extends Model
         $array_page['recordcount'] = $json['total'];
         $array_page['url'] = $url;
 
-        $type_list = GetCache('NavMenu');
         $bind_list = config('bind');
 
         $key = 0;
@@ -375,7 +403,7 @@ class Collect extends Model
 
                 $v['type_pid_id'] = intval($type_list[$v['type_id']]['pid']);
                 $pinyin = new Pinyin();
-                $v['vod_en'] = $pinyin->sentence($v['vod_name']);
+                $v['vod_en'] = $pinyin->sentence($v['vod_name'],'');
                 $v['vod_letter'] = strtoupper(substr($v['vod_en'],0,1));
                 // 使用资源站的添加时间，更新时间保持当前
                 // https://github.com/magicblack/maccms10/issues/780
@@ -449,7 +477,6 @@ class Collect extends Model
                         if($v['vod_play_url']){
                             $vod_id = SaveAt('vod',$v);
                         }
-
                         if ($vod_id > 0) {
                             //$vod_search_enabled && checkAndUpdateTopResults(['vod_id' => $vod_id] + $v, true);
                             $color = 'green';
@@ -528,7 +555,14 @@ class Collect extends Model
         echo $key;
         print_r($data);
         die;*/
-        /*if(ENTRANCE=='api'){
+        /*$con = request()->controller(true);
+        $path = request()->action();
+        echo '<pre>';
+        print_r($param);
+        echo $url;
+        die;*/
+        $entrance = app('http')->getName().'/'.request()->controller(true);
+        if($entrance=='api/timing'){
             delCache($key);
             if ($data['page']['page'] < $data['page']['pagecount']) {
                 $param['page'] = intval($data['page']['page']) + 1;
@@ -537,10 +571,11 @@ class Collect extends Model
                     return $this->error($res['msg']);
                 }
                 $this->vod_data($param,$res );
+                output_buffer();
             }
             mac_echo(lang('is_over'));
             die;
-        }*/
+        }
 
         if(empty($GLOBALS['config']['app']['collect_timespan'])){
             $GLOBALS['config']['app']['collect_timespan'] = 3;

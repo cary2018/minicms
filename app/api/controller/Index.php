@@ -7,7 +7,8 @@ class Index
 {
     public function index()
     {
-        $nav['list'] = GetCache('NavMenu');
+        $type = request()->param('type')?:0;
+        $nav['list'] = GetCache('NavMenu_'.$type);
         $nav['webInfo'] = CfgInfo('web');
         //echo json_encode($nav,JSON_UNESCAPED_UNICODE);
         echo json_encode(['code'=>200,'data'=>$nav],JSON_UNESCAPED_UNICODE);
