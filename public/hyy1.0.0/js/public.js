@@ -45,6 +45,10 @@ layui.use(['jquery','layer','iconPickerFa','form','table','laydate'], function (
 		if(!fileName){
 			fileName = 'id';
 		}
+		let title = $(this).attr('title');
+		if(!title){
+			title = '信 息';
+		}
 		let actionUrl = $(this).attr('action');
 		if(!actionUrl){
 			actionUrl = 'Change';
@@ -67,11 +71,25 @@ layui.use(['jquery','layer','iconPickerFa','form','table','laydate'], function (
 				for(let i = 0;i<data.length;i++){
 					arr_id.push(data[i][fileName]); //ar_id 是数据表唯一id
 				}
-				// console.log(obj);
+				console.log(data);
 				layer.confirm('确定删除吗?', function(index){
 					DelData(arr_id);  //执行批量删除
 					layer.close(index);
 				});
+				break;
+			case 'SelectData':
+				let idName = $(this).attr('data-id');
+				if(!idName){
+					idName = 'id';
+				}
+				let ids = '';
+				for(let i = 0;i<data.length;i++){
+					ids += data[i][idName]+","; //ar_id 是数据表唯一id
+				}
+				JumpPage(actionUrl+'&ids='+ids,title);
+				break;
+			case 'JumpPage':
+				JumpPage(actionUrl,title);
 				break;
 			case 'batchRecycle':
 				for(let i = 0;i<data.length;i++){
@@ -535,14 +553,33 @@ layui.use(['jquery','layer','iconPickerFa','form','table','laydate'], function (
 
 	//添加节点
 	$("#addDown").on('click',function (obj) {
-		let ms = $(this).parent('div').html();
+		let that = $(this);
+		let ms = that.parent('div').html();
 		let mess = ms.replace('fa-plus','fa-trash');
 		let msg = mess.replace('addDown','delDown');
 		let ttr = '<div class="layui-form-item">'+msg+'</div>';
 		$(this).parent().after(ttr);
 	});
+	$(".addDown").on('click',function (obj) {
+		let that = $(this);
+		let ttr = '';
+		let ms = that.parent('div').html();
+		const regex = /\bdelDown\b/;
+		if (!regex.test(ms)) {
+			let mess = ms.replace('fa-plus','fa-trash');
+			let msg = mess.replace('addDown','delDown');
+			ttr = '<div class="layui-form-item">'+msg+'</div>';
+		}else{
+			ttr = '<div class="layui-form-item">'+ms+'</div>';
+		}
+		$(this).parent().after(ttr);
+	});
+
 	//删除节点
 	$(document).on("click","#delDown",function (obj) {
+		$(this).parent().remove();
+	});
+	$(document).on("click",".delDown",function (obj) {
 		$(this).parent().remove();
 	});
 

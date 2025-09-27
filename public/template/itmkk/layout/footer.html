@@ -6,12 +6,14 @@
                     <span class="rt-sql">访问量：{cymini:total table="visit" where='[]'}次</span>
                     |
                     <span class="rt-sql">今日访问量：{cymini:totalCount table="visit" }次</span>
+                    |
+                    <span class="rt-sql totalOnline" id="totalOnline">在线人数：0</span>
                 </div>
                 <div class="footer-copyright text-xs">
                     {$Think.config.web.web_Copyright|raw}
 
                 </div>
-
+                <div id="translate"></div>
             </div>
         </div>
         <div class="footer-hidden-xs">
@@ -56,3 +58,33 @@
         </svg>
     </div>
 </footer>
+<style type="text/css">
+    #translate select{
+        display: block;
+        width: 30%;
+        padding-left: 10px;
+        height: 35px;
+        line-height: 1.3;
+        line-height: 35px \9;
+        border-width: 1px;
+        border-style: solid;
+        background-color: #fff;
+        color: rgba(0, 0, 0, .85);
+        border-radius: 2px;
+    }
+</style>
+<script>
+    var userKey = "{:clientSe()}";
+    var port = "{:Cfg('port')}";
+</script>
+
+<script>
+    translate.language.setLocal('chinese_simplified'); //设置本地语种（当前网页的语种）。如果不设置，默认就是 'chinese_simplified' 简体中文。 可填写如 'english'、'chinese_simplified' 等，具体参见文档下方关于此的说明
+    translate.service.use('client.edge');
+    //translate.selectLanguageTag.languages = 'chinese_simplified,chinese_traditional,english'; //设定select切换语言所支持的语种
+    translate.language.setUrlParamControl(); //url参数后可以加get方式传递 language 参数的方式控制当前网页以什么语种显示
+    translate.listener.start();	//开启html页面变化的监控，对变化部分会进行自动翻译。注意，这里变化区域，是指使用 translate.setDocuments(...) 设置的区域。如果未设置，那么为监控整个网页的变化
+    translate.execute(); //执行翻译初始化操作，显示出select语言选择
+</script>
+<script src="/hyy1.0.0/frontend/js/socket.io.js" charset="utf-8"></script>
+<script src="/hyy1.0.0/frontend/js/totalClient.js" charset="utf-8"></script>

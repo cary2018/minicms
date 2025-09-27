@@ -2,7 +2,7 @@
 // +----------------------------------------------------------------------
 // | 应用设置
 // +----------------------------------------------------------------------
-
+$domain = $_SERVER['HTTP_HOST'];
 return [
     // 应用地址
     'app_host'         => env('app.host', ''),
@@ -16,9 +16,12 @@ return [
     'default_timezone' => 'Asia/Shanghai',
 
     // 应用映射（自动多应用模式有效）
-    'app_map'          => [],
+    'app_map'          => [
+        //'article' => 'index/article', // 将 article 映射到 index 模块的 article 控制器
+    ],
     // 域名绑定（自动多应用模式有效）
-    'domain_bind'      => [],
+    //'domain_bind'      => ['www.tp8.com' =>  'index','tp8.com' =>  'admin',],
+    //'domain_bind'      => [$domain =>  'index',],
     // 禁止URL访问的应用列表（自动多应用模式有效）
     'deny_app_list'    => [],
 

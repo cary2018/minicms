@@ -74,6 +74,16 @@
                 <div id="post-body-888888" class="single-entry entry-content">
                     {cymini:detail field='content'}
                 </div>
+                {if $__detail__['downloadJur'] == 1}
+                <div class="entry entry-page">
+
+                    <a class="layui-btn layui-bg-blue layui-btn-sm" href="/{$__detail__['annex']}" target="_blank">附件下载</a>
+                    {cymini:table table='software' where='["aid","=",$__detail__["id"]]'}
+                    <a class="layui-btn layui-bg-blue layui-btn-sm" href="{$vo.url}" target="_blank">{$vo.name}</a>
+                    {/cymini:table}
+
+                </div>
+                {/if}
             </div>
             <div class="entry entry-page">
                 <div class="entry_page_flex">

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{$Think.lang.database_back}</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    {include file="public/file_css"}
+    <style>
+        .layui-tab-content{
+            padding:0;
+        }
+    </style>
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+
+        <div class="layui-tab layui-tab-card">
+            <ul class="layui-tab-title">
+                <li class="layui-this">{$Think.lang.database_back}</li>
+                <li>{$Think.lang.database_restore}</li>
+            </ul>
+            <div class="layui-tab-content" style="min-height: 100px;">
+                <div class="layui-tab-item layui-show">
+                    <!--头部工具栏-->
+                    <div id="toolbarDemo" style="display: none;background: #fff;">
+                        <button class="layui-btn layui-btn-normal layui-btn-sm" field="Name" action="{:url('export')}" lay-event="ChangeData">
+                            {$Think.lang.database_back_data} </button>
+                        <button class="layui-btn layui-btn-sm" field="Name" action="{:url('optimize')}" lay-event="ChangeData">
+                            {$Think.lang.database_optimize_data} </button>
+                        <button class="layui-btn layui-btn-sm" action="{:url('repair')}" field="Name" lay-event="ChangeData">
+                            {$Think.lang.database_repair_data} </button>
+                    </div>
+                    <!--数据-->
+                    <table class="layui-hide" id="DataDemos" lay-filter="DataDemos"></table>
+                    <!--工具条操作-->
+                    <script type="text/html" id="toolBar">
+                        <span id="FieldName" alt="Name" style="display: none"></span>
+                        <a class="layui-btn layui-btn-normal layui-btn-xs" field="Name" action="{:url('optimize')}" id="optimize" lay-event="optimize">{$Think.lang.database_optimize_data}</a>
+                        <a class="layui-btn layui-btn-danger layui-btn-xs" field="Name" action="{:url('repair')}" id="repair" lay-event="repair">{$Think.lang.database_repair_data}</a>
+                    </script>
+                </div>
+                <div class="layui-tab-item">
+                    <div id="toolDel" style="display:none;">
+                        <button class="layui-btn layui-btn-sm layui-btn-danger" action="{:url('delAll')}" field="filename" lay-event="ChangeData">
+                            {$Think.lang.batchDel} </button>
+                    </div>
+                    <table lay-filter="backup">
+                        <thead>
+                        <tr>
+                            <th lay-data="{field:'numbers',type:'checkbox', width:60}">-</th>
+                            <th lay-data="{field:'numbers',type:'numbers', width:100}">{$Think.lang.order_number}</th>
+                            <th lay-data="{field:'filename'}">{$Think.lang.database_back_name}</th>
+                            <th lay-data="{field:'size'}">{$Think.lang.database_back_size}</th>
+                            <th lay-data="{field:'parts'}">{$Think.lang.database_back_gz}</th>
+                            <th lay-data="{field:'mtime'}">{$Think.lang.database_back_time}</th>
+                            <th lay-data="{field:'option',width:130}">{$Think.lang.operate}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {volist name='filesql' id='vo'}
+                        <tr>
+                            <td> - </td>
+                            <td> - </td>
+                            <td>{$vo.filename}</td>
+                            <td>{$vo.size}</td>
+                            <td>{$vo.parts}</td>
+                            <td>{$vo.mtime}</td>
+                            <td>
+                                <a class="layui-btn layui-btn-xs" lay-event="restore">{$Think.lang.database_restore_data}</a>
+                                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">{$Think.lang.del}</a>
+                            </td>
+                        </tr>
+                        {/volist}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{include file="public/file_js"}
+<script>
+    layui.use(['form', 'table'], function () {
+        var $ = layui.jquery,
+            form = layui.form,
+            table = layui.table;
+
+        table.render({
+            elem: '#DataDemos',
+            url: '{:url("dataList")}',
+            toolbar: '#toolbarDemo',
+            method: 'post',
+            page: false,  //开启分页
+            limit: 100,  //默认10条
+            response: {
+                statusCode: 200 // 重新规定成功的状态码为 200，table 组件默认为 0
+            },
+            cols: [[
+                {field: 'Name',type: "checkbox", width: 50},
+                {field: 'Name', align: 'center', title: '{$Think.lang.database_table_name}'},
+                {field: 'Rows', align: 'center', title: '{$Think.lang.database_data_number}'},
+                {field: 'Data_length', align: 'center',title: '{$Think.lang.database_data_size}'},
+                {field: 'Data_free', align: 'center',title: '{$Think.lang.database_redundance}'},
+                {field: 'Comment', align: 'center',title: '{$Think.lang.Remark}'},
+                {field: 'Engine', width: 100, align: 'center', title: '{$Think.lang.type}'
+                },
+                {title: '{$Think.lang.operate}', width: 200, align: "center", toolbar: '#toolBar',}
+            ]],
+        });
+
+
+        //转换静态表格
+        table.init('backup', {
+            //height: 315 //设置高度
+            limit: 100, //注意：请务必确保 limit 参数（默认：10）是与你服务端限定的数据条数一致
+            toolbar:"#toolDel"
+            //支持所有基础参数
+        })
+        table.on('toolbar(backup)',function (obj) {
+            let checkStatus = table.checkStatus(obj.config.id); //idTest 即为基础参数 id 对应的值
+            let data = checkStatus.data;
+            let fieldName = $(this).attr('field');
+            if(!fieldName){
+                fieldName = 'id';
+            }
+            let actionUrl = $(this).attr('action');
+            if(!actionUrl){
+                actionUrl = 'Change';
+            }
+            let confirm = $(this).attr('title');
+            if(!confirm){
+                confirm = '{$Think.lang.collection_confirm}';
+            }
+            let arr_id = new Array();
+            switch (obj.event) {
+                case 'ChangeData':
+                    for(let i = 0;i<data.length;i++){
+                        arr_id.push(data[i][fieldName]); //ar_id 是数据表唯一id
+                    }
+                    layer.confirm(confirm, function(index){
+                        ChangeData(arr_id,actionUrl);  //执行批量删除
+                        layer.close(index);
+                    });
+                    break;
+            }
+        });
+        table.on('tool(backup)',function (obj) {
+            let data = obj.data;
+            let layEvent = obj.event;
+            let confirm = '{$Think.lang.collection_confirm}';
+            switch (layEvent) {
+                case 'restore':
+                    layer.confirm(confirm, function(index){
+                        ChangeData(data['filename'],'{:url("restore")}');
+                        layer.close(index);
+                    });
+                    break;
+                case 'del':
+                    layer.confirm(confirm, function(index){
+                        ChangeData(data['filename'],'{:url("delAll")}',obj);
+                        layer.close(index);
+                    });
+                    break;
+            }
+        });
+        function ChangeData(data,action,delHan=''){
+            //异步发送，把数据提交给后台处理
+            var wait = 3000;
+            $.ajax({
+                url: action,
+                type: "POST",
+                data: {data},
+                beforeSend: function(){
+                    layer.load(1,{shade:[0.3,'#000']});
+                },
+                success: function (data) {
+                    //关闭等待弹出层
+                    layer.closeAll();
+                    //权限不足
+                    let ob = typeof data;
+                    if(ob == 'object'){
+                        if(data.code == 0){
+                            layer.msg(data.msg,{icon:5,time:wait,shade:0.3});
+                        }
+                    }
+                    let obj = JSON.parse(data);
+                    if(obj.code == 200){
+                        //删除指定行
+                        if(delHan){
+                            delHan.del();
+                        }
+                        table.reload("backup");  //重载数据表格
+                        layer.msg(obj.msg,{icon:1,time:wait,shade:0.3});
+                        //移除选中行
+                        $(".layui-form-checked").not('.header').parents('tr').remove();
+                    }else{
+                        layer.msg(obj.msg,{icon:2,time:wait,shade:0.3});
+                    }
+                },
+                error: function () {
+                    layer.msg("上传失败！",{icon:2,time:wait,shade:0.3});
+                    $("#imgWait").hide();
+                    layer.closeAll('loading'); //关闭加载层
+                }
+            });
+        }
+    });
+</script>
+
+</body>
+</html>

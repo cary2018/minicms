@@ -1,0 +1,482 @@
+<header class="header header-layout-3 show-slide">
+    <nav class="navbar navbar-top center">
+        <div class="container-fluid container-header">
+            <div class="navbar-header">
+                <div class="navbar-brand">
+                    <a class="navbar-logo" href="/">
+                        <img src="{$Think.config.web.web_logo|ImgPath}" alt="">
+                    </a>
+                </div>
+                <button type="button" class="navbar-toggle mobile-navbar-toggle">
+                    <i class="em12 css-icon i-menu"><i></i></i>
+                </button>
+                <a class="navbar-toggle serach-switch" href="javascript:;">
+                    <i class="layui-icon css-icon layui-icon-search"></i>
+                </a>
+            </div>
+            <div class="collapse navbar-collapse">
+                <div class="navbar-form navbar-right">
+                    <ul class="list-inline splitters relative">
+                        {if !$member}
+                        <li>
+                            <a href="javascript:;" class="btn" lay-on="login">
+                                <i class="layui-icon css-icon layui-icon-username"></i>
+                            </a>
+                            <ul class="sub-menu">
+                                <div class="padding-10">
+                                    <div class="sub-user-box">
+                                        <div class="text-center">
+                                            <div>
+                                                <a lay-on="login" class="em09 signin-loader but jb-red radius4 payvip-icon btn-block mt10" href="javascript:;" style="overflow: hidden; position: relative;">
+                                                    <svg class="em12 mr10" aria-hidden="true"
+                                                         data-viewbox="0 0 1024 1024" viewBox="0 0 1024 1024">
+                                                        <use xlink:href="#icon-vip_1"></use>
+                                                    </svg>
+                                                    开通会员 尊享会员权益
+                                                </a>
+                                            </div>
+                                            <div class="flex jsa header-user-href">
+                                                <a href="javascript:;" lay-on="login" class="signin-loader">
+                                                    <div class="badg mb6 toggle-radius c-blue" style="overflow: hidden; position: relative;">
+                                                        <i class="layui-icon layui-icon-username"></i>
+                                                    </div>
+                                                    <div class="c-blue">登录</div>
+                                                </a>
+                                                <a href="javascript:;" lay-on="register" class="signup-loader">
+                                                    <div class="badg mb6 toggle-radius c-green" style="overflow: hidden; position: relative;">
+                                                        <i class="layui-icon layui-icon-user"></i>
+                                                    </div>
+                                                    <div class="c-green">注册</div>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ul>
+                        </li>
+                        {else /}
+                        <li>
+                            <a href="javascript:;" class="btn">
+                                <i class="layui-icon css-icon layui-icon-username"></i>
+                            </a>
+                            <ul class="sub-menu">
+                                <div class="padding-10">
+                                    <div class="sub-user-box">
+                                        <div class="user-info flex ac relative">
+                                            <a href="{:url('/member')}">
+                                                <span class="avatar-img">
+                                                    <img alt="{$member.username}" src="{$member.thumbImg|ImgPath}" class="avatar avatar-id-{$member.id} ls-is-cached lazyloaded lazyloadafter">
+                                                </span>
+                                            </a>
+                                            <div class="user-right flex flex1 ac jsb ml10">
+                                                <div class="flex1" style="max-width: calc(100% - 40px);">
+                                                    <b>
+                                                    <name class="flex ac flex1">
+                                                        <a class="display-name text-ellipsis " href="{:url('/member')}">{$member.username}</a>
+                                                        <img class="img-icon ml3 ls-is-cached" title="" data-original-title="LV1">
+                                                    </name>
+                                                    </b>
+                                                    <div class="px12 muted-2-color text-ellipsis">这家伙很懒，什么都没有写...</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="relative opacity5">
+                                            <i class="line-form-line"></i>
+                                        </div>
+                                        <div class="mt10 text-center">
+                                            <div class="flex jsa header-user-href">
+                                                <a rel="nofollow" class="btn" href="{:url('/member')}">
+                                                    <div class="badg mb6 toggle-radius c-blue">
+                                                        <i class="layui-icon layui-icon-username"></i>
+                                                    </div>
+                                                    <div class="c-blue">用户中心</div>
+                                                </a>
+
+                                                <a class="btn" href="javascript:;" lay-on="logout">
+                                                    <div class="badg mb6 toggle-radius c-red">
+                                                        <i class="layui-icon layui-icon-logout"></i>
+                                                    </div>
+                                                    <div class="c-red">退出登录</div>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ul>
+                        </li>
+                        {/if}
+                        <li>
+                            <a href="javascript:;" class="btn serach-switch">
+                                <i class="layui-icon css-icon layui-icon-search"></i>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:;" class="btn toggle-theme toggle-radius">
+                                <i class="fa fa-toggle-theme"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="navbar-right">
+                    <ul class="nav navbar-nav">
+                        <li id="menu-item-1360" class="menu-item">
+                            <a href="/">
+                                首页
+                            </a>
+                        </li>
+                        {cymini:navmenu }
+                        <li id="menu-item-1360" class="menu-item">
+                            {if $vo.son}
+                            <a href="javascript:;" >
+                                {$vo.name}<i class="fa fa-angle-down ml6"></i>
+                            </a>
+                            {else}
+                            <a href="{$vo.isUrl?$vo.outUrl:$vo.temp_list}?id={$vo.id}" target="{$vo.target}">
+                                {$vo.name}
+                            </a>
+                            {/if}
+                            {if $vo.son}
+                            <ul class="sub-menu">
+                                {foreach $vo.son as $skey=>$item}
+                                <li id="menu-item-1596"
+                                    class="menu-item menu-item-type-custom menu-item-object-custom menu-item-1596">
+                                    <a href="{$item.isUrl?$item.outUrl:$item.temp_list}?id={$item.id}" target="{$item.target}">
+                                        {$item.name}
+                                    </a>
+                                </li>
+                                {/foreach}
+                            </ul>
+                            {/if}
+                        </li>
+                        {/cymini:navmenu}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<div class="mobile-header">
+    <nav mini-touch="mobile-nav" touch-direction="left"
+         class="mobile-navbar visible-xs-block scroll-y mini-scrollbar left">
+        <a href="javascript:;" class="toggle-theme toggle-radius">
+            <i class="fa fa-toggle-theme"></i>
+        </a>
+        <ul class="mobile-menus theme-box">
+            {cymini:navmenu }
+            <li class="menu-item ">
+                {if $vo.son}
+                <a href="javascript:;" >
+                    {$vo.name}
+                </a>
+                {else}
+                <a href="{$vo.isUrl?$vo.outUrl:$vo.temp_list}?id={$vo.id}" target="{$vo.target}">
+                    {$vo.name}
+                </a>
+                {/if}
+                {if $vo.son}
+                <ul class="sub-menu">
+                    {foreach $vo.son as $skey=>$item}
+                    <li class="menu-item">
+                        <a href="{$item.isUrl?$item.outUrl:$item.temp_list}?id={$item.id}" target="{$item.target}">
+                            {$item.name}
+                        </a>
+                    </li>
+                    {/foreach}
+                </ul>
+                {/if}
+            </li>
+            {/cymini:navmenu}
+
+        </ul>
+        <div class="posts-nav-box" data-title="文章目录"></div>
+
+    </nav>
+    <div class="fixed-body mobile-navbar-toggle"></div>
+</div>
+
+{if !$member}
+<div id="MemberRegister" style="display:none;">
+
+    <div class="layadmin-user-login-main" style="margin:16px;">
+        <form id="DataForm1" lay-filter="DataForm1" action="{:url('/member/login/register')}" onsubmit="return false">
+            <div class="layadmin-user-login-box layadmin-user-login-body layui-form">
+                <div class="layui-form-item">
+                    <div class="layui-input-wrap">
+                        <div class="layui-input-prefix">
+                            <i class="layui-icon layui-icon-username"></i>
+                        </div>
+                        <input type="text" name="username" id="LAY-user-login-username11" lay-verify="required" placeholder="用户名" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-wrap">
+                        <div class="layui-input-prefix">
+                            <i class="layui-icon layui-icon-password"></i>
+                        </div>
+                        <input type="password" name="password" lay-verify="required" placeholder="密码" class="layui-input">
+                    </div>
+
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-wrap">
+                        <div class="layui-input-prefix">
+                            <i class="layui-icon layui-icon-password"></i>
+                        </div>
+                        <input type="password" name="repass" id="LAY-user-login-repass11" lay-verify="required" placeholder="确认密码" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-wrap">
+                        <div class="layui-input-prefix">
+                            <i class="layui-icon layui-icon-email"></i>
+                        </div>
+                        <input type="text" name="Eemail" id="Eemail" lay-verify="required|email" placeholder="邮箱" lay-reqtext="请输入-邮箱" class="layui-input VEmail">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-row">
+                        <div class="layui-col-xs7">
+                            <div class="layui-input-wrap">
+                                <div class="layui-input-prefix">
+                                    <i class="layui-icon layui-icon-vercode"></i>
+                                </div>
+                                <input type="text" name="VCode" lay-verify="required" placeholder="验证码" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-col-xs5">
+                            <div style="margin-left: 10px;">
+                                <button type="button" class="layui-btn layui-btn-primary layui-btn-fluid" id="TimeOut" lay-on="getVcode">获取验证码</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <input type="checkbox" name="agreement" lay-skin="primary" title="同意用户协议" checked=""><div class="layui-unselect layui-form-checkbox layui-form-checked" lay-skin="primary"><span>同意用户协议</span><i class="layui-icon layui-icon-ok"></i></div>
+                </div>
+                <div class="layui-form-item">
+                    <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="doSave">注 册</button>
+                </div>
+                <div class="layui-trans layui-form-item layadmin-user-login-other">
+                    <label>社交账号注册</label>
+                    <a href="javascript:;"><i class="layui-icon layui-icon-login-qq"></i></a>
+                    <a href="javascript:;"><i class="layui-icon layui-icon-login-wechat"></i></a>
+                    <a href="javascript:;"><i class="layui-icon layui-icon-login-weibo"></i></a>
+                    <a href="javascript:;" lay-on="login" class="layadmin-user-jump-change layadmin-link layui-hide-xs">用已有帐号登入</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="MemberLogin" style="display:none;">
+
+    <div class="layadmin-user-login-main" style="background:#fff;">
+        <div class="layadmin-user-login-box layadmin-user-login-body layui-form" style="margin:16px;">
+            <form id="DataForm" lay-filter="DataForm" action="{:url('/member/login/check')}" onsubmit="return false" class="layui-form login-bottom">
+                <input type="hidden" id="__token__" name="__token__" value="{:token()}">
+                <div class="layui-form-item">
+                    <div class="layui-input-wrap">
+                        <div class="layui-input-prefix">
+                            <i class="layui-icon layui-icon-username"></i>
+                        </div>
+                        <input type="text" name="username" id="LAY-user-login-username" lay-verify="required" placeholder="用户名" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-wrap">
+                        <div class="layui-input-prefix">
+                            <i class="layui-icon layui-icon-password"></i>
+                        </div>
+                        <input type="password" name="password" lay-verify="required" placeholder="密码" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-row">
+                        <div class="layui-col-xs7">
+                            <div class="layui-input-wrap">
+                                <div class="layui-input-prefix">
+                                    <i class="layui-icon layui-icon-vercode"></i>
+                                </div>
+                                <input type="text" name="captcha" lay-verify="required" placeholder="图形验证码" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-col-xs5">
+                            <div style="margin-left: 10px;">
+                                <img id="refreshCaptcha" src="{:captcha_src()}" onclick="this.src='{:captcha_src()}?'+Math.random();" class="layadmin-user-login-codeimg" id="LAY-user-get-vercode">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-input-wrap" style="margin-bottom: 20px;">
+                    <input type="checkbox" name="remember" lay-skin="primary" title="记住密码">
+                    <a href="javascript:;" style="float: right; margin-top: 7px;">忘记密码？</a>
+                </div>
+                <div class="layui-form-item">
+                    <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="doSave">登 录</button>
+                </div>
+            </form>
+
+            <div class="layui-trans layui-form-item layadmin-user-login-other">
+                <label>社交账号登入</label>
+                <a href="javascript:;"><i class="layui-icon layui-icon-login-qq"></i></a>
+                <a href="javascript:;"><i class="layui-icon layui-icon-login-wechat"></i></a>
+                <a href="javascript:;"><i class="layui-icon layui-icon-login-weibo"></i></a>
+                <a href="javascript:;" lay-on="register" class="layadmin-user-jump-change layadmin-link">注册帐号</a>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use(function(){
+        var $ = layui.$;
+        var layer = layui.layer;
+        var util = layui.util;
+        var form = layui.form;
+        // 提交事件
+        form.on('submit(doSave)', function(obj){
+            let format = obj.form;
+            let formId = $(format).attr('id');
+            let formData =  new FormData($('#'+formId)[0]); //获取整个表单数据
+            let ActionUrl = $(format).attr('action');
+            let loading = layer.load(1,{icon:6,shade:0.3});
+            // 此处可执行 Ajax 等操作
+            $.ajax({
+                url:ActionUrl,
+                type:'post',
+                data:formData,
+                async:true,  //true发送异步请求,false发送同步请求
+                processData: false,  // 告诉jQuery不要去处理发送的数据
+                contentType: false,   // 告诉jQuery不要去设置Content-Type请求头
+                success:function(data){
+                    let res = JSON.parse(data)
+                    if(res.code == 200){
+                        layer.closeAll();
+                        layer.msg(res.msg,{icon:6,shade:0.3});
+                        location.reload();
+                    }else{
+                        layer.close(loading);
+                        layer.msg(res.msg,{icon:5,shade:0.3});
+                        let Captcha = $('#refreshCaptcha').attr('src');
+                        if(Captcha){
+                            //刷新验证码
+                            $('#refreshCaptcha').attr('src',Captcha.replace(/\?.*$/, '')+'?'+Math.random());
+                        }
+                        //更新token
+                        $('input[name="__token__"]').val(res.token);//更新token防止失效
+                    }
+                    //console.log(data);
+                }
+            });
+            return false; // 阻止默认 form 跳转
+        });
+        util.on('lay-on',{
+            register:function(){
+                layer.closeAll(); // 关闭所有类型的层
+                layer.open({
+                    type: 1,
+                    title: '注册',
+                    shadeClose: true,
+                    shade: 0.8,
+                    area: '350px',
+                    content: $('#MemberRegister') // iframe 的 url
+                });
+            },
+            login:function(){
+                layer.closeAll(); // 关闭所有类型的层
+                layer.open({
+                    type: 1,
+                    title: '登录',
+                    shadeClose: true,
+                    shade: 0.8,
+                    area: '350px',
+                    content: $('#MemberLogin') // iframe 的 url
+                });
+            },
+            // 获取验证码
+            getVcode: function(){
+                var isvalid = form.validate('.VEmail');
+                // 验证通过
+                if(isvalid){
+                    let loading = layer.load(1,{icon:6,shade:0.3});
+                    //倒计时
+                    setTime(this);
+                    //获取验证码
+                    $.ajax({
+                        url:"{:url('/api/Email')}",
+                        type:'post',
+                        data: {
+                            email:$("#Eemail").val()
+                        },
+                        success:function(data){
+                            let res = JSON.parse(data);
+                            if(res.code == 200){
+                                //关闭加载层
+                                layer.close(loading);
+                                layer.msg(res.message,{icon:6,shade:0.3});
+                            }else{
+                                //关闭加载层
+                                layer.close(loading);
+                                layer.msg(res.message,{icon:5,shade:0.3});
+                            }
+                        }
+                    });
+                }
+            }
+        })
+        //倒计时
+        var outTime = 60;
+        function setTime(val){
+            if(outTime == 0){
+                $("#TimeOut").html('重新获取')
+                $("#TimeOut").removeClass('layui-btn-disabled')
+                $("#TimeOut").attr('lay-on','getVercode')
+                outTime = 60
+            }else{
+                $("#TimeOut").html('倒计时'+outTime+'秒')
+                $("#TimeOut").addClass('layui-btn-disabled')
+                $("#TimeOut").removeAttr('lay-on')
+                outTime--;
+                setTimeout(function(){
+                    setTime(val)
+                },1000)
+            }
+        }
+    })
+</script>
+{else /}
+<script>
+    layui.use(function(){
+        var $ = layui.$;
+        var layer = layui.layer;
+        var util = layui.util;
+        util.on('lay-on',{
+            logout:function(){
+                let loading = layer.msg('正在退出登录...',{icon:5,shade:0.3});
+                //获取验证码
+                $.ajax({
+                    url:"{:url('/member/login/logout')}",
+                    type:'post',
+                    data: {
+                        jump:'1'
+                    },
+                    success:function(data){
+                        let res = JSON.parse(data);
+                        if(res.code == 200){
+                            //关闭加载层
+                            layer.close(loading);
+                            layer.msg('成功退出登录！',{icon:1,shade:0.3});
+                            location.reload(); //刷新页面
+                        }else{
+                            //关闭加载层
+                            layer.close(loading);
+                            layer.msg(res.message,{icon:5,shade:0.3});
+                        }
+                    }
+                });
+            },
+        })
+
+    })
+</script>
+{/if}

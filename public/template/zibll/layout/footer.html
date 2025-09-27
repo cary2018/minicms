@@ -1,0 +1,95 @@
+<footer class="footer">
+    <div class="container-fluid container-footer">
+        <ul class="list-inline">
+            <li class="hidden-xs" style="max-width: 300px;">
+                <p>
+                    <a class="footer-logo" href="/" title="{$Think.config.web.web_title}">
+                    <img src="{$Think.config.web.web_logo|ImgPath}" style="height: 40px;">
+                </a>
+                </p>
+                <div class="footer-muted em09">
+                    {$Think.config.web.web_footer_title}
+                </div>
+            </li>
+            <li style="max-width: 550px;">
+                <p class="fcode-links">
+                    <span class="rt-sql">访问量：{cymini:total table="visit" where='[]'}次</span>
+                    |
+                    <span class="rt-sql">今日访问量：{cymini:totalCount table="visit" }次</span>
+
+                </p>
+                <div class="footer-muted em09">
+                    {$Think.config.web.web_Copyright|raw}
+                    <div class=" mt6">
+                        {$Think.config.web.web_Copy|raw}
+                    </div>
+                </div>
+                <div class="footer-contact mt10">
+
+                </div>
+            </li>
+            <li>
+                <div class="footer-miniimg" data-toggle="tooltip" >
+                    <p>
+                        <img class="ls-is-cached " src="{$view_path}/static/images/5.jpg" alt="{$Think.config.web.web_title}">
+                    </p>
+                    <span class="opacity8 em09">幽灵工作室</span>
+                </div>
+                <div class="footer-miniimg" data-toggle="tooltip" >
+                    <p>
+                        <img class="lazyloaded lazyloadafter" src="{$view_path}/static/images/6.jpg" alt="{$Think.config.web.web_title}">
+                    </p>
+                    <span class="opacity8 em09">认真工作中</span>
+                </div>
+            </li>
+        </ul>
+    </div>
+</footer>
+
+<div class="float-right round position-center scrolling-hide">
+    <a class="float-btn toggle-theme hover-show" href="javascript:;">
+        <i class="fa fa-toggle-theme"></i>
+    </a>
+    <a class="float-btn itmkk-top" href="javascript:;" data-original-title="返回顶部" >
+        <i class="fa fa-angle-up em12"></i>
+    </a>
+</div>
+
+<div id="nav_search" class="main-search fixed-body main-bg box-body navbar-search nopw-sm">
+    <div class="container">
+        <div class="mb20">
+            <button class="close serach-switch" >
+                <i class="layui-icon css-icon layui-icon-close"></i>
+            </button>
+        </div>
+        <div load-click="" no-scroll="true">
+            <div class="search-input">
+                <form method="get" class="padding-10 search-form" action="/index/search">
+                    <div class="line-form">
+                        <div class="search-input-text">
+                            <input type="text" name="q" class="line-form-input" value="{$Request.param.q?$Request.param.q:''}">
+                            <i class="line-form-line"></i>
+                            <div class="scale-placeholder" default="开启精彩搜索">开启精彩搜索</div>
+                            <div class="abs-right muted-color">
+                                <button type="submit" tabindex="2" class="null">
+                                    <i class="layui-icon icon layui-icon-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+<style type="text/css">
+    .parent-container {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .footer {
+        --footer-bg: #22292d;
+        --footer-color: #f2f2f2;
+    }
+</style>

@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=0.0, viewport-fit=cover">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta name="robots" content="max-image-preview:large">
+    <title>{$Think.config.web.web_title}</title>
+    <meta name="keywords" content="{$Think.config.web.web_key}">
+    <meta name="description" content="{$Think.config.web.web_desc}">
+    <meta name="apple-mobile-web-app-title" content="{$Think.config.web.web_key}">
+
+    {include file='layout/file-style'}
+    {include file='layout/icon'}
+    <link rel="stylesheet" href="{$view_path}/static/css/swiper.min.css" type="text/css" />
+    <script src="{$view_path}/static/js/swiper.min.js"></script>
+
+    {include file='layout/file-script'}
+
+</head>
+
+<body class="home blog white-theme nav-fixed site-layout-2" style="">
+
+{include file='layout/header'}
+
+<div class="header-slider-container relative mb20 card-4 filter-blur">
+    <div class="relative zib-slider">
+        <div class="new-swiper-index slide-index slide-header swiper-container-initialized" style="--m-height :300px;--pc-height :560px;">
+            <div class="swiper-wrapper">
+                {cymini:banner where='[["enable","=",1],["ident","=","d"]]' limit='10' order='orderSort desc'}
+                <div class="swiper-slide">
+                        <span>
+                            <img src="{$vo.img|ImgPath}">
+                            <div class="absolute"></div>
+                        </span>
+                </div>
+                {/cymini:banner}
+            </div>
+        </div>
+    </div>
+    <div class="header-slider-search abs-center">
+
+        <div class="search-input">
+            <form method="get" class="padding-10 search-form" action="/index/search">
+                <div class="line-form">
+                    <div class="search-input-text">
+                        <input type="text" name="q" class="line-form-input" value="{$Request.param.q?$Request.param.q:''}">
+                        <i class="line-form-line"></i>
+                        <div class="scale-placeholder" default="开启精彩搜索">开启精彩搜索</div>
+                        <div class="abs-right muted-color">
+                            <button type="submit" tabindex="2" class="null">
+                                <i class="layui-icon icon layui-icon-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="search-keywords">
+                <div>
+                    <p class="muted-color">热门标签</p>
+                    {cymini:tags num='9'}
+                    <a class="search_keywords muted-2-color but em09 mr6 mb6" href="{:url('/index/tags')}?tag={$vo.tag}">
+                        {$vo.tag}
+                    </a>
+                    {/cymini:tags}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="header-slider-card container">
+        <div class="">
+            <div class="flex jse flex-row gutters-5 flex-col-sm-2">
+                {cymini:article num='4' order='id' cid='11'}
+                <div class="flex1">
+                    <a class="main-color" href="{$vo.temp_archives}?id={$vo.id}">
+                        <div class="icon-cover-card flex ac zib-widget">
+                            <div class="icon-cover-icon badg cir c-yellow" style="font-size: 25px;">
+                                <img src="{$vo.articleThumbImg|ImgPath}">
+                            </div>
+                            <div class="icon-cover-desc ml10 flex1 px12-sm">
+                                <div class="em12 text-ellipsis font-bold">
+                                    {$vo.title}
+                                </div>
+                                <div class="muted-color mt6 text-ellipsis">
+                                    {$vo.description}
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {/cymini:article}
+            </div>
+        </div>
+    </div>
+</div>
+
+<main role="main" class="container">
+    <div class="content-wrap">
+        <div class="content-layout">
+            <div class="mb20">
+                <div class="relative zib-slider">
+                    <div class="new-swiper slide-widget scale-height swiper-eq-2 swiper-container-coverflow swiper-container-initialized swiper-container-horizontal swiper-container-pointer-events">
+                        <div class="swiper-wrapper" >
+                            {cymini:banner where='[["enable","=",1],["ident","=","c"]]' limit='5' order='orderSort desc'}
+                            <div class="swiper-slide">
+                                <a target="_blank" href="{$vo.link}">
+                                    <img src="{$vo.img|ImgPath}" alt="{$vo.title}">
+                                </a>
+                                <div class="swiper-slide-shadow-left" ></div>
+                                <div class="swiper-slide-shadow-right" ></div>
+                            </div>
+                            {/cymini:banner}
+                        </div>
+                        <!-- 如果需要分页器 -->
+                        <div class="swiper-pagination"></div>
+
+                        <!-- 如果需要导航按钮 -->
+                        <div class="swiper-button-prev"></div>
+                        <div class="swiper-button-next"></div>
+                    </div>
+                </div>
+            </div>
+            <script>
+                new Swiper ('.new-swiper-index', {
+                    loop: true, // 循环模式选项
+                    //可选选项，自动滑动
+                    autoplay: {
+                        pauseOnMouseEnter:true,
+                        disableOnInteraction:false,
+                    },
+                    effect : 'fade',
+                    fadeEffect: {
+                        crossFade: true,
+                    },
+                });
+                new Swiper ('.new-swiper', {
+                    direction: 'horizontal',
+                    loop: true, // 循环模式选项
+                    autoplay: {
+                        pauseOnMouseEnter:true,
+                        disableOnInteraction:false,
+                    },
+                    pagination: {
+                        el: '.swiper-pagination',
+                    },
+                    navigation: {
+                        nextEl: '.swiper-button-next',
+                        prevEl: '.swiper-button-prev',
+                    },
+                })
+            </script>
+            <div class="widget-tab-post style-mini posts-mini-lists zib-widget">
+
+                <div class="layui-tab layui-tab-brief">
+                    <ul class="layui-tab-title">
+                        <li class="layui-this">推荐</li>
+                        <li>热门</li>
+                        <li>头条</li>
+                    </ul>
+                    <div class="layui-tab-content">
+                        <div class="layui-tab-item layui-show">
+                            <div class="parent-container">
+                                {cymini:attrid aid='4' num='8'}
+                                <div class="posts-mini ajax-item wow fadeInDown">
+                                    <div class="mr10">
+                                        <div class="item-thumbnail">
+                                            <a href="{$vo.temp_archives}?id={$vo.id}" title="{$vo.title}" target="{$vo.target}">
+                                                <img src="/{$vo.articleThumbImg}" alt="{$vo.title}" class="lazy fit-cover radius8 ls-is-cached lazyloaded lazyloadafter">
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="posts-mini-con flex xx flex1 jsb">
+                                        <h2 class="item-heading text-ellipsis-2">
+                                            <a href="{$vo.temp_archives}?id={$vo.id}" title="{$vo.title}" target="{$vo.target}">
+                                                {$vo.title}
+                                            </a>
+                                        </h2>
+                                        <div class="item-meta muted-2-color flex jsb ac">
+                                            <item class="meta-author flex ac">
+                                                <span>
+                                                    <i class="layui-icon layui-icon-time"></i>
+                                                </span>
+                                                <span class="ml6">{$vo.createTime}</span>
+                                            </item>
+                                            <div class="meta-right">
+                                                <item class="meta-view">
+                                                    <span>
+                                                        <i class="layui-icon layui-icon-reply-fill"></i> {$vo.feed}
+                                                    </span>
+                                                    <span class="ml6">
+                                                        <i class="layui-icon layui-icon-eye"></i> {$vo.views}
+                                                    </span>
+                                                </item>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {/cymini:attrid}
+                            </div>
+                        </div>
+                        <div class="layui-tab-item">
+                            <div class="parent-container">
+                                {cymini:attrid aid='5' num='8'}
+                                <div class="posts-mini ajax-item wow fadeInDown">
+                                    <div class="mr10">
+                                        <div class="item-thumbnail">
+                                            <a href="{$vo.temp_archives}?id={$vo.id}" title="{$vo.title}" target="{$vo.target}">
+                                                <img src="/{$vo.articleThumbImg}" alt="{$vo.title}" class="lazy fit-cover radius8 ls-is-cached lazyloaded lazyloadafter">
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="posts-mini-con flex xx flex1 jsb">
+                                        <h2 class="item-heading text-ellipsis-2">
+                                            <a href="{$vo.temp_archives}?id={$vo.id}" title="{$vo.title}" target="{$vo.target}">
+                                                {$vo.title}
+                                            </a>
+                                        </h2>
+                                        <div class="item-meta muted-2-color flex jsb ac">
+                                            <item class="meta-author flex ac">
+                                                <span>
+                                                    <i class="layui-icon layui-icon-time"></i>
+                                                </span>
+                                                <span class="ml6">{$vo.createTime}</span>
+                                            </item>
+                                            <div class="meta-right">
+                                                <item class="meta-view">
+                                                    <span>
+                                                        <i class="layui-icon layui-icon-reply-fill"></i> {$vo.feed}
+                                                    </span>
+                                                    <span class="ml6">
+                                                        <i class="layui-icon layui-icon-eye"></i> {$vo.views}
+                                                    </span>
+                                                </item>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {/cymini:attrid}
+                            </div>
+                        </div>
+                        <div class="layui-tab-item">
+                            <div class="parent-container">
+                                {cymini:attrid aid='3' num='8'}
+                                <div class="posts-mini ajax-item wow fadeInDown">
+                                    <div class="mr10">
+                                        <div class="item-thumbnail">
+                                            <a href="{$vo.temp_archives}?id={$vo.id}" title="{$vo.title}" target="{$vo.target}">
+                                                <img src="/{$vo.articleThumbImg}" alt="{$vo.title}" class="lazy fit-cover radius8 ls-is-cached lazyloaded lazyloadafter">
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="posts-mini-con flex xx flex1 jsb">
+                                        <h2 class="item-heading text-ellipsis-2">
+                                            <a href="{$vo.temp_archives}?id={$vo.id}" title="{$vo.title}" target="{$vo.target}">
+                                                {$vo.title}
+                                            </a>
+                                        </h2>
+                                        <div class="item-meta muted-2-color flex jsb ac">
+                                            <item class="meta-author flex ac">
+                                                <span>
+                                                    <i class="layui-icon layui-icon-time"></i>
+                                                </span>
+                                                <span class="ml6">{$vo.createTime}</span>
+                                            </item>
+                                            <div class="meta-right">
+                                                <item class="meta-view">
+                                                    <span>
+                                                        <i class="layui-icon layui-icon-reply-fill"></i> {$vo.feed}
+                                                    </span>
+                                                    <span class="ml6">
+                                                        <i class="layui-icon layui-icon-eye"></i> {$vo.views}
+                                                    </span>
+                                                </item>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {/cymini:attrid}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div class="home-tab-content">
+                <div class="index-tab affix-header-sm relative home-tab-nav-box mb10" offset-top="-8">
+                    <ul style="width:100%;" class="scroll-x no-scrollbar">
+                        <li class="active">
+                            <a href="javascript:;">最新发布</a>
+                        </li>
+                        {cymini:table where='["isShow","=",1],["id","=",2]'}
+                        <li class="menu-item">
+                            <a id="{$vo.id}" href="javascript:;"> {$vo.name}</a>
+                        </li>
+                        {/cymini:table}
+                        {cymini:table where='["isShow","=",1],["id","=",3]'}
+                        <li class="menu-item">
+                            <a id="{$vo.id}" href="javascript:;"> {$vo.name}</a>
+                        </li>
+                        {/cymini:table}
+                        {cymini:table where='["isShow","=",1],["id","=",4]'}
+                        <li class="menu-item">
+                            <a id="{$vo.id}" href="javascript:;"> {$vo.name}</a>
+                        </li>
+                        {/cymini:table}
+                    </ul>
+                    <div class="scroll-x-next" style="display: none;"></div>
+                    <div class="scroll-x-prev" style="display: none;"></div>
+                </div>
+                <div class="tab-content">
+                    <div class="posts-row ajaxpager tab-pane fade in active" id="index-tab-main">
+
+                        <div></div>
+                        <script id="TPL" type="text/html">
+                            {{# d.data.forEach(function(item) { }}
+                        <posts class="posts-item list ajax-item flex wow fadeInDown">
+                            <div class="post-graphic">
+                                <div class="item-thumbnail">
+                                    <a href="{{item.temp_archives}}?id={{item.id}}" title="{{item.title}}" target="{{item.target}}">
+                                        <img src="/{{item.articleThumbImg}}" alt="{{item.title}}" class="lazy fit-cover radius8 ls-is-cached lazyloaded lazyloadafter">
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="item-body flex xx flex1 jsb">
+                                <h2 class="item-heading">
+                                    <a href="{{item.temp_archives}}?id={{item.id}}" title="{{item.title}}" target="{{item.target}}">
+                                        {{item.title}}
+                                    </a>
+                                </h2>
+                                <div class="item-excerpt muted-color text-ellipsis mb6">
+                                    {{item.description}}
+                                </div>
+                                <div>
+                                    <div class="item-tags scroll-x no-scrollbar mb6">
+                                        <a class="but c-blue" title="查看更多分类文章" href="{{item.temp_list}}?id={{item.cid}}">
+                                            <i class="fa fa-folder-open-o" aria-hidden="true"></i>{{item.name}}
+                                        </a>
+                                    </div>
+                                    <div class="item-meta muted-2-color flex jsb ac">
+                                        <item class="meta-author flex ac">
+                                            <span>
+                                                <i class="layui-icon layui-icon-time"></i>
+                                            </span>
+                                            <span class="ml6">{{item.createTime}}</span>
+                                        </item>
+                                        <div class="meta-right">
+                                            <item class="meta-comm">
+                                                <a rel="nofollow" href="{{item.temp_archives}}?id={{item.id}}#comments">
+                                                    <i class="layui-icon layui-icon-reply-fill"></i>{{item.feed}}
+                                                </a>
+                                            </item>
+                                            <item class="meta-view">
+                                                <i class="layui-icon layui-icon-eye"></i>{{item.views}}
+                                            </item>
+                                            <item class="meta-like">
+                                                <i class="layui-icon layui-icon-praise"></i>{{item.click}}
+                                            </item>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </posts>
+                            {{#  }); }}
+                        </script>
+                        <div id="view">
+                            {cymini:article start='0' num='10' order='id'}
+                            <posts class="posts-item list ajax-item flex wow fadeInDown">
+                                <div class="post-graphic">
+                                    <div class="item-thumbnail">
+                                        <a href="{$vo.temp_archives}?id={$vo.id}" title="{$vo.title}" target="{$vo.target}">
+                                            <img src="/{$vo.articleThumbImg}" alt="{$vo.title}" class="lazy fit-cover radius8 ls-is-cached lazyloaded lazyloadafter">
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="item-body flex xx flex1 jsb">
+                                    <h2 class="item-heading">
+                                        <a href="{$vo.temp_archives}?id={$vo.id}" title="{$vo.title}" target="{$vo.target}">
+                                            {$vo.title}
+                                        </a>
+                                    </h2>
+                                    <div class="item-excerpt muted-color text-ellipsis mb6">
+                                        {$vo.description}
+                                    </div>
+                                    <div>
+                                        <div class="item-tags scroll-x no-scrollbar mb6">
+                                            <a class="but c-blue" title="查看更多分类文章" href="{$vo.temp_list}?id={$vo.cid}">
+                                                <i class="fa fa-folder-open-o" aria-hidden="true"></i>{$vo.name}
+                                            </a>
+                                        </div>
+                                        <div class="item-meta muted-2-color flex jsb ac">
+                                            <item class="meta-author flex ac">
+                                                <span>
+                                                    <i class="layui-icon layui-icon-time"></i>
+                                                </span>
+                                                <span class="ml6">{$vo.createTime}</span>
+                                            </item>
+                                            <div class="meta-right">
+                                                <item class="meta-comm">
+                                                    <a rel="nofollow" href="{$vo.temp_archives}?id={$vo.id}#comments">
+                                                        <i class="layui-icon layui-icon-reply-fill"></i>{$vo.feed}
+                                                    </a>
+                                                </item>
+                                                <item class="meta-view">
+                                                    <i class="layui-icon layui-icon-eye"></i>{$vo.views}
+                                                </item>
+                                                <item class="meta-like">
+                                                    <i class="layui-icon layui-icon-praise"></i>{$vo.click}
+                                                </item>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </posts>
+                            {/cymini:article}
+                        </div>
+                        <div>
+                            <script type="text/html" id="listData"></script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {include file='layout/right'}
+</main>
+<div class="container fluid-widget">
+
+    <div class="widget-main-post style-card">
+        {cymini:table where='["isShow","=",1],["id","=",3]'}
+        <div class="box-body">
+            <div class="title-theme">{$vo.name}<small class="ml10">随机推荐{$vo.name}分类文章</small></div>
+        </div>
+        {/cymini:table}
+
+        <div class="widget-ajaxpager lazyloaded lazyloadafter parent-container" lazyload-action="ias">
+            {cymini:rand cid='3' num='8'}
+            <posts class="posts-item card ajax-item style3 wow fadeInDown">
+                <div class="item-thumbnail">
+                    <a href="{$vo.temp_archives}?id={$vo.id}">
+                        <img src="/{$vo.articleThumbImg}" alt="{$vo.title}" class="lazy fit-cover radius8 ls-is-cached">
+                    </a>
+                </div>
+                <div class="item-body">
+                    <h2 class="item-heading">
+                        <a href="{$vo.temp_archives}?id={$vo.id}">
+                            {$vo.title}
+                        </a>
+                    </h2>
+                    <div class="item-tags scroll-x no-scrollbar mb6">
+
+                        <a class="but c-blue" title="查看更多分类文章" href="{$vo.temp_list}?id={$vo.cid}">
+                            <i class="fa fa-folder-open-o" aria-hidden="true"></i>{$vo.name}
+                        </a>
+                    </div>
+                    <div class="item-meta muted-2-color flex jsb ac">
+                        <item class="meta-author flex ac">
+                            <span title="{$vo.createTime}" class="ml6">{$vo.createTime}</span>
+                        </item>
+                        <div class="meta-right">
+                            <item class="meta-comm">
+                                <a rel="nofollow" href="{$vo.temp_archives}?id={$vo.id}#comments" data-original-title="去评论">
+                                    <i class="layui-icon layui-icon-reply-fill"></i>{$vo.feed}
+                                </a>
+                            </item>
+                            <item class="meta-view"><svg class="icon" aria-hidden="true">
+                                <i class="layui-icon layui-icon-eye"></i>{$vo.views}
+                            </item>
+                            <item class="meta-like"><svg class="icon" aria-hidden="true">
+                                <i class="layui-icon layui-icon-praise"></i>{$vo.click}
+                            </item>
+                        </div>
+                    </div>
+                </div>
+            </posts>
+            {/cymini:rand}
+
+        </div>
+    </div>
+    <div class="">
+        <div class="links-box links-style-card" style="--font-size:22px;">
+            <div class="" style="color:#5b5858;">
+
+                <div class="em14 font-bold mb10">友情链接</div>
+                <div class="hover-zoom-img noshadow mb10 parent-container">
+                    {cymini:link num='18'}
+                    <div class="author-minicard links-card radius8 wow fadeInDown">
+                        <a href="{$vo.link}" target="{$vo.target}" title="{$vo.title}-{$vo.remark}">
+                            <ul class="list-inline">
+                                {if $vo.logo}
+                                <li>
+                                    <div class="avatar-img link-img">
+                                        <img class="avatar lazyloaded lazyloadafter" src="/{$vo.logo}" >
+                                    </div>
+                                </li>
+                                {/if}
+                                <li>
+                                    <dl>
+                                        <dt class="text-ellipsis">{$vo.title}</dt>
+                                        <dd class="mt3 avatar-dest em09 muted-3-color text-ellipsis">
+                                            {$vo.remark}
+                                        </dd>
+                                    </dl>
+                                </li>
+                            </ul>
+                        </a>
+                    </div>
+                    {/cymini:link}
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{include file='layout/footer'}
+
+<script>
+
+    layui.use(['table','laytpl'], function(){
+        var table = layui.table;
+        var laytpl = layui.laytpl;
+
+        // 获取所有 li 元素
+        const tabItems = document.querySelectorAll('ul.scroll-x.no-scrollbar li');
+        var loadIndex = layer.load(0);
+        var isFirstLoad = true; // 标记是否是首次加载
+        // 遍历每个 li，添加点击事件
+        tabItems.forEach(item => {
+            item.addEventListener('click', function(obj) {
+                var loadIndex = layer.load(0);
+                table.render({
+                    elem: '#listData',
+                    url:'api/article',
+                    where:{
+                        'id':obj.target.id,
+                    },
+                    page:true,
+                    limit:10,
+                    response: {
+                        statusCode: 200 // 重新规定成功的状态码为 200，table 组件默认为 0
+                    },
+                    done:function(res,curr,count,origin){
+                        //console.log(res);
+                        var getTpl = document.getElementById('TPL').innerHTML; // 获取模板字符
+                        var elemView = document.getElementById('view'); // 视图对象
+                        // 渲染并输出结果
+                        laytpl(getTpl).render(res, function(str){
+                            elemView.innerHTML = str;
+                        });
+                        layer.close(loadIndex);
+                    }
+                });
+                // 移除所有 li 的 active 类
+                tabItems.forEach(li => li.classList.remove('active'));
+                // 给当前点击的 li 添加 active 类
+                this.classList.add('active');
+            });
+        });
+
+        // 数据列表
+        table.render({
+            elem: '#listData',
+            url:'api/article',
+            page:true,
+            limit:10,
+            response: {
+                statusCode: 200 // 重新规定成功的状态码为 200，table 组件默认为 0
+            },
+            done:function(res,curr,count,origin){
+                //console.log(res);
+                // 判断是否需要跳过首次加载的渲染
+                if (isFirstLoad && curr === 1) {
+                    isFirstLoad = false; // 标记首次加载已完成
+                    layer.close(loadIndex);
+                    return; // 跳过首次加载的渲染
+                }
+
+                var getTpl = document.getElementById('TPL').innerHTML; // 获取模板字符
+                var elemView = document.getElementById('view'); // 视图对象
+                // 渲染并输出结果
+                laytpl(getTpl).render(res, function(str){
+                    elemView.innerHTML = str;
+                });
+                layer.close(loadIndex);
+            }
+        });
+    });
+</script>
+</body>
+</html>

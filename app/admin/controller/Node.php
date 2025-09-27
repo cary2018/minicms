@@ -135,4 +135,91 @@ class Node extends BaseController
         $msg = ['code'=>200,'msg'=>lang('node_update_success'),'count'=>$count,'data'=>$newData];
         echo json_encode($msg,JSON_UNESCAPED_UNICODE);
     }
+
+
+    public function test(){
+        // 使用示例
+        $weekTimestamps = $this->getWeekDayTimestamps();
+
+        // 打印结果
+        $type = 'line';
+        $to = [];
+        $vis = [];
+        $ip = [];
+        $us = [];
+        $bo = [];
+        $un = [];
+        foreach ($weekTimestamps as $day) {
+            $where = [['createTime','between',[$day['start'],$day['end']]]];
+            $todayCount = CountTable('visit',$where);
+            $visCount = CountTable('visit',$where,'','guv');
+            $ipCount = CountTable('visit',$where,'','ip');
+            $userCount = CountTable('visit',array_merge($where,[['clientType','like','%访客%']]));
+            $botCount = CountTable('visit',array_merge($where,[['clientType','like','%蜘蛛%']]));
+            $unCount = CountTable('visit',array_merge($where,[['clientType','like','%未知%']]));
+            echo "{$day['day']} ({$day['date']}): <hr>";
+            $to[] = $todayCount;
+            $vis[] = $visCount;
+            $ip[] = $ipCount;
+            $us[] = $userCount;
+            $bo[] = $botCount;
+            $un[] = $unCount;
+        }
+        $arr = [
+            [
+                'name'=>'浏览量(pv)',
+                'type'=>$type,
+                'data'=>$to,
+            ],
+            [
+                'name'=>'访客量(pv)',
+                'type'=>$type,
+                'data'=>$vis,
+            ],
+            [
+                'name'=>'IP量',
+                'type'=>$type,
+                'data'=>$ip,
+            ],
+            [
+                'name'=>'访客',
+                'type'=>$type,
+                'data'=>$us,
+            ],
+            [
+                'name'=>'蜘蛛',
+                'type'=>$type,
+                'data'=>$bo,
+            ],
+            [
+                'name'=>'未知',
+                'type'=>$type,
+                'data'=>$un,
+            ],
+        ];
+        echo '<pre>';
+        echo json_encode($arr,JSON_UNESCAPED_UNICODE);
+    }
+    public function getWeekDayTimestamps() {
+        $weekDays = [];
+        $current = strtotime('monday this week');
+        $today = date('w');
+        if($today == 0){
+            $today = 7;
+        }
+        for ($i = 0; $i < $today; $i++) {
+            $dayStart = strtotime(date('Y-m-d 00:00:00', $current));
+            $dayEnd = strtotime(date('Y-m-d 23:59:59', $current));
+
+            $weekDays[] = [
+                'day' => date('l', $current),
+                'date' => date('Y-m-d', $current),
+                'start' => $dayStart,
+                'end' => $dayEnd
+            ];
+
+            $current = strtotime('+1 day', $current);
+        }
+        return $weekDays;
+    }
 }

@@ -80,7 +80,7 @@ class Timing extends BaseController
     }
     public function delAll(){
         $id = request()->param('data');
-        $data = FindTable('timing',[['id','=',$id]]);
+        $data = FindTable('timing',[['id','in',$id]]);
         if($data){
             Db::name('timing')->delete($id);
             $msg = ['code'=>200,'msg'=>lang('delete_message')];
@@ -96,7 +96,7 @@ class Timing extends BaseController
         $newArray = [];
         $originalArray = AllTable('timing');
         foreach ($originalArray as $item) {
-            $key = md5($item['id'].$item['name']);       // 获取当前元素的 name 值
+            $key = md5($item['name']);       // 获取当前元素的 name 值
             $newArray[$key] = $item;    // 以 name 为键，存储整个子数组
         }
         putConfig($newArray,'timing.php');

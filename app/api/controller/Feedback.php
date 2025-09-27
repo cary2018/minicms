@@ -20,10 +20,10 @@ class Feedback extends BaseController
 {
     public function index(){
         $data = request()->param();
-        $size = $data['limit']?$data['limit']:10;
-        $start = $data['page']?$data['page']:0;
-        $aid = $data['aid']?$data['aid']:'';
-        $sortId = $data['cate']?$data['cate']:'';
+        $size = $data['limit']??10;
+        $start = $data['page']??0;
+        $aid = $data['aid']??'';
+        $sortId = $data['cate']??'';
         $where = [['status','=',1],['rid','=',0]];
         if($aid){
             $where[] = ['aid','=',$aid];
@@ -80,24 +80,42 @@ class Feedback extends BaseController
     public function saveAt(){
         $post = request()->param();
         $member = GetSe('MemberCenter');
+        $uid = '';
         if($member){
             $post['username'] = $member['username'];
             if($member['nickname']){
                 $post['username'] = $member['nickname'];
             }
             $post['email'] = $member['email'];
+            $uid = $member['id'];
         }
-        $article = FindTable('article',[['id','=',$post['aid'],['status','=',1]]]);
-        if(!$article){
-            $arr = ['code'=>300,'message'=>'文章错误！'];
-            return json_encode($arr,JSON_UNESCAPED_UNICODE);
+        $post['cate'] = $post['cate']??'';
+        $cid = $post['cid']??'';
+        $title = '留言板';
+        if($post['cate']<0){
+            $article = FindTable('article',[['id','=',$post['aid'],['status','=',1]]]);
+            if(!$article){
+                $arr = ['code'=>300,'message'=>'文章错误！'];
+                return json_encode($arr,JSON_UNESCAPED_UNICODE);
+            }
+            $cid = $article['cid'];
+            $uid = $article['uid'];
+            $title = $article['title'];
         }
+
         // 检测输入的验证码是否正确
         if(!captcha_check($post['captcha'])){
             // 验证失败
             $arr = ['code'=>300,'message'=>'验证码错误！'];
             return json_encode($arr,JSON_UNESCAPED_UNICODE);
         };
+        $ip = new \Ip2Region();
+        $region = $ip->btreeSearch(get_client_ip());
+        if(!$region){
+            $region = '';
+        }else{
+            $region = $region['region'];
+        }
         $check = request()->checkToken('__token__', request()->param());
         //更新token
         $token = request()->buildToken('__token__', 'sha1');
@@ -107,14 +125,16 @@ class Feedback extends BaseController
         }else{
             unset($post['__token__']);
             unset($post['captcha']);
-            $post['cid'] = $article['cid'];
-            $post['uid'] = $article['uid'];
-            $post['article'] = $article['title'];
+            $post['cid'] = $cid;
+            $post['uid'] = $uid;
+            $post['article'] = $title;
             $post['ip'] = get_client_ip();
+            $post['region'] = $region;
             $post['createTime'] = time();
             $post['msg'] = ubb($post['msg']);
+            $post['status'] = 1; //留言评论成功
             SaveAt('feedback',$post);
-            $arr = ['code'=>200,'message'=>'你的评论已进入审核过程。','token'=>$token];
+            $arr = ['code'=>200,'message'=>'你的留言评论已提交成功。','token'=>$token];
         }
         return json_encode($arr,JSON_UNESCAPED_UNICODE);
     }

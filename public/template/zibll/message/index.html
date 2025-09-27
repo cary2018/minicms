@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=0.0, viewport-fit=cover">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta name="robots" content="max-image-preview:large">
+    <title>留言板 - {$Think.config.web.web_title}</title>
+    {include file='layout/file-style'}
+    {include file='layout/file-script'}
+    {include file='layout/icon'}
+    <style type="text/css">
+        .comment-footer img{
+            display: unset;
+        }
+    </style>
+</head>
+
+<body class="post-template-default single single-post postid-1381 single-format-gallery white-theme nav-fixed site-layout-2 postformat-gallery body-scroll">
+
+    {include file='layout/header'}
+
+    <main role="main" class="container">
+        <div class="content-wrap">
+            <div class="content-layout">
+                <div class="single-head-cover">
+                    <div class="graphic mb20 single-cover imgbox-container">
+                        <img class="fit-cover" src="{$view_path}/static/images/th.jpg">
+                    </div>
+                </div>
+
+                <div class="theme-box" id="comments">
+                    <div class="box-body notop">
+                        <div class="title-theme">留言 <small>抢沙发</small></div>
+                    </div>
+
+                    <div class="no_webshot main-bg theme-box box-body radius8 main-shadow">
+                        <div class="flex ac jsb virtual-input " id="mobile-respond">
+                            <div class="flex flex1 ac">
+                                <img alt="" src="{$view_path}/static/images/5.jpg" class="avatar">
+                                <div class="text-ellipsis simulation mr10">
+                                    友好交流，请勿发纯表情，请勿灌水，会被封号喔
+                                </div>
+                            </div>
+                            <span class="but c-blue">提交</span>
+                        </div>
+                        <div id="respond" class="mobile-fixed">
+                            <div class="fixed-body"></div>
+                            <form id="frmSumbit" action="" onsubmit="return false;">
+                                <div class="flex ac">
+                                    <div class="comt-title text-center flex0 mr10">
+                                        <div class="comt-avatar mb10">
+                                            <img alt="" src="{$view_path}/static/images/5.jpg" class="avatar avatar-id-53084 ls-is-cached lazyloaded lazyloadafter">
+                                        </div>
+                                        <p class="text-ellipsis muted-2-color">*^_^*</p>
+                                    </div>
+                                    <div class="comt-box grow1">
+                                        <input type="hidden" value="{:token()}" name="__token__" id="inpRevToken" >
+                                        <div class="relative quick">
+                                            <input type="text" name="captcha" id="inpHomePage" class="captcha" placeholder="验证码" tabindex="3">
+                                            <a><img id="refreshCaptcha" onclick="this.src=this.src.replace(/\?.*$/, '')+'?'+Math.random()" class="validateImg" src="{:captcha_src()}" ></a>
+                                        </div>
+                                        <input type="text" name="username" id="inpName" class="textuser" value="匿名" tabindex="3">
+                                        <input type="text" name="email" id="inpEmail" class="textemail" placeholder="邮箱" tabindex="3">
+                                        <div class="action-text mb10 em09 muted-2-color"></div>
+                                        <textarea placeholder="友好交流，请勿发纯表情，请勿灌水，会被封号喔" autoheight="true" maxheight="188" class="form-control grin" name="msg" id="txaArticle" cols="100%" rows="4" tabindex="1" style="height: 90px; overflow: hidden;"></textarea>
+                                        <div class="comt-ctrl relative">
+                                            <div class="comt-tips">
+                                                <input type="hidden" name="aid" value="" id="comment_post_ID">
+                                                <input type="hidden" name="cate" id="cateId" value="1">
+                                                <input type="hidden" name="cid" id="cId" value="{$Request.param.id?$Request.param.id:'18'}">
+                                                <input type="hidden" name="rid" id="comment_parent" value="0">
+                                            </div>
+                                            <div class="comt-tips-right pull-right">
+                                                <a class="but c-red" id="cancel-comment-reply-link" href="javascript:;" style="overflow: hidden; position: relative;">取消</a>
+                                                <button class="but c-blue pw-1em" onclick="submitForm('frmSumbit')" name="submit" >
+                                                    提交评论
+                                                    <div style="display: block; background: rgb(41, 151, 247); border-radius: 50%; position: absolute; transform: scale(1); opacity: 0; transition: 1.5s cubic-bezier(0.22, 0.61, 0.36, 1); z-index: 1; overflow: hidden; pointer-events: none; width: 172px; height: 172px;"></div>
+                                                </button>
+                                            </div>
+
+                                            <div class="comt-tips-left">
+                                                <span class="dropup relative smilie">
+                                                    <a class="but btn-input-expand input-smilie mr6" href="javascript:;" style="overflow: hidden; position: relative;">
+                                                        <i class="fa fa-fw fa-smile-o"></i>
+                                                        <span class="hide-sm">表情</span>
+                                                    </a>
+                                                    <div class="dropdown-menu">
+                                                        <div class="dropdown-smilie scroll-y mini-scrollbar parent-container">
+                                                            {cymini:emoji}
+                                                                {foreach $vo as $k=>$v}
+                                                                    <a class="smilie-icon" href="javascript:;">
+                                                                        <img alt="{$k}" src="/ubb/{$v}" onclick="addNumber('['+this.alt+']');">
+                                                                    </a>
+                                                                {/foreach}
+                                                            {/cymini:emoji}
+                                                        </div>
+                                                    </div>
+                                                </span>
+                                                <span class="dropup relative quick">
+                                                    <a class="but btn-input-expand input-quick mr6" href="javascript:;" style="overflow: hidden; position: relative;">
+                                                        <i class="layui-icon layui-icon-reply-fill"></i>
+                                                        <span class="hide-sm">快捷回复</span>
+                                                    </a>
+                                                    <div class="dropdown-menu">
+                                                        <div class="relative dropdown-quick-often">
+                                                            <div class="tab-content">
+                                                                <div class=" in active tab-pane fade quick-often-box scroll-y mini-scrollbar" id="input_expand_quick_often_sys_comment">
+                                                                    <a class="smilie-icon" href="javascript:;">
+                                                                        <div class="quick-reply-item" onclick="addNumber('谢谢分享，学到了！学到了！');">
+                                                                            谢谢分享，学到了！学到了！
+                                                                        </div>
+                                                                    </a>
+                                                                    <a class="smilie-icon" href="javascript:;">
+                                                                        <div class="quick-reply-item" onclick="addNumber('不错有用，谢谢分享！');">
+                                                                            不错有用，谢谢分享！
+                                                                        </div>
+                                                                    </a>
+                                                                    <a class="smilie-icon" href="javascript:;">
+                                                                        <div class="quick-reply-item" onclick="addNumber('正在学习中。。。！');">
+                                                                            正在学习中。。。！
+                                                                        </div>
+                                                                    </a>
+                                                                    <a class="smilie-icon" href="javascript:;">
+                                                                        <div class="quick-reply-item" onclick="addNumber('看不懂，好利害的样子！');">
+                                                                            看不懂，好利害的样子！
+                                                                        </div>
+                                                                    </a>
+                                                                    <a class="smilie-icon" href="javascript:;">
+                                                                        <div class="quick-reply-item" onclick="addNumber('路过，留个脚印！');">
+                                                                            路过，留个脚印！
+                                                                        </div>
+                                                                    </a>
+                                                                </div>
+                                                                <div class=" tab-pane fade quick-often-box scroll-y mini-scrollbar" id="input_expand_quick_often_user_comment">
+                                                                    <div class="quick-reply-myitem-box">
+                                                                        <div class="text-center muted-2-color" style="margin: 40px 0 30px;">暂无快捷回复</div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div id="postcomments">
+                            <ol class="commentlist list-unstyled">
+                                <div class="comment-filter tab-nav-theme flex ac jsb" win-ajax-replace="comment-order-btn"></div>
+
+                                <script type="text/html" id="listData">
+                                    {{#  layui.each(d.data, function(index, item){ }}
+                                <li class="comment byuser comment-author-user even thread-even depth-1 wow fadeInDown" id="comment-{{item.id}}">
+                                    <ul class="list-inline">
+                                        <li class="comt-main" id="div-comment-{{item.id}}">
+                                            <div class="comment-header mb10">
+                                                <div class="author-box flex ac">
+                                                    <a href="javascript:;">
+                                                        <span class="avatar-img comt-avatar">
+                                                            <img alt="" src="/images/5.jpg" class="avatar avatar-id-{{item.id}}">
+                                                        </span>
+                                                    </a>
+                                                    <name class="flex ac flex1">
+                                                        <a class="text-ellipsis font-bold" href="">{{item.username}}</a>
+                                                    </name>
+                                                </div>
+                                            </div>
+                                            <div class="comment-footer">
+                                                <div class="mb10 comment-content" id="comment-content-{{item.id}}">
+                                                    {{-item.msg}}
+                                                </div>
+                                                <div class="comt-meta muted-2-color">
+                                                    <span class="comt-author" title="{{item.createTime}}">{{item.createTime}}</span>
+                                                    <span class="badg badg-sm">ip：{{item.ip}}-{{item.region}}</span>
+                                                    <span class="badge-approve"></span>
+                                                    <span class="reply-link">
+                                                        <a rel="nofollow" class="comment-reply-link" data-commentid="{{item.id}}" href="javascript:;">
+                                                            回复
+                                                        </a>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+
+                                    <ul class="children">
+                                        {{#  layui.each(item.son, function(index, item){ }}
+                                        <li class="comment byuser comment-author-shanxi233 odd alt depth-2 wow fadeInDown" id="comment-{{item.id}}">
+                                            <ul class="list-inline">
+                                                <li class="comt-main" id="div-comment-{{item.id}}">
+                                                    <div class="comment-header mb10">
+                                                        <div class="author-box flex ac">
+                                                            <a href="">
+                                                                <span class="avatar-img comt-avatar">
+                                                                    <img alt="" src="/images/default.jpg" class="avatar avatar-id-36145 ls-is-cached">
+                                                                    <img class="avatar-badge ls-is-cached" src="/images/6.jpg">
+                                                                </span>
+                                                            </a>
+                                                            <name class="flex ac flex1">
+                                                                <a class="text-ellipsis font-bold" href="">
+                                                                    {{item.username}}
+                                                                </a>
+                                                                <icon title="" class="user-auth-icon ml3">
+                                                                    <svg class="icon" aria-hidden="true">
+                                                                        <use xlink:href="#icon-user-auth"></use>
+                                                                    </svg>
+                                                                </icon>
+                                                            </name>
+                                                        </div>
+                                                    </div>
+                                                    <div class="comment-footer">
+                                                        <div class="mb10 comment-content" id="comment-content-{{item.id}}">
+                                                            {{-item.msg}}
+                                                        </div>
+                                                        <div class="comt-meta muted-2-color">
+                                                            <span class="comt-author" title="{{item.createTime}}">
+                                                                {{item.createTime}}
+                                                            </span>
+                                                            <span class="badg badg-sm">ip：{{item.ip}}-{{item.region}}</span>
+                                                            <span>
+                                                                @<a rel="nofollow" class="url" href="javascript:(scrollTopTo('#comment-76760'));">{{item.rep}}</a>
+                                                            </span>
+                                                            <span class="badge-approve"></span>
+                                                            <span class="reply-link">
+                                                                <a rel="nofollow" class="comment-reply-link" data-commentid="{{item.id}}" href="javascript:;">
+                                                                    回复
+                                                                </a>
+                                                            </span>
+
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </li><!-- #comment-## -->
+                                        {{#  }); }}
+                                    </ul><!-- .children -->
+                                </li><!-- #comment-## -->
+                                    {{#  }); }}
+                                </script>
+                                <div id="view"></div>
+                                <!----------分页显示-------->
+                                <div id="showpage"></div>
+                            </ol>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        {include file='layout/right'}
+    </main>
+    <div class="container fluid-widget"></div>
+
+    {include file='layout/footer'}
+
+    <style>
+        .article-content p img {
+            max-width: 100%;
+            width: auto!important;
+            height: auto!important;
+            cursor: zoom-in;
+        }
+        .quick-reply-item {
+            padding: 6px 0;
+            color: var(--muted-color);
+            margin: 0 10px
+        }
+        .dropdown-quick-often {
+            width: 260px;
+        }
+        .textuser{width:36%;height:32px;line-height:32px;border:1px solid #ccc;border-radius:4px;padding-left:5px;background: var(--body-bg-color);}
+        .textemail{width:60%;height:32px;line-height:32px;border:1px solid #ccc;border-radius:4px;padding-left:5px;background: var(--body-bg-color);}
+        .captcha{width:36%;height:32px;line-height:32px;border:1px solid #ccc;border-radius:4px;padding-left:5px;background: var(--body-bg-color);}
+        .validateImg{line-height:30px;height:30px;max-height:44px;border-radius:5px;cursor:pointer;}
+    </style>
+<script>
+    document.querySelector('header').classList.remove('show-slide');
+    layui.use(['table','laytpl'], function() {
+        var table = layui.table;
+        var laytpl = layui.laytpl;
+
+        table.render({
+            elem: '#showpage',
+            url:'/api/feedback',
+            where: {
+                cate: 1
+            },
+            page:true,
+            limit:6,
+            response: {
+                statusCode: 200 // 重新规定成功的状态码为 200，table 组件默认为 0
+            },
+            done:function(res,curr,count,origin){
+                //console.log(res);
+                var getTpl = document.getElementById('listData').innerHTML; // 获取模板字符
+                var elemView = document.getElementById('view'); // 视图对象
+                // 渲染并输出结果
+                laytpl(getTpl).render(res, function(str){
+                    elemView.innerHTML = str;
+                });
+            }
+        });
+        $(".bt-download").on('click',function (obj) {
+            let code =$(this).attr('data-code');
+            let url =$(this).attr('data-href');
+            layer.open({
+                title: '',
+                content: `<div class="p-4" style="min-width:300px;">
+                                <div style="padding:10px;text-align:center;background:#eee;border-radius:5px;margin-bottom:20px;">
+                                    <h4>提取码：<span style="color:#e74c3c;">`+ code +`</span>  </h4>
+                                </div>
+                                <p>
+                                    <a href="`+url+`" target="_blank" style="width:100%" class="layui-btn layui-bg-blue">前往下载</a>
+                                </p>
+                            </div>`,
+                btn: false
+            });
+        });
+    })
+    function submitForm(formId){
+        const formData = new FormData($('#'+formId)[0]);
+        // 将转换为普通对象
+        $.ajax({
+            url:'/api/feedback/saveAt',
+            type:'POST',
+            data:formData,
+            processData: false, // jQuery不要去处理发送的数据
+            contentType: false, // jQuery不要去设置Content-Type请求头
+            dataType: "json",
+            success:function(res){
+                const result = JSON.parse(res);
+                if (result.code == 200) {
+                    layer.msg(result.message,{icon:6,time:3000,shade:0.3});
+                    setTimeout( () => {
+                        //更新token
+                        $("#inpRevToken").val(result.token);
+                        //更新验证码
+                        $("#refreshCaptcha").attr('src',"{:captcha_src()}"+Math.random());
+                        //重置表单
+                        $('#'+formId)[0].reset();
+                    },500)//2秒后执行
+                } else {
+                    layer.msg(result.message,{icon:5,time:3000,shade:0.3});
+                    //更新验证码
+                    $("#refreshCaptcha").attr('src',"{:captcha_src()}"+Math.random());
+                }
+            }
+        })
+    }
+</script>
+</body>
+</html>

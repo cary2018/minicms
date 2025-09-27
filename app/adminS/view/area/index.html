@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{$Think.lang.BackMenu}</title>
+    {include file="public/file_css"}
+    <style>
+        .layui-btn:not(.layui-btn-lg ):not(.layui-btn-sm):not(.layui-btn-xs) {
+            height: 34px;
+            line-height: 34px;
+            padding: 0 8px;
+        }
+    </style>
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+        <div>
+            <!--数据表格-->
+            <table class="layui-hide" id="DataDemos" ></table>
+        </div>
+    </div>
+</div>
+<!-- 操作列 -->
+<script type="text/html" id="toolBar">
+    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="add">{$Think.lang.AddSub}</a>
+    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit">{$Think.lang.edit}</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delAll">{$Think.lang.del}</a>
+</script>
+
+{include file="public/file_js"}
+<script>
+    layui.use(['table','treeTablet'], function () {
+        var $ = layui.jquery;
+        var treeTable = layui.treeTablet;
+        // 渲染表格
+        treeTable.render({
+            elem: '#DataDemos',
+            tree: {
+                arrowType: 'arrow2', //自定义箭头风格
+                iconIndex: 1,  // 折叠图标显示在第几列
+            },
+            cols: [
+                {type: 'numbers'},
+                {field: 'name', title: '{$Think.lang.cityName}'},
+                {field: 'code', title: '{$Think.lang.cityCode}', width: 200},
+                {field: 'createTime', title: '{$Think.lang.createTime}', width: 200},
+                {align: 'center', toolbar: '#toolBar', title: '操作', width: 200}
+            ],
+            reqData: function (data, callback) {
+                setTimeout(function () {  // 延迟请求数据
+                    var id = data?data.id:'';
+                    var url = '{:url("datalist")}';
+                    url += '?id='+id;
+                    $.get(url, function (res) {
+                        let obj = JSON.parse(res);
+                        callback(obj.data);
+                    });
+                }, 300);
+            },
+        });
+        //监听工具条点击事件：
+        treeTable.on('tool(DataDemos)', function (obj) {
+            var event = obj.event;
+            var id = obj.data.id;
+            let url = '{:url("area")}'+event+'?id='+id;
+            let wait = 1000;
+            if (event == 'delAll'){
+                $.ajax({
+                    url: url,
+                    type: "GET",
+                    beforeSend: function(){
+                        layer.load(1,{shade:[0.3,'#000']});
+                    },
+                    success: function (data) {
+                        //关闭等待弹出层
+                        layer.closeAll();
+                        //权限不足
+                        let ob = typeof data;
+                        if(ob == 'object'){
+                            if(data.code == 0){
+                                layer.msg(data.msg,{icon:5,time:wait,shade:0.3});
+                            }
+                        }
+                        let obj = JSON.parse(data);
+                        if(obj.code == 200){
+                            $("#del_"+id).remove();
+                            layer.msg(obj.msg,{icon:1,time:wait,shade:0.3});
+                        }else{
+                            layer.msg(obj.msg,{icon:2,time:wait,shade:0.3});
+                        }
+                    },
+                    error: function () {
+                        layer.msg("上传失败！",{icon:2,time:wait,shade:0.3});
+                        $("#imgWait").hide();
+                        layer.closeAll('loading'); //关闭加载层
+                    }
+                });
+                return;
+            }
+            layer.open({
+                type: 2,
+                title: '信息',
+                fix: false, //不固定
+                maxmin: true,
+                shadeClose: true,
+                shade:0.4,
+                area:[$(window).width()*0.9+'px',$(window).height() - 50+'px'],
+                content: url,
+                end : function() {
+                    //关闭弹框后触发
+                    //table.reload("DataDemos");  //重载数据表格
+                }
+            })
+        });
+    });
+</script>
+</body>
+</html>

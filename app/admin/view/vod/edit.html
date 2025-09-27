@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{$Think.lang.admin}</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    {include file="public/file_css"}
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-form ">
+    <form class="layui-form" id="DataForm" lay-filter="DataForm" method="post" onsubmit="return false">
+        <div class="layui-tab">
+            <ul class="layui-tab-title">
+                <li class="layui-this">{$Think.lang.convention}</li>
+                <li>{$Think.lang.article_content}</li>
+                <li>{:lang('other_info')}</li>
+            </ul>
+            <div class="layui-tab-content">
+                <div class="layui-tab-item layui-show layuimini-form">
+                    <div class="layui-form-item">
+                        <input type="text" name="vod_id" value="{$data.vod_id}" style="display: none;">
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label required">{$Think.lang.category}</label>
+                        <div class="layui-input-inline">
+                            <select name="type_id" lay-verify="required" lay-reqtext="{$Think.lang.selectCategory}" layui.formselect>
+                                <option value="">{$Think.lang.DownSelect}</option>
+                                {volist name="tree" id="item"}
+                                <option value="{$item.id}" {if $data.type_id == $item.id} selected {/if}>{$item.p|raw}{$item.name}</option>
+                                {/volist}
+                            </select>
+                        </div>
+                        <div class="layui-input-inline">
+                            <select name="vod_status" layui.formselect>
+                                {foreach $status as $key=>$vo }
+                                <option value="{$key}" {if $key == $data.vod_status} selected {/if}>{$vo}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                        <div class="layui-input-inline">
+                            <select name="vod_lock" layui.formselect>
+                                {foreach $lock as $key=>$vo }
+                                <option value="{$key}" {if $key == $data.vod_lock} selected {/if}>{$vo}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                        <div class="layui-input-inline">
+                            <select name="vod_isend" layui.formselect>
+                                {foreach $isend as $key=>$vo }
+                                <option value="{$key}" {if $key == $data.vod_isend} selected {/if}>{$vo}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                        <div class="layui-input-inline">
+                            <select name="vod_copyright" layui.formselect>
+                                {foreach $copyright as $key=>$vo }
+                                <option value="{$key}" {if $key == $data.vod_copyright} selected {/if}>{$vo}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label required">{:lang('position_name')}</label>
+                        <div class="w30">
+                            <input type="text" name="vod_name" lay-verify="required" lay-reqtext="{$Think.lang.TitleNotEmpty}" value="{$data.vod_name}" class="layui-input">
+                        </div>
+                        <label class="layui-lable">{:lang('subtitle')}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="vod_sub" value="{$data.vod_sub}" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang('pinyin')}</label>
+                        <div class="w30">
+                            <input type="text" name="vod_en" value="{$data.vod_en}" class="layui-input">
+                        </div>
+                        <label class="layui-lable">{:lang('letter')}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="vod_letter" value="{$data.vod_letter}" class="layui-input">
+                        </div>
+                        <label class="layui-lable">{:lang('vod_level')}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="vod_level" value="{$data.vod_level}" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang('tags')}</label>
+                        <div class="w30">
+                            <input type="text" name="vod_tag" value="{$data.vod_tag}" class="layui-input">
+                        </div>
+                        <label class="layui-lable">{:lang('Remark')}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="vod_remarks" value="{$data.vod_remarks}" class="layui-input">
+                        </div>
+                        <label class="layui-lable">{:lang('behind')}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="vod_behind" value="{$data.vod_behind}" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang('total')}</label>
+                        <div class="w30">
+                            <input type="text" name="vod_total" value="{$data.vod_total}" class="layui-input">
+                        </div>
+                        <label class="layui-lable">{:lang('serial')}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="vod_serial" value="{$data.vod_serial}" class="layui-input">
+                        </div>
+                        <label class="layui-lable">{:lang('pubdate')}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="vod_pubdate" value="{$data.vod_pubdate}" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang('actor')}</label>
+                        <div class="w30">
+                            <input type="text" name="vod_actor" value="{$data.vod_actor}" class="layui-input">
+                        </div>
+                        <label class="layui-lable">{:lang('director')}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="vod_director" value="{$data.vod_director}" class="layui-input">
+                        </div>
+                        <label class="layui-lable">{:lang('writer')}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="vod_writer" value="{$data.vod_writer}" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang('tv')}</label>
+                        <div class="w30">
+                            <input type="text" name="vod_tv" value="{$data.vod_tv}" class="layui-input">
+                        </div>
+                        <label class="layui-lable">{:lang('weekday')}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="vod_weekday" value="{$data.vod_weekday}" class="layui-input">
+                        </div>
+                        <label class="layui-lable">{:lang('duration')}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="vod_duration" value="{$data.vod_duration}" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang('douban_score')}</label>
+                        <div class="w30">
+                            <input type="text" name="vod_douban_score" value="{$data.vod_douban_score}" class="layui-input">
+                        </div>
+                        <label class="layui-lable">{:lang('douban_id')}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="vod_douban_id" value="{$data.vod_douban_id}" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang('rel_vod')}</label>
+                        <div class="w50">
+                            <input type="text" placeholder="如“变形金刚”1、2、3部ID分别为11,12,13或将每部都填“变形金刚”" name="vod_rel_vod" value="{$data.vod_rel_vod}" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang('rel_art')}</label>
+                        <div class="w50">
+                            <input type="text" placeholder="如“变形金刚资讯”1、2、3部ID分别为11,12,13或将每部都填“变形金刚资讯”" name="vod_rel_art" value="{$data.vod_rel_art}" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang('vod_class')}</label>
+                        <div class="w30">
+                            <input type="text" name="vod_class" value="{$data.vod_class}" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang('vod_year')}</label>
+                        <div class="w30">
+                            <input type="text" name="vod_year" value="{$data.vod_year}" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang('vod_area')}</label>
+                        <div class="w30">
+                            <input type="text" name="vod_area" value="{$data.vod_area}" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang('vod_lang')}</label>
+                        <div class="w30">
+                            <input type="text" name="vod_lang" value="{$data.vod_lang}" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang('vod_version')}</label>
+                        <div class="w30">
+                            <input type="text" name="vod_version" value="{$data.vod_version}" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang('vod_state')}</label>
+                        <div class="w30">
+                            <input type="text" name="vod_state" value="{$data.vod_state}" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{$Think.lang.articleImg}</label>
+                        <div class="w40">
+                            <input type="text" name="vod_pic" value="{$data.vod_pic}" class="layui-input">
+                        </div>
+                        <div class="layui-input-inline">
+                            <div class="z_file fl">
+                                {if $data.vod_pic}
+                                <img src="{$data.vod_pic}" id="show_img" class="add_img">
+                                <input type="file" class="up_file" id="vod_pic" name="vod_pic" onchange="PreviewImg('vod_pic','show_img')" accept="image/*">
+                                {else/}
+                                <img src="/images/all.png" id="show_img" class="add_img">
+                                <input type="file" class="up_file" id="vod_pic" name="vod_pic" onchange="PreviewImg('vod_pic','show_img')" accept="image/*">
+                                {/if}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{$Think.lang.pic_slide}</label>
+                        <div class="w40">
+                            <input type="text" name="vod_pic_slide" value="" class="layui-input">
+                        </div>
+                        <div class="layui-input-inline">
+                            <div class="z_file fl">
+                                {if $data.vod_pic_slide}
+                                <img src="{$data.vod_pic_slide}" id="pic_slide" class="add_img">
+                                <input type="file" class="up_file" id="vod_pic_slide" name="vod_pic_slide" onchange="PreviewImg('vod_pic_slide','pic_slide')" accept="image/*">
+                                {else/}
+                                <img src="/images/all.png" id="pic_slide" class="add_img">
+                                <input type="file" class="up_file" id="vod_pic_slide" name="vod_pic_slide" onchange="PreviewImg('vod_pic_slide','pic_slide')" accept="image/*">
+                                {/if}
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang('vod_blurb')}</label>
+                        <div class="layui-input-block">
+                            <textarea name="vod_blurb" class="layui-textarea" >{$data.vod_blurb}</textarea>
+                        </div>
+                    </div>
+                    {foreach $play as $k=>$v}
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang('vod_play_url')}</label>
+                        <div class="layui-input-inline">
+                            <select name="vod_play_from[]" layui.formselect>
+                                {foreach $fromlist as $key=>$vo }
+                                <option value="{$vo.from}" {if $vo.from == $from[$k]} selected {/if}>{$vo.show}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+
+                        <span class="layui-btn addDown" ><i class="fa fa-plus"></i> </span>
+                        {if $k neq 0}
+                        <span class="layui-btn delDown" ><i class="fa fa-trash"></i> </span>
+                        {/if}
+
+                        <div class="layui-input-block">
+                            <textarea name="vod_play_url[]" class="layui-textarea" >{$v|mac_str_correct='#',chr(13)}</textarea>
+                        </div>
+                    </div>
+                    {/foreach}
+                </div>
+                <div class="layui-tab-item">
+                    <label class="layui-form-label">{:lang('vod_content')}</label>
+                    <div class="layui-input-block">
+                        <textarea id="editor" name="vod_content" style="width:100%;height:200px;">{$data.vod_content}</textarea>
+                    </div>
+                </div>
+                <div class="layui-tab-item">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang('vod_up')}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="vod_up" value="{$data.vod_up}" class="layui-input">
+                        </div>
+                        <label class="layui-lable">{:lang('vod_down')}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="vod_down" value="{$data.vod_down}" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang('vod_hits')}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="vod_hits" value="{$data.vod_hits}" class="layui-input">
+                        </div>
+                        <label class="layui-lable">{:lang('vod_hits_month')}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="vod_hits_month" value="{$data.vod_hits_month}" class="layui-input">
+                        </div>
+                        <label class="layui-lable">{:lang('vod_author')}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="vod_author" value="{$data.vod_author}" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang('vod_hits_week')}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="vod_hits_week" value="{$data.vod_hits_week}" class="layui-input">
+                        </div>
+                        <label class="layui-lable">{:lang('vod_hits_day')}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="vod_hits_day" value="{$data.vod_hits_day}" class="layui-input">
+                        </div>
+                        <label class="layui-lable">{:lang('vod_jumpurl')}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="vod_jumpurl" value="{$data.vod_jumpurl}" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang('vod_score')}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="vod_score" value="{$data.vod_score}" class="layui-input">
+                        </div>
+                        <label class="layui-lable">{:lang('vod_score_all')}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="vod_score_all" value="{$data.vod_score_all}" class="layui-input">
+                        </div>
+                        <label class="layui-lable">{:lang('vod_score_num')}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="vod_score_num" value="{$data.vod_score_num}" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang('vod_points')}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="vod_points" value="{$data.vod_points}" class="layui-input">
+                        </div>
+                        <label class="layui-lable">{:lang('vod_points_play')}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="vod_points_play" value="{$data.vod_points_play}" class="layui-input">
+                        </div>
+                        <label class="layui-lable">{:lang('vod_points_down')}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="vod_points_down" value="{$data.vod_points_down}" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang('vod_tpl')}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="vod_tpl" value="{$data.vod_tpl}" class="layui-input">
+                        </div>
+                        <label class="layui-lable">{:lang('vod_tpl_play')}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="vod_tpl_play" value="{$data.vod_tpl_play}" class="layui-input">
+                        </div>
+                        <label class="layui-lable">{:lang('vod_tpl_down')}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="vod_tpl_down" value="{$data.vod_tpl_down}" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang('vod_pwd')}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="vod_pwd" value="{$data.vod_pwd}" class="layui-input">
+                        </div>
+                        <label class="layui-lable">{:lang('vod_pwd_url')}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="vod_pwd_url" value="{$data.vod_pwd_url}" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang('vod_pwd_play')}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="vod_pwd_play" value="{$data.vod_pwd_play}" class="layui-input">
+                        </div>
+                        <label class="layui-lable">{:lang('vod_pwd_play_url')}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="vod_pwd_play_url" value="{$data.vod_pwd_play_url}" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang('vod_pwd_down')}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="vod_pwd_down" value="{$data.vod_pwd_down}" class="layui-input">
+                        </div>
+                        <label class="layui-lable">{:lang('vod_pwd_down_url')}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="vod_pwd_down_url" value="{$data.vod_pwd_down_url}" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn layui-btn-normal" lay-submit lay-filter="doSubmit">{$Think.lang.Save}</button>
+            </div>
+        </div>
+    </form>
+
+</div>
+{include file="public/file_js"}
+<script type="text/javascript" charset="utf-8" src="/ueditor/ueditor.config.js"></script>
+<script type="text/javascript" charset="utf-8" src="/ueditor/ueditor.all.min.js"> </script>
+<script>
+    var ue = UE.getEditor('editor');
+</script>
+</body>
+</html>

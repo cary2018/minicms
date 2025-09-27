@@ -26,7 +26,7 @@ type                     #显示菜单类型 默认0
 {/cymini:navmenu}
 
 //------------------------banner 广告图片 num显示量---------------------
-{cymini:banner num='5'}
+{cymini:banner where='[["enable","=",1],["ident","=","d"]]' limit='1' order='orderSort desc'}
 {$vo.link}          #链接地址
 {$vo.img}           #图片地址
 {$vo.target}        #打开方式
@@ -134,7 +134,7 @@ cid='5'         #所属分类id 默认：无
 //---------------------------分页标签---------------------------
 分页标签要配合 {cymini:article}{/cymini:article} 使用
 否则 $__total__  会报错
-{cymini:page total="$__total__"}
+{cymini:page total="$__total__" num="20"}
 
 //-----------------------------文章详情------------------------
 
@@ -254,3 +254,93 @@ where                       #条件 默认：[["status","=",1]]
 field                       #要计算的字段名 默认： views
 //示例：  计算所有文章的浏览量
 {cymini:sum table='article' where='[["status","=",1]]' field='views'}
+
+
+
+
+//-------------------------------------视频导航菜单--------------------------------------------
+
+{cymini:navmenu type='1'}
+    {$vo.name}    ## 一级菜单
+    {foreach $vo.son as $skey=>$item}
+        {$item.name}   ## 子菜单
+    {/foreach}
+{/cymini:navmenu}
+
+
+//----------------------------------------视频数据-------------------------------------------------
+
+{cymini:vod where='[["type_id","=",17]]' limit='5' order="vod_time desc"}
+    {$vo.vod_name}   ## 视频名称
+    {$vo.nickname}   ## 分类名
+    {foreach :vodExplode($vo.vod_play_url,$vo.vod_play_from) as $k=>$v}
+        {$k}  ##资源名称
+        {foreach :vodSeep($v) as $name=>$url}
+            {$url}  ## 视频url
+            {$name} ## 视频集（例：国语，高清，正片，第一集、第二集 或者 第01集、第02集）
+        {/foreach}
+    {/foreach}
+{/cymini:vod}
+
+
+//----------------------------------------调用视频字段数据-----------------------------------------------
+{cymini:voddetail where='[["vod_id","=",31]]' field='vod_name' /}
+---
+{cymini:voddetail where='[["vod_id","=",31]]' field='nickname' /}
+vod_name        ## 视频名称
+nickname        ## 分类名称
+。。。。。。
+
+//--------------------------------------------- 调用当前播放视频详细 ------------------------------------------------------
+{cymini:vodplay names='select_url' /}  ## 显示播放地址
+{cymini:vodplay play='select_url' /}   ## 通用播放视频
+---
+{$__play__['select_from']}  ## 该写法要先调用标签
+---
+{$__play__['select_page']}
+---
+{$__play__['select_url']}
+
+## =========视频播放示例===========
+{cymini:vodplay names='select_url' /}---
+{$__play__['select_page']}---
+{$__play__['vod_name']}---
+{$__play__['select_from']}---
+<div style="height: 500px;width: 500px;border:1px solid #ccc;">
+    {cymini:vodplay play='select_url' /}
+</div>
+
+## 使用播放插件 播放示例
+##  引入播放器样式和js相关文件
+<link type="text/css" rel="stylesheet" href="/hyy1.0.0/ckplayer/css/ckplayer.css" />
+<script type="text/javascript" src="/hyy1.0.0/ckplayer/js/ckplayer.min.js" charset="UTF-8"></script>
+##  播放器容器
+<div class="PlayVideo" style="width: 100%; height: 500px;max-width: 800px;">播放容器</div>
+<script>
+    // 播放地址
+    let PlayUrl = "{cymini:vodplay names='select_url'/}";
+</script>
+##  引入实例播放js
+<script type="text/javascript" src="/hyy1.0.0/js/play.js" charset="UTF-8"></script>
+
+//------------------------------------------视频播放列表----------------------------------------
+
+{cymini:PlayList }
+    {$vo.vod_name}
+    {foreach $vo.play_info as $kk=>$vv}
+        <p>
+            {if $vo.select_from == $vv.play_from.from}
+                当前资源：
+            {/if}
+            {$vv.play_from.from}
+        </p>
+        {foreach $vv.page as $sk=>$sv}
+            <p>
+                {if $vo.select_url == $vv.purl[$sk]}
+                    当前播放：
+                {/if}
+                {$sv}---{$kk}-{$sk}
+            </p>
+        {/foreach}
+    {/foreach}
+{/cymini:PlayList}

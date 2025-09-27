@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{$Think.lang.AddMenu}</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    {include file="public/file_css"}
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-form layuimini-form">
+    <form class="layui-form" id="DataForm" lay-filter="DataForm" action="{:url('menu/ajax')}" method="post" onsubmit="return false">
+        <div class="layui-form-item">
+            <label class="layui-form-label">{$Think.lang.departUp}</label>
+            <input type="hidden" name="id" value="{$data.id}" >
+            <div class="layui-input-block">
+                <select name="pid" lay-filter="pid" layui.formselect>
+                    <option value="0">{$Think.lang.DownSelect}</option>
+                    {volist name="tree" id="item"}
+                    <option value="{$item.id}" {if $item.id == $data.pid}selected{/if} >{$item.p|raw}{$item.name}</option>
+                    {/volist}
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">{$Think.lang.departName}</label>
+            <div class="layui-input-inline">
+                <input type="text" name="name" lay-verify="required" lay-reqtext="{$Think.lang.CategoryNameEmpty}" value="{$data.name}" class="layui-input">
+            </div>
+            <label class="layui-form-label required">{$Think.lang.OrderSort}</label>
+            <div class="layui-input-inline">
+                <input type="number" name="orderSort" value="{if $data.orderSort}{$data.orderSort}{else}100{/if}" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">{$Think.lang.departCode}</label>
+            <div class="layui-input-block">
+                <input name="code" value="{$data.code}" class="layui-input" >
+            </div>
+        </div>
+
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">{$Think.lang.Remark}</label>
+            <div class="layui-input-block">
+                <textarea name="remark" class="layui-textarea" >{$data.remark}</textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn layui-btn-normal" lay-submit lay-filter="doSubmit">{$Think.lang.Save}</button>
+            </div>
+        </div>
+    </form>
+
+</div>
+{include file="public/file_js"}
+</body>
+</html>

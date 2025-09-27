@@ -231,6 +231,16 @@ create table cy_article(
 alter table cy_article add uid int not null default 0 comment'所属用户' after cid;
 alter table cy_article add tags varchar(100) not null default '' comment'tag标签' after title;
 alter table cy_article add recycle tinyint(1) not null default 0 comment'回收站' after status;
+//附件下载地址
+CREATE TABLE `cy_software` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `aid` int(11) NOT NULL DEFAULT '0' COMMENT '所属信息',
+  `code` varchar(6) NOT NULL DEFAULT '' COMMENT '提取码',
+  `name` varchar(30) NOT NULL DEFAULT '' COMMENT '下载名称',
+  `url` varchar(200) NOT NULL DEFAULT '' COMMENT '下载地址',
+  `orderSort` int NOT NULL DEFAULT '100' COMMENT '排序',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM CHARSET=utf8 COMMENT='软件下载地址表';
 //采集规则
 CREATE TABLE `cy_collection` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -296,16 +306,7 @@ create table cy_feedback(
     status int not null default 0 comment'状态',
     createTime int not null default 0 comment'创建时间'
 )engine=MyIsam charset=utf8;
-//附件下载地址
-CREATE TABLE `cy_software` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `aid` int(11) NOT NULL DEFAULT '0' COMMENT '所属信息',
-  `code` varchar(6) NOT NULL DEFAULT '' COMMENT '提取码',
-  `name` varchar(30) NOT NULL DEFAULT '' COMMENT '下载名称',
-  `url` varchar(200) NOT NULL DEFAULT '' COMMENT '下载地址',
-  `orderSort` int NOT NULL DEFAULT '100' COMMENT '排序',
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM CHARSET=utf8 COMMENT='软件下载地址表';
+alter table cy_feedback add region varchar(50) not null default '' COMMENT'所在区域' after ip;
 //文章分类
 create table cy_category(
     id int primary key auto_increment,
@@ -392,6 +393,8 @@ CREATE TABLE `cy_classify` (
   `path` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM CHARSET=utf8 COMMENT='导航分类表';
+alter table cy_classify add route varchar(50) not null comment'路由地址';
+alter table cy_classify add routes varchar(50) not null comment'统计点击路由';
 //导航地址
 CREATE TABLE `cy_navigation` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -409,6 +412,8 @@ CREATE TABLE `cy_navigation` (
   `updateTime` int NOT NULL COMMENT '更新时间',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM CHARSET=utf8 COMMENT='导航地址表';
+alter table cy_navigation add click int not null comment'点击量';
+alter table cy_navigation add logo varchar(120) not null comment'图片';
 //站群配置
 create table `cy_domain`(
     id int(11) not null primary key auto_increment,
@@ -425,4 +430,66 @@ create table `cy_domain`(
     updateTime int not null default 0 comment'创建时间'
 )engine=myisam charset=utf8 comment='站群配置表';
 alter table cy_domain add web_ico varchar(130) not null default '' comment'ico图标' after web_logo;
+
+// 商品表
+CREATE TABLE `cy_goods` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `cid` int(11) NOT NULL COMMENT '商品分类id',
+  `attr_id` tinyint(4) NOT NULL COMMENT '属性id',
+  `g_sn` varchar(60) NOT NULL COMMENT '商品编号',
+  `brand_id` tinyint(5) NOT NULL COMMENT '品牌id',
+  `title` varchar(55) NOT NULL COMMENT '商品名称',
+  `img_url` varchar(100) NOT NULL COMMENT '商品主图',
+  `small_img` varchar(100) NOT NULL COMMENT '商品小图',
+  `shop_price` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '售价',
+  `zk_price` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '折扣价',
+  `is_show` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否上架',
+  `virtual_sales` int(11) NOT NULL COMMENT '虚拟销量',
+  `promote_price` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '促销价格',
+  `promote_end_date` int(11) NOT NULL COMMENT '促销结束',
+  `promote_start_date` int(11) NOT NULL COMMENT '促销开始',
+  `is_promote` int(11) NOT NULL COMMENT '促销',
+  `is_hot` int(11) NOT NULL COMMENT '热销',
+  `is_new` int(11) NOT NULL COMMENT '新品',
+  `is_best` int(11) NOT NULL COMMENT '精品',
+  `sort_order` int(11) NOT NULL DEFAULT '100' COMMENT '排序',
+  `is_del` int(11) NOT NULL COMMENT '回收站',
+  `click_count` int(11) NOT NULL COMMENT '浏览量',
+  `warn_number` int(11) NOT NULL COMMENT '库存警告',
+  `g_number` int(11) NOT NULL COMMENT '库存量',
+  `g_text` text NOT NULL COMMENT '商品详情',
+  `g_desc` varchar(180) NOT NULL COMMENT '描述',
+  `keywords` varchar(150) NOT NULL COMMENT '关键字',
+  `createTime` int(11) NOT NULL COMMENT '添加时间',
+  `updateTime` int(11) NOT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='本地商品列表';
+// 商品相册
+CREATE TABLE `cy_shop_gallery` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `gid` int(11) NOT NULL COMMENT '所属商品id',
+  `img_url` varchar(100) NOT NULL COMMENT '商品主图',
+  `small_img` varchar(100) NOT NULL COMMENT '商品缩略图',
+  `img_order` int(11) NOT NULL COMMENT '排序',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='商品图片相册';
+// 商品属性类型
+CREATE TABLE `cy_goods_type` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL COMMENT '类型名称',
+  `group` varchar(200) NOT NULL COMMENT '分组',
+  `enabled` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '是否启用，默认1为启用',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+// 商品属性列表
+CREATE TABLE `cy_goods_attr` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `goods_id` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT '商品id',
+  `attr_id` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT '所属类型属性id',
+  `attr_value` text NOT NULL COMMENT '属性值',
+  `attr_price` varchar(255) NOT NULL DEFAULT '' COMMENT '该属性商品价格',
+  PRIMARY KEY (`id`),
+  KEY `goods_id` (`goods_id`),
+  KEY `attr_id` (`attr_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='商品属性关联表';
 

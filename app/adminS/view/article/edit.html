@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{$Think.lang.admin}</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    {include file="public/file_css"}
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-form ">
+    <form class="layui-form" id="DataForm" lay-filter="DataForm" method="post" onsubmit="return false">
+        <div class="layui-tab">
+            <ul class="layui-tab-title">
+                <li class="layui-this">{$Think.lang.convention}</li>
+                <li>{$Think.lang.article_content}</li>
+                <li>{$Think.lang.article_annex}</li>
+            </ul>
+            <div class="layui-tab-content">
+                <div class="layui-tab-item layui-show layuimini-form">
+                    <div class="layui-form-item">
+                        <input type="text" name="id" value="{$data.id}" style="display: none;">
+                    </div>
+                    <div class="layui-form-item">
+                        <label for="thumb_img" class="layui-form-label">{$Think.lang.articleImg}</label>
+                        <div class="layui-input-inline">
+                            <div class="z_file fl">
+                                {if $data.articleThumbImg}
+                                <img src="/{$data.articleThumbImg}" id="show_img" class="add_img">
+                                {else}
+                                <img src="/images/all.png" id="show_img" class="add_img">
+                                {/if}
+                                <input type="file" class="up_file" id="thumb_img" name="articleImg" onchange="PreviewImg('thumb_img','show_img')" accept="image/*">
+                            </div>
+                        </div>
+                        <label class="layui-form-label">{$Think.lang.annex}</label>
+                        <div class="layui-input-inline">
+                            <input type="file" name="annex" class="layui-input" accept=".zip,.rar,.gz">
+                        </div>
+                        <div class="layui-form-mid layui-word-aux">{if $data.annex}{$data.annex}{/if}</div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label required">{$Think.lang.variable_title}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="title" lay-verify="required" lay-reqtext="{$Think.lang.TitleNotEmpty}" value="{$data.title}" class="layui-input">
+                        </div>
+                        <label class="layui-form-label required">{$Think.lang.category}</label>
+                        <div class="layui-input-inline">
+                            <select name="cid" lay-verify="required" lay-reqtext="{$Think.lang.selectCategory}" layui.formselect>
+                                <option value="">{$Think.lang.DownSelect}</option>
+                                {volist name="tree" id="item"}
+                                <option value="{$item.id}" {if $item.id == $data.cid}selected{/if} >{$item.p|raw}{$item.name}</option>
+                                {/volist}
+                            </select>
+                        </div>
+                        <label class="layui-form-label">{$Think.lang.author}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="author" value="{$data.author}" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{$Think.lang.orderSort}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="orderSort" {if $data.orderSort} value="{$data.orderSort}" {else} value="100" {/if} class="layui-input">
+                        </div>
+                        <label class="layui-form-label required">{$Think.lang.status}</label>
+                        <div class="layui-input-inline">
+                            <select name="status" lay-filter="pid" layui.formselect>
+                                {foreach $read as $key=>$vo }
+                                    <option value="{$key}" {if $data.status == $key}selected{/if}>{$vo}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                        <label class="layui-form-label required">{$Think.lang.downloadJur}</label>
+                        <div class="layui-input-inline">
+                            <input type="radio" name="downloadJur" value="1" title="{$Think.lang.public}" {if $data.downloadJur == 1}checked{/if} {if $data.downloadJur == ''}checked{/if}>
+                            <input type="radio" name="downloadJur" value="0" title="{$Think.lang.private}" {if $data.downloadJur === 0}checked{/if}>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{$Think.lang.attrId}</label>
+                        <div class="layui-input-block">
+                            {foreach $attr as $key=>$vo }
+                                <input type="checkbox" name="attrId[]" value="{$vo.id}" lay-skin="primary" title="{$vo.remarks}[{$vo.code}]" {php}if($data['attrId'] && in_array($vo['id'],$data['attrId'])){echo 'checked';}{/php}>
+                            {/foreach}
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{$Think.lang.data_sync}</label>
+                        <div class="layui-input-inline">
+                            <input type="radio" name="async" value="1" title="{$Think.lang.yes}" {if !$data.id} checked {/if}>
+                            <input type="radio" name="async" value="0" title="{$Think.lang.no}" {if $data.id} checked {/if}>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{$Think.lang.tags}</label>
+                        <div class="layui-input-inline" style="width:50%;">
+                            <input type="text" name="tags" value="{$data.tags}" class="layui-input">
+                        </div>
+                        <div class="layui-form-mid layui-word-aux">{$Think.lang.tagsDesc}</div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{$Think.lang.keywords}</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="keywords" value="{$data.keywords}" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item layui-form-text">
+                        <label class="layui-form-label">{$Think.lang.description}</label>
+                        <div class="layui-input-block">
+                            <textarea name="description" class="layui-textarea" >{$data.description}</textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-tab-item">
+                    <label class="layui-form-label">{$Think.lang.content}</label>
+                    <div class="layui-input-block">
+                        <textarea id="editor" name="content" style="width:100%;height:200px;">{$data.content}</textarea>
+                    </div>
+                </div>
+                <div class="layui-tab-item">
+                    <div class="layui-form">
+                        <table class="layui-table">
+                            <colgroup>
+                                <col width="150">
+                                <col width="150">
+                                <col width="200">
+                                <col width="200">
+                                <col width="80">
+                                <col>
+                            </colgroup>
+                            <thead>
+                            <tr>
+                                <th>{$Think.lang.downName}</th>
+                                <th>{$Think.lang.downAddr}</th>
+                                <th>{$Think.lang.getCode}</th>
+                                <th>{$Think.lang.orderSort}</th>
+                                <th>{$Think.lang.operate}</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {volist name="soft" id="item"}
+                            <tr>
+                                <td>{$item.name}</td>
+                                <td>{$item.url}</td>
+                                <td>{$item.code}</td>
+                                <td>{$item.orderSort}</td>
+                                <td>
+                                    <a class="layui-btn layui-btn-sm" alt="{:url('/admin/article/del')}?id={$item.id}" id="delete" >{$Think.lang.del}</a>
+                                </td>
+                            </tr>
+                            {/volist}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-inline">
+                            <input type="text" placeholder="{$Think.lang.downName}" name="name[]" class="layui-input">
+                        </div>
+                        <div class="layui-input-inline">
+                            <input type="text" placeholder="{$Think.lang.downAddr}" name="url[]" class="layui-input">
+                        </div>
+                        <div class="layui-input-inline">
+                            <input type="text" placeholder="{$Think.lang.getCode}" name="code[]" class="layui-input">
+                        </div>
+                        <div class="layui-input-inline">
+                            <input type="text" placeholder="{$Think.lang.orderSort}" value="100" name="sort[]" class="layui-input">
+                        </div>
+                        <span class="layui-btn" id="addDown"><i class="fa fa-plus"></i> </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn layui-btn-normal" lay-submit lay-filter="doSubmit">{$Think.lang.Save}</button>
+            </div>
+        </div>
+    </form>
+
+</div>
+{include file="public/file_js"}
+<script type="text/javascript" charset="utf-8" src="/ueditor/ueditor.config.js"></script>
+<script type="text/javascript" charset="utf-8" src="/ueditor/ueditor.all.min.js"> </script>
+<script>
+    var ue = UE.getEditor('editor');
+</script>
+</body>
+</html>

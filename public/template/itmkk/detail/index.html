@@ -31,9 +31,7 @@
 </head>
 <body class="home home-article" style="transform: none;">
 
-
 {include file='layout/navmenu'}
-
 
 <main class="main-content container clearfix" style="transform: none; height: auto !important;">
     <div class="row" style="transform: none; height: auto !important;">
@@ -70,7 +68,17 @@
                             {cymini:detail field='content'/}
                         </div>
                     </div>
+                    {if $__detail__['downloadJur'] == 1}
+                    <div class="entry-next-prev wow fadeInDown " style="visibility: hidden; animation-name: none;">
+                        {if $__detail__['annex']}
+                        <a class="layui-btn layui-bg-blue layui-btn-sm" href="/{$__detail__['annex']}" target="_blank">附件下载</a>
+                        {/if}
+                        {cymini:table table='software' where='["aid","=",$__detail__["id"]]'}
+                        <a class="layui-btn layui-bg-blue layui-btn-sm bt-download" data-code="{$vo.code}" data-href="{$vo.url}" target="_blank">{$vo.name}</a>
+                        {/cymini:table}
 
+                    </div>
+                    {/if}
                 </article>
             </div>
             <div class="entry-next-prev wow fadeInDown " style="visibility: hidden; animation-name: none;">
@@ -126,6 +134,10 @@
                                 <input type="text" name="email" id="inpEmail" class="text" value="" placeholder="邮箱" size="28" tabindex="2" />
                             </div>
                             {/if}
+                            <div class="form-group liuyan form-www">
+                                <input type="text" name="captcha" style="width:50%;float:left;" id="inpHomePage" class="text" value="" placeholder="验证码" size="28" tabindex="3">
+                                <a><img style="line-height:44px;height:44px;max-height:44px;width:50%;" id="refreshCaptcha" onclick="this.src=this.src.replace(/\?.*$/, '')+'?'+Math.random()" class="validateImg" src="{:captcha_src()}" ></a>
+                            </div>
                         </div>
                         <!--verify-->
                         <div class="liblog_ad6a5_0ec0e" id="comment-tools">
@@ -142,37 +154,14 @@
                                 <span class="com-title">表情：</span>
                                 <a href="javascript:;" class="face-show"><i class="icon font-smile-o"></i></a>
                                 <div id="ComtoolsFrame" class="ComtoolsFrame liblog_a6b58_bb989">
-                                    <img class="comment_ubb" src="/ubb/Addoil.png" alt="Addoil" onclick="InsertText(objActive,'['+this.alt+']',false);" />
-                                    <img class="comment_ubb" src="/ubb/Applause.png" alt="Applause" onclick="InsertText(objActive,'['+this.alt+']',false);" />
-                                    <img class="comment_ubb" src="/ubb/Badlaugh.png" alt="Badlaugh" onclick="InsertText(objActive,'['+this.alt+']',false);" />
-                                    <img class="comment_ubb" src="/ubb/Bomb.png" alt="Bomb" onclick="InsertText(objActive,'['+this.alt+']',false);" />
-                                    <img class="comment_ubb" src="/ubb/Coffee.png" alt="Coffee" onclick="InsertText(objActive,'['+this.alt+']',false);" />
-                                    <img class="comment_ubb" src="/ubb/Fabulous.png" alt="Fabulous" onclick="InsertText(objActive,'['+this.alt+']',false);" />
-                                    <img class="comment_ubb" src="/ubb/Facepalm.png" alt="Facepalm" onclick="InsertText(objActive,'['+this.alt+']',false);" />
-                                    <img class="comment_ubb" src="/ubb/Feces.png" alt="Feces" onclick="InsertText(objActive,'['+this.alt+']',false);" />
-                                    <img class="comment_ubb" src="/ubb/Frown.png" alt="Frown" onclick="InsertText(objActive,'['+this.alt+']',false);" />
-                                    <img class="comment_ubb" src="/ubb/Heyha.png" alt="Heyha" onclick="InsertText(objActive,'['+this.alt+']',false);" />
-                                    <img class="comment_ubb" src="/ubb/Insidious.png" alt="Insidious" onclick="InsertText(objActive,'['+this.alt+']',false);" />
-                                    <img class="comment_ubb" src="/ubb/KeepFighting.png" alt="KeepFighting" onclick="InsertText(objActive,'['+this.alt+']',false);" />
-                                    <img class="comment_ubb" src="/ubb/NoProb.png" alt="NoProb" onclick="InsertText(objActive,'['+this.alt+']',false);" />
-                                    <img class="comment_ubb" src="/ubb/PigHead.png" alt="PigHead" onclick="InsertText(objActive,'['+this.alt+']',false);" />
-                                    <img class="comment_ubb" src="/ubb/Shocked.png" alt="Shocked" onclick="InsertText(objActive,'['+this.alt+']',false);" />
-                                    <img class="comment_ubb" src="/ubb/Sinistersmile.png" alt="Sinistersmile" onclick="InsertText(objActive,'['+this.alt+']',false);" />
-                                    <img class="comment_ubb" src="/ubb/Slap.png" alt="Slap" onclick="InsertText(objActive,'['+this.alt+']',false);" />
-                                    <img class="comment_ubb" src="/ubb/Social.png" alt="Social" onclick="InsertText(objActive,'['+this.alt+']',false);" />
-                                    <img class="comment_ubb" src="/ubb/Sweat.png" alt="Sweat" onclick="InsertText(objActive,'['+this.alt+']',false);" />
-                                    <img class="comment_ubb" src="/ubb/Tolaugh.png" alt="Tolaugh" onclick="InsertText(objActive,'['+this.alt+']',false);" />
-                                    <img class="comment_ubb" src="/ubb/Watermelon.png" alt="Watermelon" onclick="InsertText(objActive,'['+this.alt+']',false);" />
-                                    <img class="comment_ubb" src="/ubb/Witty.png" alt="Witty" onclick="InsertText(objActive,'['+this.alt+']',false);" />
-                                    <img class="comment_ubb" src="/ubb/Wow.png" alt="Wow" onclick="InsertText(objActive,'['+this.alt+']',false);" />
-                                    <img class="comment_ubb" src="/ubb/Yeah.png" alt="Yeah" onclick="InsertText(objActive,'['+this.alt+']',false);" />
-                                    <img class="comment_ubb" src="/ubb/Yellowdog.png" alt="Yellowdog" onclick="InsertText(objActive,'['+this.alt+']',false);" />
+                                    {cymini:emoji}
+                                    {foreach $vo as $k=>$v}
+                                    <img class="comment_ubb" src="/ubb/{$v}" alt="{$k}" onclick="InsertText(objActive,'['+this.alt+']',false);" />
+                                    {/foreach}
+                                    {/cymini:emoji}
                                 </div>
                             </div>
-                            <div class="form-group liuyan form-www">
-                                <input type="text" name="captcha" style="width:50%;float:left;" id="inpHomePage" class="text" value="" placeholder="验证码" size="28" tabindex="3">
-                                <a><img style="line-height:44px;height:44px;max-height:44px;width:50%;" id="refreshCaptcha" onclick="this.src=this.src.replace(/\?.*$/, '')+'?'+Math.random()" class="validateImg" src="{:captcha_src()}" ></a>
-                            </div>
+
                             <div class="psumbit-r">
                                 <span class="button" onclick="submitForm('frmSumbit')" style="text-align:center;">提交</span>
                             </div>
@@ -206,7 +195,7 @@
                                 <div class="interact-bar">
                                     <span class="interact-time" title="评论时间：{{item.createTime}}">{{item.createTime}}</span>
                                     <span class="spot"></span>
-                                    <span class="interact-area" title="">ip：{{item.ip}}</span>
+                                    <span class="interact-area" title="">ip：{{item.ip}}-{{item.region}}</span>
                                     <span class="spot"></span>
                                     <a href="#reply" onclick="zbp.comment.reply('{{item.id}}')" class="comment-reply-link">回复</a>
                                 </div>
@@ -227,7 +216,7 @@
                                             <div class="interact-bar">
                                                 <span class="interact-time" title="评论时间：{{item.createTime}}">{{item.createTime}}</span>
                                                 <span class="spot"></span>
-                                                <span class="interact-area" title="">ip：{{item.ip}}</span>
+                                                <span class="interact-area" title="">ip：{{item.ip}}-{{item.region}}</span>
                                                 <span class="spot"></span>
                                                 <a href="#reply" onclick="zbp.comment.reply('{{item.id}}')" class="comment-reply-link">回复</a>
                                             </div>
@@ -302,7 +291,24 @@
                 });
             }
         });
+        $(".bt-download").on('click',function (obj) {
+            let code =$(this).attr('data-code');
+            let url =$(this).attr('data-href');
+            layer.open({
+                title: '',
+                content: `<div class="p-4" style="min-width:300px;">
+                                <div style="padding:10px;text-align:center;background:#eee;border-radius:5px;margin-bottom:20px;">
+                                    <h4>提取码：<span style="color:#e74c3c;">`+ code +`</span>  </h4>
+                                </div>
+                                <p>
+                                    <a href="`+url+`" target="_blank" style="width:100%" class="layui-btn layui-bg-blue">前往下载</a>
+                                </p>
+                            </div>`,
+                btn: false
+            });
+        });
     })
+
     //添加图片属性
     //$('single-entry').img.setAttribute("data-fancybox","gallery");
     function submitForm(formId){

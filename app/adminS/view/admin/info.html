@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{$Think.lang.admin}</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    {include file="public/file_css"}
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-form">
+    <form class="layui-form layuimini-form" id="DataForm" lay-filter="DataForm" method="post" onsubmit="return false">
+        <span id="ActionUrl" alt="{:url('saveInfo')}"></span>
+        <div class="layui-form-item">
+            <input type="text" name="id" value="{$data.id}" style="display: none;">
+        </div>
+        <div class="layui-form-item">
+            <label for="" class="layui-form-label">{$Think.lang.HeadImg}</label>
+            <div class="z_file fl">
+                {if $data.headImg}
+                <img src="/{$data.headImg}" id="show_img" class="add_img">
+                {else}
+                <img src="/images/all.png" id="show_img" class="add_img">
+                {/if}
+                <input type="file" class="up_file" id="thumb_img" name="headImg" onchange="PreviewImg('thumb_img','show_img')" accept="image/*">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">{$Think.lang.username}</label>
+            <div class="layui-input-inline">
+                <input type="text" name="username" readonly lay-verify="required" lay-reqtext="{$Think.lang.MenuNotEmpty}" value="{$data.username}" class="layui-input">
+            </div>
+            <label class="layui-form-label">{$Think.lang.nickname}</label>
+            <div class="layui-input-inline">
+                <input type="text" name="nickname" value="{$data.nickname}" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label required">{$Think.lang.password}</label>
+            <div class="layui-input-inline">
+                <input type="password" name="password" class="layui-input">
+            </div>
+            <label class="layui-form-label required">{$Think.lang.repassword}</label>
+            <div class="layui-input-inline">
+                <input type="password" name="repassword" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">{$Think.lang.iphone}</label>
+            <div class="layui-input-inline">
+                <input type="text" name="iphone" readonly value="{$data.iphone}" class="layui-input">
+            </div>
+            <label class="layui-form-label">{$Think.lang.Email}</label>
+            <div class="layui-input-inline">
+                <input type="text" name="email" readonly value="{$data.email}" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">{$Think.lang.realname}</label>
+            <div class="layui-input-inline">
+                <input type="text" name="realname" readonly value="{$data.realname}" class="layui-input">
+            </div>
+            <label class="layui-form-label">{$Think.lang.identity}</label>
+            <div class="layui-input-inline">
+                <input type="text" name="identity" readonly value="{$data.identity}" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">{$Think.lang.department}</label>
+            <div class="layui-input-inline">
+                <span class="layui-input" style="line-height:38px;">
+                    {$data.depart}
+                </span>
+            </div>
+            <label class="layui-form-label">{$Think.lang.position}</label>
+            <div class="layui-input-inline">
+                <span class="layui-input" style="line-height:38px;">
+                    {$data.position}
+                </span>
+            </div>
+        </div>
+
+        <div class="layui-form-item" id="area-picker">
+            <div class="layui-form-label">{$Think.lang.city}</div>
+            <div class="layui-input-inline" style="width:200px;">
+                <span class="layui-input" style="line-height:38px;">
+                    {$data.area}--{$data.city}--{$data.county}
+                </span>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">{$Think.lang.address}</label>
+            <div class="layui-input-block">
+                <span class="layui-input" style="line-height:38px;">
+                    {$data.address}
+                </span>
+            </div>
+        </div>
+
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">{$Think.lang.Remark}</label>
+            <div class="layui-input-block">
+                <span class="layui-textarea">
+                    {$data.remark}
+                </span>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn layui-btn-normal" lay-submit lay-filter="doSubmit">{$Think.lang.Save}</button>
+            </div>
+        </div>
+    </form>
+</div>
+{include file="public/file_js"}
+</body>
+</html>

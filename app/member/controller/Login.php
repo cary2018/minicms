@@ -24,6 +24,10 @@ class Login extends BaseController
     public function index(){
         $host = $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['HTTP_HOST'].'/api/bing';
         view::assign('host',$host);
+        $user = GetSe('MemberCenter');
+        if($user){
+            return redirect((string)url('/member'));
+        }
         return view();
     }
     public function check(){
@@ -37,7 +41,7 @@ class Login extends BaseController
                 if(PasswordVerify($data['password'],$user['password'])){
                     //保存登录信息
                     SetSe('MemberCenter',$user);
-                    $msg = ['code'=>200,'msg'=>lang('login_success'),'jump_url'=>'/Member'];
+                    $msg = ['code'=>200,'msg'=>lang('login_success'),'jump_url'=>'/member'];
                 }else{
                     $msg = ['code'=>300,'msg'=>lang('login_error'),'token'=>$token];
                 }
@@ -104,7 +108,7 @@ class Login extends BaseController
         if($jump){
             return json_encode(['code'=>200]);
         }else{
-            return redirect((string)url('/Member/login'));
+            return redirect((string)url('/member/login'));
         }
     }
 }

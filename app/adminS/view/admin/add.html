@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{$Think.lang.admin}</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    {include file="public/file_css"}
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-form">
+    <form class="layui-form layuimini-form" id="DataForm" lay-filter="DataForm" method="post" onsubmit="return false">
+        <div class="layui-form-item">
+            <input type="text" name="id" value="" style="display: none;">
+        </div>
+        <div class="layui-form-item">
+            <label for="" class="layui-form-label">{$Think.lang.HeadImg}</label>
+            <div class="z_file fl">
+                <img src="/images/all.png" id="show_img" class="add_img">
+                <input type="file" class="up_file" id="thumb_img" name="headImg" onchange="PreviewImg('thumb_img','show_img')" accept="image/*">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">{$Think.lang.username}</label>
+            <div class="layui-input-inline">
+                <input type="text" name="username" lay-verify="required" lay-reqtext="{$Think.lang.MenuNotEmpty}" value="" class="layui-input">
+            </div>
+            <div class="layui-input-inline">
+                <input type="text" name="nickname" placeholder="{$Think.lang.nickname}" value="" class="layui-input">
+            </div>
+            <div class="layui-input-inline">
+                <select name="group_id">
+                    <option value="">【{$Think.lang.DownSelect}】</option>
+                    <option value="0" selected >{$Think.lang.admin}</option>
+                    <option value="1" >{$Think.lang.private}</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label required">{$Think.lang.password}</label>
+            <div class="layui-input-inline">
+                <input type="password" name="password" class="layui-input">
+            </div>
+            <label class="layui-form-label required">{$Think.lang.repassword}</label>
+            <div class="layui-input-inline">
+                <input type="password" name="repassword" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">{$Think.lang.iphone}</label>
+            <div class="layui-input-inline">
+                <input type="text" name="iphone" value="" class="layui-input">
+            </div>
+            <label class="layui-form-label">{$Think.lang.Email}</label>
+            <div class="layui-input-inline">
+                <input type="text" name="email" value="" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">{$Think.lang.realname}</label>
+            <div class="layui-input-inline">
+                <input type="text" name="realname" value="" class="layui-input">
+            </div>
+            <label class="layui-form-label">{$Think.lang.identity}</label>
+            <div class="layui-input-inline">
+                <input type="text" name="identity" value="" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">{$Think.lang.gender}</label>
+            <div class="layui-input-inline">
+                <select name="gender">
+                    <option value="">【{$Think.lang.select_sex}】</option>
+                    <option value="1" selected >{$Think.lang.boy}</option>
+                    <option value="0" >{$Think.lang.girl}</option>
+                </select>
+            </div>
+            <div class="layui-input-inline">
+                <select name="dept_id">
+                    <option value="">【{$Think.lang.select_department}】</option>
+                    {volist name='depart' id='item'}
+                    <option value="{$item.id}" >{$item.p|raw}{$item.name}</option>
+                    {/volist}
+                </select>
+            </div>
+            <div class="layui-input-inline">
+                <select name="position_id">
+                    <option value="">【{$Think.lang.select_position}】</option>
+                    {volist name='position' id='item'}
+                    <option value="{$item.id}" >{$item.name}</option>
+                    {/volist}
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">{$Think.lang.entryDate}</label>
+            <div class="layui-input-inline">
+                <input type="text" name="entry_date" id="date" value="" placeholder="yyyy-mm-dd H:i:s" autocomplete="off" class="layui-input">
+            </div>
+            <label class="layui-form-label">{$Think.lang.departDate}</label>
+            <div class="layui-input-inline">
+                <input type="text" name="depart_date" id="date2" value="" placeholder="yyyy-mm-dd H:i:s" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item" id="area-picker">
+            <div class="layui-form-label">{$Think.lang.city}</div>
+            <div class="layui-input-inline" style="width: 200px;">
+                <select name="province_id" class="province-selector" data-value="" lay-filter="province_id">
+                    <option value="">【{$Think.lang.select_area}】</option>
+                    {volist name="area" id="item"}
+                    <option value="{$item.id}" >{$item.name}</option>
+                    {/volist}
+                </select>
+            </div>
+            <div class="layui-input-inline" style="width: 200px;">
+                <select name="city_id" class="city-selector" data-value="" lay-filter="city_id">
+                    <option value="">【{$Think.lang.select_city}】</option>
+                    {volist name="city" id="item"}
+                    <option value="{$item.id}" >{$item.name}</option>
+                    {/volist}
+                </select>
+            </div>
+            <div class="layui-input-inline" style="width: 200px;">
+                <select name="county_id" class="county-selector" data-value="" lay-filter="county_id">
+                    <option value="">【{$Think.lang.select_county}】</option>
+                    {volist name="county" id="item"}
+                    <option value="{$item.id}" >{$item.name}</option>
+                    {/volist}
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">{$Think.lang.address}</label>
+            <div class="layui-input-block">
+                <input type="text" name="address" value="" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item layui-form-text">
+            {if $user.isAdmin == 1}
+            <label class="layui-form-label">{$Think.lang.admin}</label>
+            <div class="layui-input-inline">
+                <input type="radio" name="isAdmin" value="1" title="{$Think.lang.yes}">
+                <input type="radio" name="isAdmin" value="0" title="{$Think.lang.no}" checked >
+            </div>
+            {/if}
+            <label class="layui-form-label">{$Think.lang.IsEnable}</label>
+            <div class="layui-input-inline">
+                <input type="radio" name="status" value="1" title="{$Think.lang.Enable}" checked >
+                <input type="radio" name="status" value="0" title="{$Think.lang.Disable}" >
+            </div>
+        </div>
+
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">{$Think.lang.Remark}</label>
+            <div class="layui-input-block">
+                <textarea name="remark" class="layui-textarea" ></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item" pane="">
+            <label class="layui-form-label">{$Think.lang.roleName}</label>
+            <div class="layui-input-block">
+                {volist name="role" id="vo"}
+                    <input type="checkbox" name="role[]" value="{$vo.id}" lay-skin="primary" title="{$vo.title}">
+                {/volist}
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn layui-btn-normal" lay-submit lay-filter="doSubmit">{$Think.lang.Save}</button>
+            </div>
+        </div>
+    </form>
+</div>
+{include file="public/file_js"}
+</body>
+</html>

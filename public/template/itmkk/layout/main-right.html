@@ -40,6 +40,11 @@
                 </div>
             </div>
         </section>
+		<section class="widget" id="side_countdown" style="visibility: visible; animation-name: fadeInDown;">
+            <h3 >
+			<span class="rt-sql totalOnline" id="totalOnline">在线人数：0</span>
+			</h3>
+        </section>
         <section class="widget" id="side_countdown" style="visibility: visible; animation-name: fadeInDown;">
             <h3 class="widget-title">时过境迁</h3>
             <ul class="widget-box side_countdown">
@@ -175,15 +180,19 @@
     setInterval(function() {
         //alert('ddd');
         $.ajax({
-            url:"https://api.cenguigui.cn/api/djt/api/?format=json&charset=utf-8",
-            dataType:"json",
+            //url:"https://api.nxvav.cn/api/yiyan/?encode=json&charset=utf-8",
+            url:"https://v.api.aa1.cn/api/yiyan/index.php",
+            //dataType:"json",
             type:"get",
             async : false,
             cache : false,
             success:function(res){
-                $("#pcs").attr('title',res.data.content)
-                $("#pcs").text(res.data.content);
+                const tmp = document.createElement("div");
+                tmp.innerHTML = res;
+                const text = tmp.textContent || tmp.innerText || "";
+                $("#pcs").attr('title',text)
+                $("#pcs").text(text);
             },
         })
-    }, 10000);
+    }, 20000);
 </script>

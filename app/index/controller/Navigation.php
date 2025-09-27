@@ -14,6 +14,7 @@
 namespace app\index\controller;
 
 use app\index\BaseController;
+use think\facade\Db;
 use think\facade\View;
 
 class Navigation extends BaseController
@@ -34,5 +35,17 @@ class Navigation extends BaseController
         $acc =  '1';
         View::assign('pass',$acc);
         return ViewHtml();
+    }
+    public function cate(){
+        return ViewHtml();
+    }
+
+    public function jump(){
+        $id = request()->param('id');
+        $url = request()->param('url');
+        Db::name('navigation')->where('id', $id)->inc('click')->update();
+        View::assign('url',$url);
+        return view();
+        return redirect($url);
     }
 }

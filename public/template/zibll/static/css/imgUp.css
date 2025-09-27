@@ -1,0 +1,133 @@
+.x-right{
+	float:right;line-height:40px;
+}
+/*上传图片插件的样式*/
+.img-box{
+	margin-top: 10px;
+}
+.img-box .up-p{
+	margin-bottom: 20px;
+	font-size: 16px;
+	color: #555;
+}
+.z_photo{
+	padding: 18px;
+	border:2px dashed #E7E6E6;
+	border-radius: 10px;
+	float: left;
+}
+.z_photo .z_file{
+	position: relative;
+}
+.z_file  .file{
+	width: 100%;
+	height: 100%;
+	opacity: 0;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	z-index: 100;
+}
+.img-box .upimg-div .z_file {
+    width: 100px;
+    height: 90px;
+}
+.z_file .add-img {
+    display: block;
+    width: 100px;
+    height: 90px;
+	border-radius: 10px;
+}
+
+/**
+input 图片上传样式
+ */
+.z_file {
+	width: 66px;
+	height: 66px;
+	position: relative;
+	padding-right: 15px;
+}
+
+.add_img {
+	display: block;
+	width: 66px;
+	height: 66px;
+	border-radius: 10px;
+}
+
+.del_img {
+	border: 1px solid #ccc;
+	border-radius: 10px;
+	background: #c9b9b9;
+	color: #fff;
+	text-align: center;
+	cursor: pointer;
+	position: relative;
+	top: -30px;
+	height: 30px;
+	line-height: 30px;
+	z-index: 101;
+}
+/**
+  input  图片上传文件样式
+ */
+.z_file .del_img {
+	display: none;
+}
+
+.z_file:hover .del_img {
+	display: block;
+}
+
+.z_file .up_file {
+	width: 100%;
+	height: 100%;
+	opacity: 0;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	z-index: 100;
+	background: #000;
+}
+
+.fl {
+	float: left;
+}
+/**
+   分页样式
+ */
+.pager{
+	margin:0 auto;
+	text-align: center;
+}
+.pager .pagination {
+	margin: 0;
+}
+.pagination strong {
+	display: inline-block;
+	padding: 10px;
+	min-width: 15px;
+	line-height: 15px;
+	border-radius: 0.25em;
+	border-image: initial;
+	margin-top: 20px;
+	font-weight: bold;
+	text-align: center;
+	color: rgb(255, 255, 255);
+	background: url(xadmin.css) 0px 0px no-repeat rgb(0, 150, 136);
+}
+.pagination a{
+	background: none;
+	border: 1px solid #e6e6e6;
+	border-radius: 0.25em;
+	padding: .5em .93em;
+	font-size: 14px;
+	margin: 0 .4em;
+	display: inline-block;
+}
+
+
+
+
+

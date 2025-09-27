@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{$Think.lang.link_list}</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    {include file="public/file_css"}
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-form layuimini-form">
+    <form class="layui-form layuimini-form" id="DataForm" lay-filter="DataForm" method="post" onsubmit="return false">
+        <div class="layui-tab layui-tab-brief">
+            <ul class="layui-tab-title">
+                <li class="layui-this">基础信息</li>
+                <li>其他信息</li>
+            </ul>
+            <div class="layui-tab-content">
+                <div class="layui-tab-item layui-show layuimini-form">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label" style="top:10px;">{$Think.lang.web_logo}</label>
+                        <div class="z_file fl">
+                            {if $data.web_logo}
+                            <img src="{$data.web_logo|ImgPath}" id="show_img" class="add_img">
+                            {else}
+                            <img src="/images/all.png" id="show_img" class="add_img">
+                            {/if}
+                            <input type="file" class="up_file" id="thumb_img" name="web_logo" onchange="PreviewImg('thumb_img','show_img')" accept="image/*">
+                        </div>
+                        <div class="layui-input-inline" style="margin-top:15px;width:20%;">
+                            <input type="text" name="web_logo" value="{$data.web_logo}" class="layui-input">
+                            <input type="hidden" name="id" value="{$data.id}" class="layui-input">
+                        </div>
+                        <label class="layui-form-label" style="top:10px;">{$Think.lang.web_ico}</label>
+                        <div class="z_file fl">
+                            {if $data.web_ico}
+                            <img src="{$data.web_ico|ImgPath}" id="shows_img" class="add_img">
+                            {else}
+                            <img src="/images/all.png" id="shows_img" class="add_img">
+                            {/if}
+                            <input type="file" class="up_file" id="thumbs_img" name="web_ico" onchange="PreviewImg('thumbs_img','shows_img')" accept="image/*">
+                        </div>
+                        <div class="layui-input-inline" style="margin-top:15px;width:20%;">
+                            <input type="text" name="web_ico" value="{$data.web_ico}" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label required">{$Think.lang.web_domain}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="web_domain" lay-verify="required" lay-reqtext="{$Think.lang.requireEmpty}" value="{$data.web_domain}" class="layui-input">
+                        </div>
+                        <label class="layui-form-label">{$Think.lang.view_path}</label>
+                        <div class="layui-input-inline">
+                            <select name="view_path" lay-filter="view_path" layui.formselect>
+                                {volist name="template" id="item"}
+                                <option value="{$item}" {if $item == $data.view_path} selected {/if}>{$item|raw}</option>
+                                {/volist}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{$Think.lang.web_title}</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="web_title" lay-verify="required" lay-reqtext="{$Think.lang.requireEmpty}" value="{$data.web_title}" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{$Think.lang.keywords}</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="web_key" value="{$data.web_key}" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item layui-form-text">
+                        <label class="layui-form-label">{$Think.lang.description}</label>
+                        <div class="layui-input-block">
+                            <textarea name="web_desc" class="layui-textarea" >{$data.web_desc}</textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-tab-item">
+                    <div class="layui-form-item layui-form-text">
+                        <label class="layui-form-label">{$Think.lang.web_Copyright}</label>
+                        <div class="layui-input-block">
+                            <textarea name="web_Copyright" class="layui-textarea" >{$data.web_Copyright}</textarea>
+                        </div>
+                    </div>
+                    <div class="layui-form-item layui-form-text">
+                        <label class="layui-form-label">{$Think.lang.web_Copy}</label>
+                        <div class="layui-input-block">
+                            <textarea name="web_Copy" class="layui-textarea" >{$data.web_Copy}</textarea>
+                        </div>
+                    </div>
+                    <div class="layui-form-item layui-form-text">
+                        <label class="layui-form-label">{$Think.lang.web_footer_title}</label>
+                        <div class="layui-input-block">
+                            <textarea name="web_footer_title" class="layui-textarea" >{$data.web_footer_title}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn layui-btn-normal" lay-submit lay-filter="doSubmit">{$Think.lang.Save}</button>
+            </div>
+        </div>
+    </form>
+
+</div>
+{include file="public/file_js"}
+</body>
+</html>

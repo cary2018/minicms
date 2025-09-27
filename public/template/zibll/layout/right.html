@@ -1,0 +1,190 @@
+<div class="sidebar">
+    <div class="sidebar-affix affix-top" style="width: 311px; top: 88px;"></div>
+    <div></div>
+    <div class="posts-nav-box" data-title="文章目录"></div>
+    <div data-affix="true" class="mb20">
+        <div class="user-card zib-widget widget">
+            <div class="user-cover graphic" style="padding-bottom: 50%;">
+                <img class="lazy fit-cover ls-is-cached" src="{$view_path}/static/images/6.png" >
+            </div>
+            <div class="card-content mt10">
+                <div class="user-content">
+                    <div class="user-avatar">
+                        <span class="avatar-img avatar-lg">
+                            <img alt="默认头像" class="lazy fit-cover avatar" src="{$view_path}/static/images/5.jpg">
+                        </span>
+                    </div>
+                    <div class="user-info mt10">
+                        <div class="text-center ">
+                            <p class="muted-color box-body em12">
+                                {if !$member}
+                                HI！请登录
+                                {else /}
+                                {$member.username}--这家伙很懒，什么都留下...
+                                {/if}
+                            </p>
+                            {if !$member}
+                            <p>
+                                <a lay-on="login" href="javascript:;" class="dslog signin-loader but jb-blue padding-lg">
+                                    <i class="fa fa-fw fa-sign-in" aria-hidden="true"></i>登录
+                                </a>
+                                <a lay-on="register" href="javascript:;" class="signup-loader ml10 but jb-yellow padding-lg">
+                                    <i class="layui-icon layui-icon-user icon"></i>注册
+                                </a>
+                            </p>
+                            {/if}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <div class="zib-widget nobottom notop">
+            <div class="row gutters-5">
+
+            </div>
+        </div>
+    </div>
+    <div>
+        <div class="box-body notop">
+            <div class="title-theme">热门文章</div>
+        </div>
+        <div class="zib-widget hot-posts">
+            {cymini:article num='10' order='views'}
+            {if $key == 1}
+            <div class="relative wow fadeInDown">
+                <a href="{$vo.temp_archives}?id={$vo.id}" title="{$vo.title}" target="{$vo.target}">
+                    <div class="graphic hover-zoom-img" style="padding-bottom: 60%!important;">
+                        <img src="/{$vo.articleThumbImg}" alt="{$vo.title}" class="fit-cover radius8 ls-is-cached lazyloaded lazyloadafter">
+                        <div class="absolute linear-mask"></div>
+                        <div class="abs-center left-bottom box-body">
+                            <div class="mb6"><span class="badg b-theme badg-sm">{$vo.views}人已阅读</span></div>
+                            {$vo.title}
+                        </div>
+                    </div>
+                </a>
+                <badge class="img-badge left hot em12"><i>TOP{$key}</i></badge>
+            </div>
+            {else}
+            <div class="flex mt15 relative hover-zoom-img wow fadeInDown">
+                <a href="{$vo.temp_archives}?id={$vo.id}" title="{$vo.title}" target="{$vo.target}">
+                    <div class="graphic">
+                        <img src="/{$vo.articleThumbImg}" alt="{$vo.title}" class="lazy fit-cover radius8 ls-is-cached lazyloaded lazyloadafter">
+                    </div>
+                </a>
+                <div class="term-title ml10 flex xx flex1 jsb">
+                    <div class="text-ellipsis-2">
+                        <a class="" href="{$vo.temp_archives}?id={$vo.id}">{$vo.title}</a>
+                    </div>
+                    <div class="px12 muted-3-color text-ellipsis flex jsb">
+                        <span><i class="layui-icon layui-icon-time"></i>{$vo.createTime}</span>
+                        <span>{$vo.views}人已阅读</span>
+                    </div>
+                </div>
+                {if $key eq 2}
+                <badge class="img-badge left hot jb-red"><i>TOP{$key}</i></badge>
+                {elseif $key == 3}
+                <badge class="img-badge left hot jb-yellow"><i>TOP{$key}</i></badge>
+                {else}
+                <badge class="img-badge left hot b-gray"><i>TOP{$key}</i></badge>
+                {/if}
+            </div>
+            {/if}
+            {/cymini:article}
+        </div>
+    </div>
+    <div class="box-body notop">
+        <div class="title-theme">随机推荐</div>
+    </div>
+    <div data-affix="true" class="widget-tab-post style-mini posts-mini-lists zib-widget">
+        <div class="tab-content">
+            <div class="tab-pane fade active in" id="zib_widget_ui_tab_post-3-1">
+                <div class="widget-ajaxpager">
+                    {cymini:rand num='10'}
+                    <div class="posts-mini ajax-item wow fadeInDown">
+                        <div class="posts-mini-con flex xx flex1 jsb">
+                            <h2 class="item-heading text-ellipsis">
+                                <span class="badg badg-sm mr3 c-red">{$key}</span>
+                                <a href="{$vo.temp_archives}?id={$vo.id}" title="{$vo.title}" target="{$vo.target}">
+                                    {$vo.title}
+                                    <span class="focus-color"></span>
+                                </a>
+                            </h2>
+                        </div>
+                    </div>
+                    {/cymini:rand}
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="theme-box">
+        <div class="box-body notop">
+            <div class="title-theme">最新评论</div>
+        </div>
+        <div class="box-body comment-mini-lists zib-widget">
+            {cymini:feedback num='6'}
+            <div class="posts-mini wow fadeInDown">
+                {if $vo.cate eq 0}
+                <a href="{$vo.temp_archives}?id={$vo.aid}#cmt{$vo.id}">
+                    <span class="avatar-img">
+                        <img alt="" src="/images/default.jpg" class="avatar avatar-id-3886 ls-is-cached lazyloaded lazyloadafter">
+                    </span>
+                </a>
+                <div class="posts-mini-con em09 ml10 flex xx jsb">
+                    <p class="flex jsb">
+                        <span class="flex1 flex">
+                            <name class="inflex ac relative-h">
+                                <a class="display-name text-ellipsis" href="{$vo.temp_archives}?id={$vo.aid}">
+                                    {$vo.username}
+                                </a>
+                            </name>
+                            <span class="flex0 icon-spot muted-3-color" title="{$vo.createTime}">{$vo.createTime}</span>
+                        </span>
+                    </p>
+                    <a class="muted-color text-ellipsis-5" href="{$vo.temp_archives}?id={$vo.aid}#comment-{$vo.id}">
+                        {$vo.msg|raw}
+                    </a>
+                </div>
+                {else}
+                <a href="{$vo.temp_list}?id={$vo.cid}#cmt{$vo.id}">
+                    <span class="avatar-img">
+                        <img alt="" src="/images/default.jpg" class="avatar avatar-id-3886 ls-is-cached lazyloaded lazyloadafter">
+                    </span>
+                </a>
+                <div class="posts-mini-con em09 ml10 flex xx jsb">
+                    <p class="flex jsb">
+                        <span class="flex1 flex">
+                            <name class="inflex ac relative-h">
+                                <a class="display-name text-ellipsis" href="{$vo.temp_list}?id={$vo.cid}">
+                                    {$vo.username}
+                                </a>
+                            </name>
+                            <span class="flex0 icon-spot muted-3-color" title="{$vo.createTime}">{$vo.createTime}</span>
+                        </span>
+                    </p>
+                    <a class="muted-color text-ellipsis-5" href="{$vo.temp_list}?id={$vo.cid}#comment-{$vo.id}">
+                        {$vo.msg|raw}
+                    </a>
+                </div>
+                {/if}
+            </div>
+            {/cymini:feedback}
+
+        </div>
+    </div>
+    <div class="theme-box">
+        <div class="box-body notop">
+            <div class="title-theme">标签云</div>
+        </div>
+        <div class="zib-widget widget-tag-cloud author-tag">
+            {cymini:tags num='20'}
+            <a href="{:url('/index/tags')}?tag={$vo.tag}" class="text-ellipsis but c-purple-2 wow fadeInDown">
+                {$vo.tag}<span class="em09 tag-count"> ({$vo.count})</span>
+            </a>
+            {/cymini:tags}
+        </div>
+    </div>
+</div>

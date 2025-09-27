@@ -49,6 +49,7 @@
                 {cymini:feedback num='6'}
                 <li class="side-new-comments"> <strong></strong><b></b>
                     <div class="newComments-info">
+                        {if $vo.cate == 0}
                         <div class="newComments-deanxz">
                             <a href="{$vo.temp_archives}?id={$vo.aid}#cmt{$vo.id}" title="用户昵称：{$vo.username}" target="{$vo.target}">
                                 <img alt="用户昵称：{$vo.username}" src="/images/default.jpg" />
@@ -57,6 +58,16 @@
                         <div class="newComments-text">
                             <a href="{$vo.temp_archives}?id={$vo.aid}#cmt{$vo.id}" target="{$vo.target}" title="{$vo.article}">{$vo.msg|raw}</a>
                         </div>
+                        {else}
+                        <div class="newComments-deanxz">
+                            <a href="{$vo.temp_list}?id={$vo.cid}#cmt{$vo.id}" title="用户昵称：{$vo.username}" target="{$vo.target}">
+                                <img alt="用户昵称：{$vo.username}" src="/images/default.jpg" />
+                            </a>
+                        </div>
+                        <div class="newComments-text">
+                            <a href="{$vo.temp_list}?id={$vo.cid}#cmt{$vo.id}" target="{$vo.target}" title="{$vo.article}">{$vo.msg|raw}</a>
+                        </div>
+                        {/if}
                         <div class="newComments-mary" title="留言时间：{$vo.createTime}">
                             <em title="用户昵称：{$vo.username}">{$vo.username}</em>
                             <span class="spot"></span>{$vo.createTime}

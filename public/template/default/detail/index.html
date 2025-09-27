@@ -74,6 +74,16 @@
                 <div id="post-body-888888" class="single-entry entry-content">
                     {cymini:detail field='content'}
                 </div>
+                {if $__detail__['downloadJur'] == 1}
+                <div class="entry entry-page">
+
+                    <a class="layui-btn layui-bg-blue layui-btn-sm" href="/{$__detail__['annex']}" target="_blank">附件下载</a>
+                    {cymini:table table='software' where='["aid","=",$__detail__["id"]]'}
+                    <a class="layui-btn layui-bg-blue layui-btn-sm" href="{$vo.url}" target="_blank">{$vo.name}</a>
+                    {/cymini:table}
+
+                </div>
+                {/if}
             </div>
             <div class="entry entry-page">
                 <div class="entry_page_flex">
@@ -150,10 +160,10 @@
                         <div id="comment-tools">
                             <div class="tools_text">
                                 <div class="tools_content_avator">
-                                    <a href="" target="_blank">
+                                    <a href="javascript:;" >
                                         <img src="/images/default.jpg" alt="访客" width="90" height="90" />
                                     </a>
-                                    <span class="autlv user-name aut-6">访客</span>
+                                    <span style="color:#312828;" class="autlv user-name aut-6">访客</span>
                                 </div>
                                 <textarea placeholder="请遵守相关法律与法规，文明评论。O(∩_∩)O~~" name="msg" id="txaArticle" class="text input-block-level comt-area" cols="50" rows="4" tabindex="5"></textarea>
                             </div>

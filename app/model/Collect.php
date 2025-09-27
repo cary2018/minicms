@@ -249,7 +249,8 @@ class Collect extends Model
         if ($result['code'] > 1) {
             return $result;
         }
-        $html = FCurl_post($url,[],'','','GET');
+
+        $html = GetCurl($url,$url_param);
         //$html = mac_curl_get($url);
         if($html['response_code'] == 0){
             $json = ['code'=>300, 'msg'=>lang('get_html_err') . ', url: ' . $url];
@@ -262,6 +263,7 @@ class Collect extends Model
         }
         $html = mac_filter_tags($html);
         $json = json_decode($html,true);
+
         if(!$json){
             return ['code'=>1002, 'msg'=>lang('model/collect/json_err') . ', url: ' . $url . ', response: ' . mb_substr($html, 0, 15)];
         }
@@ -348,7 +350,7 @@ class Collect extends Model
             'psearea' => '0',
             'pselang' => '0',
             'urlrole' => '0',
-            'inrule' => ',a,f,g',
+            'inrule' => ',a,b',
             'uprule' => ',a,d,j,r,u,v',
             'filter' => '色戒,色即是空',
             'namewords' => '第1季=第一季#第2季=第二季#第3季=第三季#第4季=第四季',
@@ -400,10 +402,15 @@ class Collect extends Model
                         $v[$k2] = strip_tags($v2);
                     }
                 }
-
-                $v['type_pid_id'] = intval($type_list[$v['type_id']]['pid']);
+                if($type_list){
+                    $v['type_pid_id'] = intval($type_list[$v['type_id']]['pid']);
+                }
                 $pinyin = new Pinyin();
                 $v['vod_en'] = $pinyin->sentence($v['vod_name'],'');
+                if(array_key_exists('vod_enname',$v)){
+                    $v['vod_en'] = $v['vod_enname'];
+                    unset($v['vod_enname']);
+                }
                 $v['vod_letter'] = strtoupper(substr($v['vod_en'],0,1));
                 // 使用资源站的添加时间，更新时间保持当前
                 // https://github.com/magicblack/maccms10/issues/780
@@ -415,6 +422,38 @@ class Collect extends Model
                 $v['vod_time'] = time();
                 if (!empty($v['vod_time_update']) && strlen($v['vod_time_update']) == 10) {
                     $v['vod_time'] = (int)$v['vod_time_update'];
+                }
+
+                $v['vod_status'] = intval($config['status']);
+                if(array_key_exists('vod_lock',$v)){
+                    $v['vod_lock'] = intval($v['vod_lock']);
+                }
+                if(!empty($v['vod_status'])) {
+                    $v['vod_status'] = intval($v['vod_status']);
+                }
+                $v['vod_year'] = intval($v['vod_year']);
+                if(array_key_exists('vod_level',$v)){
+                    $v['vod_level'] = intval($v['vod_level']);
+                }
+                if(array_key_exists('vod_total',$v)){
+                    $v['vod_total'] = intval($v['vod_total']);
+                }
+                $v['vod_serial'] = intval($v['vod_serial']);
+                $v['vod_isend'] = intval($v['vod_isend']);
+                if(array_key_exists('vod_class',$v)){
+                    $v['vod_class'] = mac_txt_merge($v['vod_class'],$v['type_name']);
+                    $v['vod_class'] = mac_format_text($v['vod_class'], true);
+                }
+                $v['vod_actor'] = mac_format_text($v['vod_actor'], true);
+                $v['vod_director'] = mac_format_text($v['vod_director'], true);
+                if(array_key_exists('vod_tag',$v)){
+                    $v['vod_tag'] = mac_format_text($v['vod_tag'], true);
+                }
+                if(array_key_exists('vod_plot_name',$v)){
+                    $v['vod_plot_name'] = intval($v['vod_plot_name']);
+                }
+                if(array_key_exists('vod_plot_detail',$v)){
+                    $v['vod_plot_detail'] = intval($v['vod_plot_detail']);
                 }
 
                 if($config['hits_start']>0 && $config['hits_end']>0) {
@@ -463,13 +502,16 @@ class Collect extends Model
                 if (strpos($config['inrule'], 'a')!==false) {
                     $where['vod_name'] = mac_filter_xss($v['vod_name']);
                 }
+                if (strpos($config['inrule'], 'b')!==false) {
+                    $where['type_id'] = $v['type_id'];
+                }
 
                 //验证地址
                 $info = Db::name('Vod')->where($where)->find();
-
+                $v['vod_name'] = mac_filter_xss($v['vod_name']);
                 if (!$info) {
                     // 新增
-                    if ($param['opt'] == 2) {
+                    if (array_key_exists('opt',$param) && $param['opt'] == 2) {
                         $des= lang('not_check_add');
                     } else {
                         //2024 ------- 判断播放地址是否存在，存在则执行添加操作
@@ -490,17 +532,14 @@ class Collect extends Model
                     // 更新
                     if(empty($config['uprule'])){
                         $des = lang('uprule_empty');
-                    }
-                    elseif ($info['vod_lock'] == 1) {
+                    }elseif ($info['vod_lock'] == 1) {
                         $des = lang('data_lock');
-                    }
-                    elseif($param['opt'] == 1){
+                    }elseif(array_key_exists('opt',$param) && $param['opt'] == 1){
                         $des = lang('not_check_update');
-                    }
-                    else {
-                        unset($v['vod_time_add']);
-                        unset($v['type_name']);
+                    }else {
+                        $updata = [];
                         $v=array('vod_id'=>$info['vod_id'])+$v;
+                        $updata['vod_id'] = $v['vod_id'];
                         //重组播放数组
                         $old_play = combinePlayData($info['vod_play_from'],$info['vod_play_url']);
                         $new_play = combinePlayData($v['vod_play_from'],$v['vod_play_url']);
@@ -509,24 +548,28 @@ class Collect extends Model
                         //重组播放地址数组转字符串
                         $str_url = implode('$$$',$new_arr);
                         $str_from = implode('$$$',array_keys($new_arr));
-                        $v['vod_play_from'] = $str_from;
-                        $v['vod_play_url'] = $str_url;
+                        $updata['vod_play_from'] = $str_from;
+                        $updata['vod_play_url'] = $str_url;
                         if(strpos($info['vod_play_from'],$v['vod_play_from']) === false){
                             // 新类型播放组，加入
                             $color = 'green';
                             $des .= lang('playgroup_add_ok',[$info['vod_play_from']]);
-                            $v['vod_play_server'] = $info['vod_play_server'].'$$$'.$v['vod_play_server'];
-                            $v['vod_play_note'] = $info['vod_play_note'].$v['vod_play_note'];
+                            $updata['vod_play_server'] = $info['vod_play_server'].'$$$'.$v['vod_play_server'];
+                            $updata['vod_play_note'] = $info['vod_play_note'].$v['vod_play_note'];
                         }else{
                             $color = 'green';
                             $des .= lang('playgroup_update_ok',[$info['vod_play_from']]);
-                            $v['vod_play_server'] = $info['vod_play_server'];
-                            $v['vod_play_note'] = $info['vod_play_note'];
+                            $updata['vod_play_server'] = $info['vod_play_server'];
+                            $updata['vod_play_note'] = $info['vod_play_note'];
+                        }
+
+                        if(array_key_exists('vod_total',$v) && $v['vod_total'] > $info['vod_total']){
+                            $updata['vod_total'] = intval($v['vod_total']);
                         }
 
                         if($v['vod_id']>0){
-                            $v['vod_time'] = time();
-                            $res = SaveAt('vod',$v);
+                            $updata['vod_time'] = time();
+                            $res = SaveAt('vod',$updata);
                             $color = 'green';
                             if ($res === false) {
 

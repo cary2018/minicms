@@ -30,7 +30,7 @@ class Check
         $session = GetSe('MemberCenter');
         if(stripos($path,'login') == false){
             if(!$session){
-                return redirect((string)url('/Member/login'));
+                return redirect((string)url('/member/login'));
             }
         }
         //前置中间件

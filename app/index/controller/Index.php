@@ -13,6 +13,11 @@ class Index extends BaseController
         /*hook('show', ['id'=>1]);
         hook('testhook', ['id'=>1]);
         die;*/
+        /*$html = \think\facade\View::fetch();
+        $c = \think\facade\Request::controller().'/'.\think\facade\Request::action();
+        echo $c;
+        echo $html;
+        die;*/
 
         return ViewHtml();
     }

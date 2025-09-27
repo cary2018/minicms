@@ -48,7 +48,7 @@ abstract class BaseController
         $this->request = $this->app->request;
         //获取用户登录信息
         $user = GetSe('MemberCenter');
-        View::assign('Member',$user);
+        View::assign('member',$user);
         // 控制器初始化
         $this->initialize();
     }

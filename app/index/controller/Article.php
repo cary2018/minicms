@@ -24,6 +24,9 @@ class Article extends BaseController
         if(!$data){
             return redirect('/');
         }
+        /*$url = (string) \think\facade\Route::buildUrl();
+        echo $url;
+        die;*/
         return ViewHtml();
     }
 }

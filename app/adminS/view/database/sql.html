@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>{$Think.lang.database_back}</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    {include file="public/file_css"}
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+        <form class="layui-form layui-form-pane" id="DataForm" lay-filter="DataForm" onsubmit="return false;">
+
+            <fieldset class="layui-elem-field layui-field-title" style="margin:0px;">
+                <legend>{$Think.lang.database_in_common}</legend>
+            </fieldset>
+            <blockquote class="layui-elem-quote">
+                {$Think.lang.database_tips_sql|raw}
+            </blockquote>
+
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">{$Think.lang.database_sql_place}</label>
+                <div class="layui-input-block">
+                    <textarea name="sql" placeholder="{$Think.lang.database_input_sql}" class="layui-textarea"></textarea>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <button class="layui-btn layui-btn-normal" lay-submit lay-filter="doSubmit">{$Think.lang.database_submit_sql}</button>
+                <button type="reset" class="layui-btn ">{$Think.lang.database_reset}</button>
+            </div>
+        </form>
+    </div>
+</div>
+{include file="public/file_js"}
+</body>
+</html>

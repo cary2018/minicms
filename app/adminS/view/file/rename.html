@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>{$Think.lang.file_manage}</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    {include file="public/file_css"}
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+        <form class="layui-form" id="DataDemos" lay-filter="DataDemos">
+            <span id="ActionUrl" alt="{:url('saveName')}"></span>
+            <div class="layui-form-item">
+                <label class="layui-form-label">{$Think.lang.current_dir}</label>
+                <div class="layui-input-block">
+                    <input type="text" name="path" value="{$info.dirname}" readonly class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">{$Think.lang.old_file_name}</label>
+                <div class="layui-input-block">
+                    <input type="text" name="oldname" value="{$info.basename}" readonly class="layui-input">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">{$Think.lang.new_file_name}*</label>
+                <div class="layui-input-block">
+                    <input type="text" name="newname" value="" lay-verify="required" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button type="submit" class="layui-btn" lay-submit lay-filter="doSubmit">{$Think.lang.database_submit}</button>
+                    <button type="reset" class="layui-btn layui-btn-primary">{$Think.lang.database_reset}</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{include file="public/file_js"}
+</body>
+</html>

@@ -22,10 +22,13 @@ class Cymini extends TagLib
     protected $tags = [
         // 标签定义： attr 属性列表 close 是否闭合（0 或者1 默认1） alias 标签别名 level 嵌套层次
         'banner'              => ['attr' => 'num', 'expression' => 1,'close'=>1], //闭合标签，默认为不闭合
+        'emoji'              => ['attr' => 'num', 'expression' => 1,'close'=>1], //闭合标签，默认为不闭合
+        'search'              => ['attr' => 'num', 'expression' => 1,'close'=>1], //闭合标签，默认为不闭合
         'link'                => ['attr' => 'start,num','expression'=>1,'close'=>1],
         'tags'                => ['attr' => 'start,num','expression'=>1,'close'=>1],
         'attrid'              => ['attr' => 'num,aid','expression'=>1,'close'=>1],
         'article'             => ['attr' => 'start,num,cid,order','expression'=>1,'close'=>1],
+        'navtop'             => ['attr' => '','expression'=>1,'close'=>1],
         'navmenu'             => ['attr' => '','expression'=>1,'close'=>1],
         'cate'                => ['attr' => '','expression'=>1,'close'=>0],
         'detail'              => ['attr' => '','expression'=>1,'close'=>0],
@@ -36,9 +39,14 @@ class Cymini extends TagLib
         'breadcrumb'          => ['attr' => 'aid','expression'=>1,'close'=>1],
         'next'                => ['attr' => 'cid','expression'=>1,'close'=>1],
         'navigation'          => ['attr' => 'cid','expression'=>1,'close'=>1],
+        'navlist'             => ['attr' => 'cid','expression'=>1,'close'=>1],
         'table'               => ['attr' => 'table,where','expression'=>1,'close'=>1],
         'sum'                 => ['attr' => 'table,where','expression'=>1,'close'=>0],
         'rand'                => ['attr' => 'cid,num','expression'=>1,'close'=>1],
+        'vod'                 => ['attr' => 'where','expression'=>true,'close'=>1],
+        'voddetail'           => ['attr' => 'where','expression'=>1,'close'=>0],
+        'vodplay'             => ['attr' => 'where','expression'=>1,'close'=>0],
+        'playlist'            => ['attr' => 'where','expression'=>1,'close'=>1],
     ];
 
     /**
@@ -55,18 +63,30 @@ class Cymini extends TagLib
         if(empty($tag['key'])){
             $tag['key'] = 'key';
         }
-        if(empty($tag['num'])){
-            $tag['num'] = 10;
+        if(empty($tag['where'])){
+            $tag['where'] = [];
         }
         $parse = '<?php ';
-        $parse .= '$__banner__ = AllTables(\'banner\',[[\'enable\',\'=\',1]],'.$tag['num'].',[\'orderSort\'=>\'desc\']);';
-        $parse .= '$__LIST__ = $__banner__;';
+        $parse .= '$__args__ = \'' . json_encode($tag) . '\';';
+        $parse .= '$__Shared__ = SharedTable($__args__);';
         $parse .= ' ?>';
-        $parse .= '{volist name="__LIST__" id="' . $tag['id'] . '" key="'.$tag['key'].'"';
-        if(!empty($tag['num'])){
-            $parse .= ' num="'.$tag['num'].'"';
+        $parse .= '{volist name="$__Shared__" id="'. $tag['id'].'" key="'.$tag['key'].'"}';
+        $parse .= $content;
+        $parse .= '{/volist}';
+        return $parse;
+    }
+
+    public function tagEmoji($tag,$content){
+        if(empty($tag['id'])){
+            $tag['id'] = 'vo';
         }
-        $parse .= '}';
+        if(empty($tag['key'])){
+            $tag['key'] = 'key';
+        }
+        $parse = '<?php ';
+        $parse .= '$__emoji__ = emojiGif();';
+        $parse .= ' ?>';
+        $parse .= '{volist name="$__emoji__" id="'. $tag['id'].'" key="'.$tag['key'].'"}';
         $parse .= $content;
         $parse .= '{/volist}';
         return $parse;
@@ -225,6 +245,45 @@ class Cymini extends TagLib
             $parse .= ' cid="'.$tag['cid'].'"';
         }
         $parse .= '}';
+        $parse .= $content;
+        $parse .= '{/volist}';
+        return $parse;
+    }
+
+    public function tagSearch($tag,$content){
+        if(empty($tag['id'])){
+            $tag['id'] = 'vo';
+        }
+        if(empty($tag['key'])){
+            $tag['key'] = 'key';
+        }
+        $parse = '<?php ';
+        $parse .= '$__Search__ = Search(\''.json_encode($tag).'\');';
+        $parse .= '$__total__ = $__Search__["__total__"];';
+        $parse .= '$__Search__ = $__Search__["data"];';
+        $parse .= ' ?>';
+        $parse .= '{volist name="$__Search__" id="'. $tag['id'].'" key="'.$tag['key'].'"}';
+        $parse .= $content;
+        $parse .= '{/volist}';
+
+        return $parse;
+    }
+
+    public function tagNavtop($tag, $content)
+    {
+        if(empty($tag['id'])){
+            $tag['id'] = 'vo';
+        }
+        if(empty($tag['key'])){
+            $tag['key'] = 'key';
+        }
+        if(empty($tag['num'])){
+            $tag['num'] = 16;
+        }
+        $parse = '<?php ';
+        $parse .= '$__navtop__ = topNav('.$tag['num'].');';
+        $parse .= ' ?>';
+        $parse .= '{volist name="__navtop__" id="' . $tag['id'] . '" key="'.$tag['key'].'"}';
         $parse .= $content;
         $parse .= '{/volist}';
         return $parse;
@@ -436,7 +495,23 @@ class Cymini extends TagLib
         $parse .= '}';
         $parse .= $content;
         $parse .= '{/volist}';
-
+        return $parse;
+    }
+    public function tagNavlist($tag,$content){
+        if(empty($tag['id'])){
+            $tag['id'] = 'vo';
+        }
+        if(empty($tag['key'])){
+            $tag['key'] = 'key';
+        }
+        $parse = '<?php ';
+        $parse .= '$__navlist__ = navlist(\''.json_encode($tag).'\');';
+        $parse .= '$__total__ = $__navlist__[0]["__total__"];';
+        $parse .= ' ?>';
+        $parse .= '{volist name="__navlist__" id="' . $tag['id'] . '" key="'.$tag['key'].'"';
+        $parse .= '}';
+        $parse .= $content;
+        $parse .= '{/volist}';
         return $parse;
     }
 
@@ -453,8 +528,11 @@ class Cymini extends TagLib
         if(empty($tag['where'])){
             $tag['where'] = '[]';
         }
+        if(empty($tag['order'])){
+            $tag['order'] = '';
+        }
         $parse = '<?php ';
-        $parse .= '$__LIST__ = AllTable("'.$tag['table'].'",['.$tag['where'].']);';
+        $parse .= '$__LIST__ = AllTable("'.$tag['table'].'",['.$tag['where'].'],"'.$tag['order'].'");';
         $parse .= ' ?>';
         $parse .= '{volist name="$__LIST__" id="'. $tag['id'].'" key="'.$tag['key'].'"';
         if(!empty($tag['table'])){
@@ -510,6 +588,91 @@ class Cymini extends TagLib
             $parse .= ' num="'.$tag['num'].'"';
         }
         $parse .= '}';
+        $parse .= $content;
+        $parse .= '{/volist}';
+
+        return $parse;
+    }
+
+    /**
+     * @param $tag
+     * @param $content
+     * @return string
+     * 示例
+     * {cymini:vod where='[["type_id","=",17]]' limit='5' order="vod_time desc"}
+     * {$vo.vod_name}--->{$vo.nickname} ---{$vo.vod_pic}
+     * {/cymini:vod}
+     *
+     */
+    public function tagVod($tag,$content){
+        if(empty($tag['id'])){
+            $tag['id'] = 'vo';
+        }
+        if(empty($tag['key'])){
+            $tag['key'] = 'key';
+        }
+        if(!empty($tag['where'])){
+            $arr = json_decode($tag['where']);
+            $tag['where'] = array_merge($arr,[['vod_status','=',1]]);
+        }else{
+            $tag['where'] = [['vod_status','=',1]];
+        }
+        $parse = '<?php ';
+        $parse .= '$__TAG__ = \'' . json_encode($tag) . '\';';
+        $parse .= '$__Vod__ = VodData($__TAG__);';
+        $parse .= ' ?>';
+        $parse .= '{volist name="__Vod__" id="'. $tag['id'].'" key="'.$tag['key'].'"}';
+        $parse .= $content;
+        $parse .= '{/volist}';
+
+        return $parse;
+    }
+    public function tagVoddetail($tag){
+
+        if(!empty($tag['where'])){
+            $arr = json_decode($tag['where']);
+            $tag['where'] = array_merge($arr,[['vod_status','=',1]]);
+        }else{
+            $tag['where'] = [['vod_status','=',1]];
+        }
+
+        $parse = '<?php ';
+        $parse .= '$__vod__ = VodDetail(\''.json_encode($tag).'\');';
+        if(!empty($tag['field'])){
+            $parse .= 'echo $__vod_detail__["'.$tag['field'].'"];';
+        }
+        $parse .= ' ?>';
+        return $parse;
+    }
+
+    public function tagVodPlay($tag){
+        $parse = '<?php ';
+        $parse .= '$__play__ = VodPlay();';
+        $parse .= '$is_ps = $__play__["select_ps"];';
+        $parse .= '$parse_url = "https://cdn.zyc888.top/?url=";';
+        $parse .= 'if($is_ps == 1){ $parse_url = $__play__["select_parse"]; }';
+        $parse .= '$play_url = $__play__["select_url"];';
+        if(!empty($tag['play'])){
+            $parse .= 'echo "<iframe width=\"100%\" height=\"100%\" src=\"'.'$parse_url'.'$play_url'.'\" frameborder=\"0\" allowfullscreen=\"true\" border=\"0\" marginwidth=\"0\" marginheight=\"0\" scrolling=\"no\"></iframe>";';
+        }
+        if(!empty($tag['names'])){
+            $parse .= 'echo $__play__["'.$tag['names'].'"];';
+        }
+        $parse .= ' ?>';
+        return $parse;
+    }
+
+    public function tagPlayList($tag,$content){
+        if(empty($tag['id'])){
+            $tag['id'] = 'vo';
+        }
+        if(empty($tag['key'])){
+            $tag['key'] = 'key';
+        }
+        $parse = '<?php ';
+        $parse .= '$__vod_lIST__ = playLIst();';
+        $parse .= ' ?>';
+        $parse .= '{volist name="$__vod_lIST__" id="'. $tag['id'].'" key="'.$tag['key'].'"}';
         $parse .= $content;
         $parse .= '{/volist}';
 

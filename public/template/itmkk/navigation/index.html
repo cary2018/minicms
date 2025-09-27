@@ -15,7 +15,8 @@
     <meta property="og:description" content="{$Think.config.web.web_desc}" />
     {include file='layout/file-js'}
     {include file='layout/file-style'}
-    <link rel="stylesheet" href="{$view_path}/static/css/navigation.css" type="text/css" media="all" />
+    <!--<link rel="stylesheet" href="{$view_path}/static/css/navigation.css" type="text/css" media="all" />-->
+    <link rel="stylesheet" href="{$view_path}/static/css/navstyle.css" type="text/css" media="all" />
     {include file='layout/icon'}
 
     <!--[if lt IE 9]><script src="https://cdn.staticfile.org/html5shiv/3.7.0/html5shiv.js"></script><![endif]-->
@@ -25,69 +26,99 @@
 
 {include file='layout/navmenu'}
 
-<main class="main-content container clearfix" style="height: auto !important; transform: none;">
-    <div class="container">
-        {if !$pass}
-        <div style="margin: 0 auto;max-width:430px;">
-            <div style="margin:15px 15px;">
-                <form method="post" name="search" action="" class="pjaxmain">
-                    <input style="width:60%;background:#fff;display:unset;" class="search-input" value="" placeholder="请输入访问密码：123.." type="text" name="pass" />
-                    <button type="submit" class="showhide-search" />访 问</button>
-                </form>
+<div class="container">
+
+    <div class="row same-height row-position">
+        <div class="col-md-1 quick-nav">
+            <div class="content-sidebar same-height-l">
+                <dl id="goto">
+                    <dt style="top: 13px;">
+                        <span class="show-list"></span>
+                    </dt>
+                    <dd class="current">
+                        <a href="#cate-999999" class="auto-scroll" rel="nofollow" data-offset="-78" data-speed="500">热门</a>
+                    </dd>
+                    {cymini:navigation}
+                    <dd class="{if $vo.id == 1}current{/if} wow fadeInDown">
+                        <a href="#cate-{$key}" class="auto-scroll" rel="nofollow" data-offset="-78" data-speed="500">{$vo.name}</a>
+                    </dd>
+                    {/cymini:navigation}
+                </dl>
             </div>
         </div>
-        {/if}
-        {if $pass}
-        <div class="row row-position">
-            <div class="col-md-12">
-                {cymini:navigation}
-                <div class="part" id="cate{$vo.id}" >
-                    <p class="tt" id="{$vo.id}">
-                        <i class="fa fa-globe"></i>
-                        <strong>{$vo.name}</strong>
-                    </p>
-                    <div class="items">
-
-                        <div class="row">
-                            {volist name='$vo.nav' id='vo'}
-                            <article class="grid col-xs-6 col-sm-4 col-md-2">
-                                <div class="item">
-                                    <a class="link" target="{$vo.target}" href="{$vo.nav_url}" rel="nofollow">
-                                        <i class="autoleft fa fa-link" title="{$vo.keywords}"></i>
-                                    </a>
-                                    <a class="a" href="{$vo.nav_url}" title="{$vo.nav_name}" target="{$vo.target}">
-                                        <h3>
-                                            {$vo.nav_name}
-                                        </h3>
-                                    </a>
+        <!-- diy-tab  -->
+        <div class="col-md-12 same-height-r">
+            <div class="part current" id="cate-999999" data-title="热门" style="position: relative;">
+                <div style="display: none;  height: 56.8px; margin: 0px; float: none;"></div>
+                <div class="items">
+                    <div class="row">
+                        {cymini:navtop num="16"}
+                        <div class="col-xs-6 col-sm-4 col-md-3 wow fadeInDown">
+                            <div class="item">
+                                <div class="diva" >
+                                    {if $vo.logo}
+                                    <img class="img-bao" src="{$vo.logo|ImgPath}" alt="{$vo.keywords}" title="{$vo.keywords}" />
+                                    {else}
+                                    <img class="img-bao" src="/images/1.png" alt="{$vo.keywords}" title="{$vo.keywords}" />
+                                    {/if}
+                                    <div class="solititle" >
+                                        <a target="{$vo.target}" href="{$vo.routes}?url={$vo.nav_url}&id={$vo.id}" title="{$vo.nav_name}">{$vo.nav_name}</a>
+                                        {if $vo.sun_name}
+                                        |
+                                        <a target="{$vo.target}" href="{$vo.routes}?url={$vo.nav_url}&id={$vo.id}" title="{$vo.sun_name}">{$vo.sun_name}</a>
+                                        {/if}
+                                    </div>
+                                    <p class="partitemp" title="{$vo.description}">{$vo.description}</p>
                                 </div>
-                            </article>
-
-                            {if $vo.sun_name}
-                            <article class="grid col-xs-6 col-sm-4 col-md-2">
-                                <div class="item">
-                                    <a class="link" target="{$vo.target}" href="{$vo.sun_url}" rel="nofollow">
-                                        <i class="autoleft fa fa-link" title="{$vo.keywords}"></i>
-                                    </a>
-                                    <a class="a" href="{$vo.sun_url}" title="{$vo.sun_name}" target="{$vo.target}">
-                                        <h3>{$vo.sun_name}</h3>
-                                    </a>
-                                </div>
-                            </article>
-                            {/if}
-                            {/volist}
+                            </div>
                         </div>
+                        {/cymini:navtop}
                     </div>
                 </div>
-                {/cymini:navigation}
             </div>
+            {foreach $__navigation__ as $k=>$vs}
+            <div class="part" id="cate-{$k}" data-title="{$vs.name}" style="position: relative;">
+                <div style="display: none;  height: 56.8px; margin: 0px; float: none;"></div>
+                <p class="tt sticky" style=" position: static; top: 78px;"> <strong>{$vs.name}</strong>
+                    <a title="更多{$vs.name}的内容" href="{$vs.route}?id={$vs.id}">更多+</a>
+                </p>
+                <div class="items">
+                    <div class="row">
+                        {volist name='$vs.nav' id='vo'}
+                        <div class="col-xs-6 col-sm-4 col-md-3 wow fadeInDown">
+                            <div class="item">
+                                <div class="diva" >
+                                    {if $vo.logo}
+                                    <img class="lazy img-bao" src="{$vo.logo|ImgPath}" alt="{$vo.keywords}" title="{$vo.keywords}" />
+                                    {else}
+                                    <img class="lazy img-bao" src="/images/1.png" alt="{$vo.keywords}" title="{$vo.keywords}" />
+                                    {/if}
+                                    <div class="solititle" >
+                                        <a target="{$vo.target}" href="{$vs.routes}?url={$vo.nav_url}&id={$vo.id}" title="{$vo.nav_name}">{$vo.nav_name}</a>
+                                        {if $vo.sun_name}
+                                        |
+                                        <a target="{$vo.target}" href="{$vs.routes}?url={$vo.nav_url}&id={$vo.id}" title="{$vo.sun_name}">{$vo.sun_name}</a>
+                                        {/if}
+                                    </div>
+                                    <p class="partitemp" title="{$vo.description}">{$vo.description}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {/volist}
+                    </div>
+                </div>
+            </div>
+            {/foreach}
+
         </div>
-        {/if}
     </div>
-</main>
+
+</div>
+
+
 
 {include file='layout/footer'}
-
+<script src="{$view_path}/static/js/main.js"></script>
 <script>var cookieDomain = "https://www.itmkk.com/";</script>
 <script src="{$view_path}/static/js/zh-tw.js"></script>
 <script src="{$view_path}/static/js/custom.js"></script>

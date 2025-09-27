@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{$Think.lang.BackMenu}</title>
+    {include file="public/file_css"}
+    <style>
+        .layui-btn:not(.layui-btn-lg ):not(.layui-btn-sm):not(.layui-btn-xs) {
+            height: 34px;
+            line-height: 34px;
+            padding: 0 8px;
+        }
+    </style>
+</head>
+<body>
+<div class="layuimini-container">
+    <div id="saveOrUpdate" style="display: none;">
+        66666
+    </div>
+    <div class="layuimini-main">
+        <div>
+            <div class="layui-btn-group">
+                <button class="layui-btn" id="btn-expand">{$Think.lang.allExpand}</button>
+                <button class="layui-btn layui-btn-normal" id="btn-fold">{$Think.lang.allFold}</button>
+                <button class="layui-btn layui-btn-warm" id="btn-reload">
+                    <i class="fa fa-refresh"></i>
+                </button>
+            </div>
+            <!--头部工具栏-->
+            <div id="toolbarDemo" style="display: none;background: #fff;">
+                <span id="SwitchUrl" alt="{:url('system/switchAt')}" style="display: none"></span>
+                <span id="AddUrl" alt="{:url('system/add')}" style="display: none"></span>
+                <a href="#" class="layui-btn " lay-event="adds"><i class="fa fa-plus"></i> {$Think.lang.add}</a>
+            </div>
+            <!--数据表格-->
+            <table class="layui-hide" id="DataDemos" lay-filter="DataDemos"></table>
+        </div>
+    </div>
+</div>
+<!-- 操作列 -->
+<script type="text/html" id="toolBar">
+    <span id="ActionUrl" alt="{:url('edit')}" style="display: none"></span>
+    <span id="DelUrl" alt="{:url('delAll')}" style="display: none"></span>
+    <span id="FieldUrl" alt="{:url('updateField')}" style="display: none"></span>
+    <span id="JumpUrl" alt="{:url('add')}" style="display: none"></span>
+    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="product">{$Think.lang.AddSub}</a>
+    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edits">{$Think.lang.edit}</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">{$Think.lang.del}</a>
+</script>
+
+{include file="public/file_js"}
+<script>
+    layui.use(['table','treetable'], function () {
+        var $ = layui.jquery;
+        var treetable = layui.treetable;
+
+        // 渲染表格
+        layer.load(2);
+        var treeIns = function () {
+            layer.load(2);
+            treetable.render({
+                treeColIndex: 1,
+                treeSpid: 0,
+                treeIdName: 'id',
+                treePidName: 'pid',
+                elem: '#DataDemos',
+                toolbar: '#toolbarDemo', //开启头部工具栏，并为其绑定左侧模板
+                url: '{:url("dataList")}',
+                defaultToolbar: ['filter', 'exports', 'print', {
+                    title: '{$Think.lang.search}',
+                    layEvent: 'LAYTABLE_TIPS',
+                    icon: 'layui-icon layui-icon-search'
+                }],
+                page: false,
+                cols: [[
+                    {type: 'numbers'},
+                    {field: 'sys_title', minWidth: 200, title: '{$Think.lang.variable_title}'},
+                    {field: 'sys_variable', minWidth: 120, align: 'center',title: '{$Think.lang.variable_name}'},
+                    {field: 'sys_content', title: '{$Think.lang.variable_value}',edit:'true'},
+                    {field: 'sys_remark', title: '{$Think.lang.remark}',edit:'true'},
+                    {field: 'sys_order', width: 80, align: 'center',edit:true, title: '{$Think.lang.OrderSort}'},
+                    {templet: '#toolBar', width: 190, align: 'center', title: '{$Think.lang.operate}'}
+                ]],
+                done: function () {
+                    layer.closeAll('loading');
+                }
+            });
+        }
+
+        $('#btn-expand').click(function () {
+            treetable.expandAll('#DataDemos');
+        });
+
+        $('#btn-fold').click(function () {
+            treetable.foldAll('#DataDemos');
+        });
+        //重载数据表格
+        treeIns();
+        $('#btn-reload').click(function () {
+            treeIns();
+        });
+    });
+</script>
+</body>
+</html>

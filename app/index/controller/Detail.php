@@ -25,8 +25,17 @@ class Detail extends BaseController
         if(!$data){
             return redirect('/');
         }
+
         //更新阅读量
         Db::name('article')->where('id', $id)->inc('views')->update();
         return ViewHtml();
+    }
+    public function action(){
+        $id = request()->param('id');
+        //更新阅读量
+        Db::name('article')->where('id', $id)->inc('click')->update();
+        $list = FindTable('article',[['id','=',$id],['status','=',1]]);
+        $arr = array('code'=>200,'msg'=>'点赞成功！','data'=>$list,'id'=>$id);
+        echo json_encode($arr);
     }
 }

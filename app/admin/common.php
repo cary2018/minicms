@@ -500,23 +500,7 @@ function read_gz($gz_file){
 //****************************  文件管理相关函数  START *********************************************************
 //************************************************************************************************************
 
-//文件大小单位转换================================
-function toSize($size){
-    $dw = 'Bytes';
-    if($size > pow(2 , 30)){
-        $size = round($size/pow(2,30),2);
-        $dw = ' GB';
-    }else if($size > pow(2,20)){
-        $size = round($size/pow(2,20),2);
-        $dw = ' MB';
-    }else if($size > pow(2,10)){
-        $size = round($size/pow(2,10),2);
-        $dw = ' KB';
-    }else{
-        $dw = ' Bytes';
-    }
-    return $size.($dw);
-}
+
 //文件夹大小
 function dirSize($dirname){
     $dirSize = 0;

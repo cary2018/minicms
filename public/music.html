@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>免费音乐搜索下载</title>
+    <link rel="stylesheet" href="hyy1.0.0/lib/layui-v2.6.3/css/layui.css">
+     <script
+    disable-devtool-auto
+    src='hyy1.0.0/js/disable-devtool.js'
+    clear-log='true'
+    disable-select='false'
+    disable-copy='false'
+    disable-cut='true'
+    disable-paste='true'></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 900px;
+            width: 100%;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        h1:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 4px;
+            background: linear-gradient(to right, #3498db, #2c3e50);
+            border-radius: 2px;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+        
+        .search-box {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+            font-size: 1.6rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 25px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .search-box {
+                flex-direction: column;
+            }
+
+        }
+        .layui-table-cell{
+            text-align:center;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+        .layui-table img{
+            max-width:100%
+        }
+    </style>
+    <link rel="stylesheet" href="/hyy1.0.0/css/APlayer.min.css">
+    <script src="/hyy1.0.0/js/APlayer.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h2>音乐搜索</h2>
+            <p class="subtitle">本站仅学习研究使用，请勿用于商业用途</p>
+            <div id="aplayer01"></div>
+        </header>
+        
+        <div id="inputSearch" class="search-box">
+            <form id="searchData" lay-filter="searchData" onsubmit="return false;" class="layui-form layui-form-pane" action="">
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <div class="layui-input-inline">
+                            <input type="text" id="name" name="name" placeholder="输入歌曲名称或歌手..." autocomplete="off" class="layui-input">
+                        </div>
+                        <div class="layui-input-inline">
+                            <select id="level" name="level">
+                                <option value="standard">标准音质</option>
+                                <option value="exhigh">极高音质</option>
+                                <option value="lossless">无损音质</option>
+                                <option value="hires">Hi-Res音质</option>
+                                <option value="jyeffect">高清环绕声</option>
+                                <option value="sky">沉浸环绕声</option>
+                                <option value="jymaster">超清母带</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <button type="submit" class="layui-btn layui-btn-primary" id="doSearch" lay-submit lay-filter="doSearch"><i class="layui-icon"></i> 搜索歌曲 </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <table class="layui-hide" id="DataDemos" lay-filter="DataDemos"></table>
+
+        <div class="footer">
+            <p>音乐获取工具 &copy; 2025 | 仅供学习研究使用</p>
+        </div>
+    </div>
+    <script src="hyy1.0.0/lib/layui-v2.6.3/layui.js"></script>
+    <script type="text/javascript">
+        const ap = new APlayer({
+            //定义容器
+            container: document.getElementById('aplayer01'),
+            mini:false,
+            autoplay: false,
+            theme:'#FADFA3',
+            loop:'all',
+            order:'random',
+            preload:'auto',
+            volume:0.7,
+            mutex: true,
+            listFolded: false,
+            listMaxHeight:90,
+            lrcType: 3,
+            //关于音频的相关参数：
+            audio: [{
+                name: '遥远的她',//音频名称
+                artist: '张学友',//艺术家
+                url: 'https://m801.music.126.net/20250922181659/737d07be7fa719c87205768e8704cb29/jdymusic/obj/wo3DlMOGwrbDjj7DisKw/34609086223/9001/77dc/2e69/9e1c966234ec9091eb33775d5b3ed7b0.mp3?vuutv=R1ntN7sPJJAf7dXSjGI8J3TLTXnnH2pcVdn9lIcobik4CWbYXS72FAHZKvVUKrrPHyRXnJk3kdiPAD2MBKGO6kR6Y1ZDyQD7xVOfWDLpG3s=',//文件地址
+                cover: 'http://p4.music.126.net/vjLs7CkHECi5PUu9hX79CQ==/109951171530606390.jpg',//封面地址
+                lrc:'/api/musicnte/musiclrc?id=190233', //歌词
+            }]
+        });
+    </script>
+    <script>
+        // Usage
+        layui.use(['form', 'table'], function () {
+            var $ = layui.jquery,
+                form = layui.form,
+                table = layui.table;
+
+            table.render({
+                elem: '#DataDemos',
+                url: '/api/musicnte',
+                toolbar: '#toolbarDemo',
+                method: 'get',
+                page: true,  //开启分页
+                limit: 10,  //默认10条
+                defaultToolbar: ['filter', 'exports', 'print', {
+                    title: '{$Think.lang.search}',
+                    layEvent: 'laySearch',
+                    icon: 'layui-icon layui-icon-search'
+                }],
+                cols: [[
+                    /*{type: "checkbox", width: 50},*/
+                    {field: 'id', align:"center", width: 120, title: 'ID', sort: true},
+                    {field: 'name', align: 'center',title: '歌曲'},
+                    {field: 'artists', align: 'center',title: '歌手'},
+                    {field: 'album', align: 'center',title: '专辑'},
+                    {field: 'duration', align: 'center',title: '时长'},
+
+                    {field: 'picUrl', align: 'center',width:80,title: '封面',templet:function (d) {
+                            if(d.picUrl){
+                                return '<img id="imgAmplify" title="'+d.name+'" layer-src="'+d.picUrl+'" src="'+d.picUrl+'"/>';
+                            }else{
+                                return '';
+                            }
+                        }},
+                    {field: 'picUrl', align: 'center',width:150,title: '操作',templet:function (d) {
+                            let act = '<a href="javascript:;" id="playMusic" data-id="'+d.id+'" title="'+d.name+'" >播放</a>';
+                                act += ' | <a href="javascript:;" id="download" data-id="'+d.id+'" title="'+d.name+'" >下载</a>';
+                            return act;
+                        }},
+                ]],
+            });
+            // 执行搜索，表格重载
+            $('#doSearch').on('click', function (data) {
+                // 搜索条件
+                table.reload('DataDemos', {
+                    method: 'get'
+                    , where: {
+                        /*'page':0,*/
+                        'data': $('#searchData').serializeArray(),
+                    }
+                    , page: {
+                        curr: 1
+                    }
+                });
+            });
+            $(document).on('click','#playMusic',function(rs){
+                $.ajax({
+                    url: '/api/musicnte/musicplay',
+                    type: "POST",
+                    data: {
+                        'id':$(this).attr('data-id'),
+                        'level':$('#level').val(),
+                    },
+                    beforeSend: function(){
+                        layer.load(1,{shade:[0.3,'#000']});
+                    },
+                    success: function (data) {
+                        //关闭等待弹出层
+                        layer.closeAll();
+                        let obj = JSON.parse(data);
+                        if(obj.code == 200){
+                            const ap = new APlayer({
+                                //定义容器
+                                container: document.getElementById('aplayer01'),
+                                mini:false,
+                                autoplay: true,
+                                theme:'#FADFA3',
+                                loop:'all',
+                                order:'random',
+                                preload:'auto',
+                                volume:0.7,
+                                mutex: true,
+                                listFolded: false,
+                                listMaxHeight:90,
+                                lrcType: 3,
+                                //关于音频的相关参数：
+                                audio: [{
+                                    name: obj.data[0].name,//音频名称
+                                    artist: obj.data[0].artists,//艺术家
+                                    url: obj.data[0].url,//文件地址
+                                    cover: obj.data[0].pic,//封面地址
+                                    lrc:'/api/musicnte/musiclrc?id='+obj.data[0].id, //歌词
+                                }]
+                            });
+                        }else{
+                            layer.msg(obj.msg,{icon:2,time:3000,shade:0.3});
+                        }
+                    },
+                    error: function () {
+                        layer.msg("上传失败！",{icon:2,time:3000,shade:0.3});
+                        $("#imgWait").hide();
+                        layer.closeAll('loading'); //关闭加载层
+                    }
+                });
+
+            })
+            $(document).on('click','#download',function(rs){
+                $.ajax({
+                    url: '/api/musicnte/download',
+                    type: "POST",
+                    data: {
+                        'id':$(this).attr('data-id'),
+                        'level':$('#level').val(),
+                    },
+                    beforeSend: function(){
+                        layer.load(1,{shade:[0.3,'#000']});
+                    },
+                    success: function (data) {
+                        //关闭等待弹出层
+                        layer.closeAll();
+                        let obj = JSON.parse(data);
+                        if(obj.code == 200){
+                            //删除指定行
+                            //delHan.del();
+                            console.log(obj.data[0]);
+                            layer.open({
+                                type:1,
+                                title:'音乐下载',
+                                shade:0.5,
+                                shadeClose: true,
+                                maxmin:true,
+                                content:'<blockquote class="layui-elem-quote layui-quote-nm">歌曲：'+obj.data[0].name+'-'+obj.data[0].artists+'<br>'+'文件大小：'+obj.data[0].size+'<br>歌曲时长：'+obj.data[0].duration+'<br><a class="layui-btn" href="'+obj.data[0].url+'"target="_blank">前往下载</a></blockquote>',
+                                area:['30%','30%']
+                            })
+                            //layer.msg(obj.msg,{icon:1,time:3000,shade:0.3});
+                        }else{
+                            layer.msg(obj.msg,{icon:2,time:3000,shade:0.3});
+                        }
+                    },
+                    error: function () {
+                        layer.msg("上传失败！",{icon:2,time:3000,shade:0.3});
+                        $("#imgWait").hide();
+                        layer.closeAll('loading'); //关闭加载层
+                    }
+                });
+            })
+            //点击表格图片
+            $(document).on('click', '#imgAmplify', function(data){
+                var imgAlt=$(this).attr('layer-src');
+                var imgSrc=$(this).attr('src');
+                var title=$(this).attr('title');
+                layer.photos({
+                    photos: {
+                        "title": "", //相册标题
+                        "id": '#layer-photos-demo', //相册id
+                        "start": 0, //初始显示的图片序号，默认0
+                        "data": [   //相册包含的图片，数组格式
+                            {
+                                "alt": title,
+                                "pid": 666, //图片id
+                                "src": imgAlt, //原图地址
+                                "thumb": imgSrc //缩略图地址
+                            }
+                        ]
+                    },
+                    success: function () {
+                        //以鼠标位置为中心的图片滚动放大缩小
+                        $(document).on("mousewheel", ".layui-layer-photos", function (ev) {
+                            //console.log(6666);
+                            var oImg = this;
+                            var ev = event || window.event;//返回WheelEvent
+                            //ev.preventDefault();
+                            var delta = ev.detail ? ev.detail > 0 : ev.wheelDelta < 0;
+                            var ratioL = (ev.clientX - oImg.offsetLeft) / oImg.offsetWidth,
+                                ratioT = (ev.clientY - oImg.offsetTop) / oImg.offsetHeight,
+                                ratioDelta = !delta ? 1 + 0.05 : 1 - 0.05,
+                                w = parseInt(oImg.offsetWidth * ratioDelta),
+                                h = parseInt(oImg.offsetHeight * ratioDelta),
+                                l = Math.round(ev.clientX - (w * ratioL)),
+                                t = Math.round(ev.clientY - (h * ratioT));
+                            //设置相册层宽高
+                            $(".layui-layer-photos").css({ width: w, height: h, left: l, top: t });
+                            //设置图片外div宽高
+                            $("#layui-layer-photos").css({ width: w, height: h });
+                            //设置图片宽高
+                            $("#layui-layer-photos>img").css({ width: w, height: h });
+                        });
+                    },
+                    //销毁回调
+                    end: function () {},
+                    anim: 0 //0-6的选择，指定弹出图片动画类型，默认随机（请注意，3.0之前的版本用shift参数）
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>DPlayer Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+	<script src="hls.min.js"></script>
+    <script src="DPlayer.min.js"></script>
+</head>
+
+<body class="markdown-body">
+    <h2>在 dialog 中承载视频</h2>
+    
+    <div id="dplayer"></div>
+
+<script>
+const dp = new DPlayer({
+    container: document.getElementById('dplayer'),
+	preload: 'none',
+    screenshot: true,
+    video: {
+        quality: [
+            {
+                name: 'HD中字版',
+                url: 'https://v14.fentvoss.com/yyv14/202506/19/UZJzEfYZJ623/video/index.m3u8',
+                type: 'hls',
+            },
+            {
+                name: 'HD国语',
+                url: 'https://yzzy.play-cdn10.com/20221125/14687_a6a7e81b/index.m3u8',
+                type: 'normal',
+            },
+        ],
+        defaultQuality: 0,
+        pic: 'demo.png',
+        thumbnails: 'thumbnails.jpg',
+		defaultSubtitle: 7,
+            type: 'webvtt',
+            fontSize: '25px',
+            bottom: '10%',
+            color: '#b7daff'
+    },
+	autoplay: true,
+	contextmenu: [],
+	
+});
+</script>
+</body>
+
+</html>

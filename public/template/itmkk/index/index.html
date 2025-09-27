@@ -38,7 +38,7 @@
             <div class="wrapper-ban">
                 <div class="swiper-container swiper-main swiper-container-initialized swiper-container-horizontal">
                     <div class="swiper-wrapper" style="transform: translate3d(-3428px, 0px, 0px); transition-duration: 0ms;">
-                        {cymini:banner }
+                        {cymini:banner where='[["enable","=",1],["ident","=","c"]]'}
                         <div class="swiper-slide" data-swiper-slide-index="{$vo.id}" style="width: 827px; margin-right: 30px;">
                             <a href="{$vo.link}" target="{$vo.target}">
                                 <img src="{$vo.img|ImgPath}" alt="{$vo.title}" />

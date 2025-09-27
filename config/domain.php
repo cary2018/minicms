@@ -1,6 +1,6 @@
 <?php 
 return array (
-  'www.9wdn.com' => 
+  'www.tp.com' => 
   array (
     'id' => 1,
     'web_logo' => '',
@@ -11,8 +11,8 @@ return array (
     'web_Copyright' => '',
     'web_Copy' => '',
     'web_footer_title' => '',
-    'view_path' => 'ckey',
+    'view_path' => 'default',
     'createTime' => 1729664394,
-    'updateTime' => 1729664394,
+    'updateTime' => 1757131131,
   ),
 );

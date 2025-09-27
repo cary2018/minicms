@@ -24,7 +24,37 @@ body {
     top: 6px;
     right: 5px;
 }
-
+.w20{
+    float: left;
+    width: 20%;
+    min-width:190px;
+}
+.w30{
+    float: left;
+    width: 30%;
+    min-width:190px;
+}
+.w40{
+    float: left;
+    width: 40%;
+    min-width:190px;
+}
+.w50{
+    float: left;
+    width: 50%;
+    min-width:190px;
+}
+.w60{
+    float: left;
+    width: 60%;
+    min-width:190px;
+}
+.layui-lable{
+    float: left;
+    padding:9px 10px;
+    line-height: 20px;
+    font-size: 14px;
+}
 .layuimini-form > .layui-form-item > .layui-form-label {
     width: 120px !important;
 }

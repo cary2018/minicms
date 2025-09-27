@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{$Think.lang.collection_add_rule}</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    {include file="public/file_css"}
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-form ">
+    <form class="layui-form" id="DataForm" lay-filter="DataForm" method="post" onsubmit="return false">
+        <div class="layui-tab">
+            <ul class="layui-tab-title">
+                <li class="layui-this">{$Think.lang.collection_rule}</li>
+                <li>{$Think.lang.collection_rule_content}</li>
+            </ul>
+            <div class="layui-tab-content">
+                <div class="layui-tab-item layui-show layuimini-form">
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label required">{$Think.lang.collection_name}</label>
+                        <div class="layui-input-inline" style="width:50%;">
+                            <input type="hidden" name="id" value="" class="layui-input">
+                            <input type="text" name="name" value="" lay-verify="required" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{$Think.lang.collection_web_config}</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="url" value="" placeholder="{$Think.langcollection_rule_place}" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{$Think.lang.collection_page_form}</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="ps" value="1" class="layui-input">
+                        </div>
+                        <span style="float:left;width:25px;line-height:38px;">{$Think.lang.collection_page_to}</span>
+                        <div class="layui-input-inline">
+                            <input type="text" name="pe" value="10" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item layui-form-text">
+                        <label class="layui-form-label">{$Think.lang.collection_rule}</label>
+                        <div class="layui-input-block">
+                            <textarea name="start" placeholder="{$Think.lang.collection_start_tag}" style="width:50%;float:left;" class="layui-textarea" ></textarea>
+                            <textarea name="end" placeholder="{$Think.lang.collection_end_tag}" style="width:50%;float:left;" class="layui-textarea" ></textarea>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="layui-tab-item">
+                    <div class="layui-form-item layui-form-text">
+                        <label class="layui-form-label">{$Think.lang.collection_title_rule}</label>
+                        <div class="layui-input-block">
+                            <textarea name="title" placeholder="{$Think.lang.collection_title_tips}" class="layui-textarea" ></textarea>
+                        </div>
+                    </div>
+                    <div class="layui-form-item layui-form-text">
+                        <label class="layui-form-label">{$Think.lang.collection_rule_content}</label>
+                        <div class="layui-input-block">
+                            <textarea name="content" placeholder="{$Think.lang.collection_content_rule}" class="layui-textarea" ></textarea>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label required">{$Think.lang.collection_down_img}</label>
+                        <div class="layui-input-inline">
+                            <input type="radio" name="download" value="1" title="{$Think.lang.yes}" >
+                            <input type="radio" name="download" value="0" title="{$Think.lang.no}" checked>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn layui-btn-normal" lay-submit lay-filter="doSubmit">{$Think.lang.Save}</button>
+            </div>
+        </div>
+    </form>
+
+</div>
+{include file="public/file_js"}
+<script type="text/javascript" charset="utf-8" src="/ueditor/ueditor.config.js"></script>
+<script type="text/javascript" charset="utf-8" src="/ueditor/ueditor.all.min.js"> </script>
+<script>
+    var ue = UE.getEditor('editor');
+</script>
+</body>
+</html>

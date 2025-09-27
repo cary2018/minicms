@@ -224,6 +224,18 @@ function Cfg($str=''){
 function GetConfig($name,$str){
     return Config::get($name.'.'.$str);
 }
+
+/**
+ *  生成客户端 session
+ */
+function clientSe(){
+    $userKey = GetSe('userKey');
+    if(!$userKey){
+        SetSe('userKey',md5(time().uniqid()));
+        $userKey = GetSe('userKey');
+    }
+    return $userKey;
+}
 /**
  * @param string $name
  * @param float|int $outTime
@@ -419,12 +431,66 @@ function SumField($table,$where=[],$field='id',$alias=''){
 function getNav(){
     $data = GetCache('navigation');
     if(!$data){
-        $data = AllTable('classify',['status'=>1],['orderBy'=>'desc']);
+        $data = pageTable('classify',0,11,['status'=>1],['orderBy'=>'desc']);
+        //$data = AllTable('classify',['status'=>1],['orderBy'=>'desc']);
         foreach ($data as $k=>$v){
             $data[$k]['nav'] = AllTables('navigation',[['cid','=',$v['id']],['is_show','=',1]],$v['number'],['orderBy'=>'desc']);
         }
     }
     return $data;
+}
+
+function navlist($args){
+    if(!is_array($args)){
+        $args = json_decode($args,true);
+        if(array_key_exists('where',$args)){
+            if(!is_array($args['where'])){
+                $args['where'] = json_decode($args['where']);
+            }
+        }
+    }
+    static $defaults = [
+        'table'=>'classify',
+        'table2'=>'navigation',
+        'limit'=>10,
+        'page'=>0,
+    ];
+    $table = $args['table'] ?? $defaults['table'];
+    $table2 = $args['table2'] ?? $defaults['table2'];
+    $limit = $args['limit'] ?? $defaults['limit'];
+    $page = $args['page'] ?? $defaults['page'];
+    $id = request()->param('id');
+    $where = [['id','=',$id],['status','=',1]];
+    $size = request()->param('limit')?request()->param('limit'):$limit;
+    $start = request()->param('page')?request()->param('page'):$page;
+    $wd = request()->param('wd');
+    $data = FindTable($table,$where);
+    $baseConditions = [['is_show', '=', 1]];
+    if($wd){
+        $baseConditions = [['is_show', '=', 1],['nav_name','like','%'.$wd.'%']];
+    }
+    if($data){
+        $conditions = array_merge($baseConditions, [['cid', '=', $data['id']]]);
+    }else{
+        $data = [
+            'id'   => '',
+            'name' => '全部'
+        ];
+        $conditions = $baseConditions;
+    }
+    $navwher = [
+        'table'=>$table2,
+        'table2'=>$table,
+        'order'=>['orderBy'=>'desc'],
+        'condition'=>'b.id= a.cid',
+        'field'=>'a.*,b.name,b.routes',
+        'where'=>$conditions,
+        'page'=>$start,
+        'limit'=>$size,
+    ];
+    $data['list'] = joinTables($navwher);
+    $data['__total__'] = CountTable($table2,$conditions);
+    return [$data];
 }
 
 function vodType($n){
@@ -463,6 +529,31 @@ function pageTable($table,$start=0,$size=10,$where=[],$order=['id'=>'desc'],$gro
 function joinTable($table,$table2,$start=0,$size=10,$where=[],$order=['id'=>'desc']){
     return Db::name($table)->alias('a')->leftJoin($table2.' b ','b.id= a.cid')->field('a.*,b.name as nickname')->where($where)->order($order)->page($start,$size)->select()->toArray();
 }
+function joinTables($args){
+    static $defaults = [
+        'table'=>'vod',
+        'table2'=>'category',
+        'alias'=>'a',
+        'alias2'=>'b',
+        'condition'=>'b.id= a.type_id',
+        'field'=>'a.*,b.name as nickname',
+        'page'=>0,
+        'limit'=>10,
+        'where'=>[],
+        'order'=>['id'=>'desc'],
+    ];
+    $table = $args['table'] ?? $defaults['table'];
+    $table2 = $args['table2'] ?? $defaults['table2'];
+    $alias = $args['alias'] ?? $defaults['alias'];
+    $alias2 = $args['alias2'] ?? $defaults['alias2'];
+    $condition = $args['condition'] ?? $defaults['condition'];
+    $field = $args['field'] ?? $defaults['field'];
+    $page = $args['page'] ?? $defaults['page'];
+    $limit = $args['limit'] ?? $defaults['limit'];
+    $where = $args['where'] ?? $defaults['where'];
+    $order = $args['order'] ?? $defaults['order'];
+    return Db::name($table)->alias($alias)->leftJoin($table2.' '.$alias2.' ',$condition)->field($field)->where($where)->order($order)->page($page,$limit)->select()->toArray();
+}
 /**
  * @param $table
  * @param array $where
@@ -478,6 +569,32 @@ function AllTable($table,$where=[],$order=['id'=>'desc']){
 }
 function AllTables($table,$where=[],$number=10,$order=['id'=>'desc']){
     return Db::name($table)->where($where)->order($order)->limit($number)->select()->toArray();
+}
+
+function SharedTable($args){
+    if(!is_array($args)){
+        $args = json_decode($args,true);
+        if(array_key_exists('where',$args)){
+            if(!is_array($args['where'])){
+                $args['where'] = json_decode($args['where']);
+            }
+        }
+    }
+    static $defaults = [
+        'table'=>'banner',
+        'where'=>[],
+        'order'=>'id desc',
+        'field'=>'*',
+        'page'=>0,
+        'limit'=>10,
+    ];
+    $table = $args['table'] ?? $defaults['table'];
+    $where = $args['where'] ?? $defaults['where'];
+    $order = $args['order'] ?? $defaults['order'];
+    $field = $args['field'] ?? $defaults['field'];
+    $page = $args['page'] ?? $defaults['page'];
+    $limit = $args['limit'] ?? $defaults['limit'];
+    return Db::name($table)->field($field)->where($where)->order($order)->page($page,$limit)->select()->toArray();
 }
 
 function mac_day($t,$f='',$c='#FF0000')
@@ -625,6 +742,11 @@ function mac_rep_pse_syn($psearr,$txt)
     return $txt;
 }
 
+function mac_str_correct($str,$from,$to)
+{
+    return str_replace($from,$to,$str);
+}
+
 function mac_substring($str, $lenth, $start=0)
 {
     $len = strlen($str);
@@ -670,7 +792,8 @@ function mac_substring($str, $lenth, $start=0)
 
 function mac_filter_xss($str)
 {
-    return trim(htmlspecialchars(strip_tags($str), ENT_QUOTES));
+    $str = trim(htmlspecialchars(strip_tags($str), ENT_QUOTES));
+    return str_replace(' ', '', $str);
 }
 
 function mac_like_arr($s)
@@ -982,12 +1105,14 @@ function AttrId($size=10,$aid=''){
     $prefix = Config::get('database.connections.mysql.prefix');
     $table = $prefix.'article';
     $table2 = $prefix.'category';
-    $sql = "SELECT a.id,a.cid,a.title,a.author,a.attrId,a.description,a.author,a.articleThumbImg,a.createTime,a.updateTime,a.keywords,a.views,b.name,b.temp_archives,b.temp_list,.b.target FROM `$table` as a left join `$table2` as b on a.cid = b.id WHERE FIND_IN_SET($aid,attrId) > 0 and a.status = 1 and a.recycle = 0 ORDER BY a.id DESC LIMIT $size";
+    $sql = "SELECT a.id,a.cid,a.title,a.author,a.attrId,a.description,a.author,a.articleThumbImg,a.createTime,a.updateTime,a.keywords,a.views,b.name,b.temp_archives,b.temp_list,.b.target FROM `$table` as a left join `$table2` as b on a.cid = b.id WHERE FIND_IN_SET('$aid',a.attrId) > 0 and a.status = 1 and a.recycle = 0 ORDER BY a.id DESC LIMIT $size";
     $list = Db::query($sql);
     foreach ($list as &$v){
         if(!$v['articleThumbImg'] || !file_exists($v['articleThumbImg'])){
             $v['articleThumbImg'] = 'images/default.jpg';
         }
+        $v['temp_list'] = (string)url($v['temp_list']);
+        $v['temp_archives'] = (string)url($v['temp_archives']);
         $v['attr'] = AllTable('attribute',[['id','in',$v['attrId']]]);
         $v['month'] = date('m',$v['createTime']);
         $v['day'] = date('d',$v['createTime']);
@@ -1014,12 +1139,63 @@ function Article($id='',$order='id',$size=12,$start=0){
         if(!$v['articleThumbImg'] || !file_exists($v['articleThumbImg'])){
             $v['articleThumbImg'] = 'images/default.jpg';
         }
+        $v['temp_list'] = (string)url($v['temp_list']);
+        $v['temp_archives'] = (string)url($v['temp_archives']);
         $v['attr'] = AllTable('attribute',[['id','in',$v['attrId']]]);
         $v['month'] = date('m',$v['createTime']);
         $v['day'] = date('d',$v['createTime']);
         $v['createTime'] = date('Y-m-d',$v['createTime']);
         $v['updateTime'] = date('Y-m-d',$v['updateTime']);
     }
+    return $list;
+}
+
+function Search($args){
+    if(!is_array($args)){
+        $args = json_decode($args,true);
+        if(array_key_exists('where',$args)){
+            if(!is_array($args['where'])){
+                $args['where'] = json_decode($args['where']);
+            }
+        }
+    }
+
+    static $defaults = [
+        'order'=>'id',
+        'page'=>0,
+        'limit'=>10,
+        'wd'=>'q',
+        'like'=>'title',
+    ];
+
+    $order = $args['order'] ?? $defaults['order'];
+    $page = $args['page'] ?? $defaults['page'];
+    $limit = $args['limit'] ?? $defaults['limit'];
+    $like = $args['like'] ?? $defaults['like'];
+    $key = $args['wd'] ?? $defaults['wd'];
+    $wd = request()->param($key);
+    $where = [['a.status','=',1],['a.recycle','=',0]];
+    if($wd){
+        $where = array_merge($where, [[$like,'like','%'.$wd.'%']]);
+    }
+
+    $field = 'a.id,a.cid,a.title,a.author,a.attrId,a.articleThumbImg,a.createTime,a.updateTime,a.keywords,a.description,a.views,a.click,b.name,b.target,b.temp_list,b.temp_archives,count(c.id) as feed';
+    $list['data'] = Db::name('article')->alias('a')->join('category'.' b ','b.id= a.cid')->leftJoin('feedback'.' c ','c.aid=a.id')->field($field)->where($where)->group('a.id, a.title, b.name')->order(['a.'.$order=>'desc'])->page($page,$limit)->select()->toArray();
+
+    foreach ($list['data'] as &$v){
+        if(!$v['articleThumbImg'] || !file_exists($v['articleThumbImg'])){
+            $v['articleThumbImg'] = 'images/default.jpg';
+        }
+        $v['temp_list'] = (string)url($v['temp_list']);
+        $v['temp_archives'] = (string)url($v['temp_archives']);
+        $v['attr'] = AllTable('attribute',[['id','in',$v['attrId']]]);
+        $v['month'] = date('m',$v['createTime']);
+        $v['day'] = date('d',$v['createTime']);
+        $v['createTime'] = date('Y-m-d',$v['createTime']);
+        $v['updateTime'] = date('Y-m-d',$v['updateTime']);
+    }
+    $list['__total__'] = CountTable('article',$where,'a');
+
     return $list;
 }
 
@@ -1036,8 +1212,8 @@ function Feedback($aid='',$cate=0,$size=10,$start=0){
     foreach ($list['data'] as &$v){
         $cate = FindTable('category',[['id','=',$v['cid']]]);
         if($cate){
-            $v['temp_archives'] = $cate['temp_archives'];
-            $v['temp_list'] = $cate['temp_list'];
+            $v['temp_archives'] = (string)url($cate['temp_archives']);
+            $v['temp_list'] = (string)url($cate['temp_list']);
             $v['target'] = $cate['target'];
         }
         $v['date'] = date('Y-m-d H:i:s',$v['createTime']);
@@ -1091,6 +1267,8 @@ function RandRow($id='',$size=12,$start=0){
         if(!$v['articleThumbImg'] || !file_exists($v['articleThumbImg'])){
             $v['articleThumbImg'] = 'images/default.jpg';
         }
+        $v['temp_list'] = (string)url($v['temp_list']);
+        $v['temp_archives'] = (string)url($v['temp_archives']);
         $v['attr'] = AllTable('attribute',[['id','in',$v['attrId']]]);
         $v['month'] = date('m',$v['createTime']);
         $v['day'] = date('d',$v['createTime']);
@@ -1122,14 +1300,20 @@ function pageBar($table,$pageSize=10,$showPage=5){
     $start = 1;    //开始页码
     $end = $totalPage;    //结束页码
     if($page > 1){
-        $pageBanner .= "<a href=".handlerUrl($urls,array_merge($_GET,['page'=>$start,'limit'=>$pageSize])).">". lang('page_index') ."</a>";
-        $pageBanner .= "<a href=".handlerUrl($urls,array_merge($_GET,['page'=>$page-1,'limit'=>$pageSize])).">". lang('page_prev') ."</a>";
+        $pageBanner .= "<a href=".handlerUrl($urls,array_merge($_GET,['page'=>$start])).">". lang('page_index') ."</a>";
+        $pageBanner .= "<a href=".handlerUrl($urls,array_merge($_GET,['page'=>$page-1])).">". lang('page_prev') ."</a>";
+    }else{
+        //$pageBanner .= "<a class='page-disabled' >". lang('page_index') ."</a>";
+        //$pageBanner .= "<a class='page-disabled'>". lang('page_prev') ."</a>";
     }
-    if($totalPage > $showPage){    //当总页数大于显示页数时
-        if($page > $pageOffset + 1){    //当当前页大于页码偏移量+1时，也就是当页码为4时 开始页码1替换为...
+    //当总页数大于显示页数时
+    if($totalPage > $showPage){
+        //当当前页大于页码偏移量+1时，也就是当页码为4时 开始页码1替换为...
+        if($page > $pageOffset + 1){
             $pageBanner .= "...";
         }
-        if($page > $pageOffset){        //当当前页大于页码偏移量时 开始页码变为当前页-偏移页码
+        //当当前页大于页码偏移量时 开始页码变为当前页-偏移页码
+        if($page > $pageOffset){
             $start = $page - $pageOffset;
             $end = $totalPage > $page + $pageOffset ?  $page + $pageOffset : $totalPage;
             //如果当前页数+偏移量大于总页数 那么$end为总页数
@@ -1141,22 +1325,25 @@ function pageBar($table,$pageSize=10,$showPage=5){
             $start = $start - ($page + $pageOffset - $end);
         }
     }
-    for($i = $start ; $i <= $end ; $i++){ //循环出页码
+    //循环出页码
+    for($i = $start ; $i <= $end ; $i++){
         if($i == $page){
             $pageBanner .= "<span class='minincms-curr'>".$i." </span>";
         }else{
-            $pageBanner .= "<a href=".handlerUrl($urls,array_merge($_GET,['page'=>$i,'limit'=>$pageSize])).">".$i." </a>";
+            $pageBanner .= "<a href=".handlerUrl($urls,array_merge($_GET,['page'=>$i])).">".$i." </a>";
         }
     }
-    if($totalPage > $showPage && $totalPage > $page + $pageOffset){    //当总页数大于页码显示页数时 且总页数大于当前页+偏移量
+    //当总页数大于页码显示页数时 且总页数大于当前页+偏移量
+    if($totalPage > $showPage && $totalPage > $page + $pageOffset){
         $pageBanner .= "...";
     }
     if($page < $totalPage){
-        $pageBanner .= "<a href=".handlerUrl($urls,array_merge($_GET,['page'=>$page+1,'limit'=>$pageSize])).">". lang('page_next') ."</a>";
-        $pageBanner .= "<a href=".handlerUrl($urls,array_merge($_GET,['page'=>$totalPage,'limit'=>$pageSize])).">". lang('page_tail') ."</a>";
+        $pageBanner .= "<a href=".handlerUrl($urls,array_merge($_GET,['page'=>$page+1])).">". lang('page_next') ."</a>";
+        $pageBanner .= "<a href=".handlerUrl($urls,array_merge($_GET,['page'=>$totalPage])).">". lang('page_tail') ."</a>";
     }
-    $pageBanner .= lang('page_current').$page.lang('page');
-    $pageBanner .= lang('page_common').$totalPage.lang('page')." </div>";
+    $pageBanner .= '<a>'.lang('page_current').$page.lang('page_ma').'</a>';
+    $pageBanner .= '<a>'.lang('page_common').$totalPage.lang('page_ma')."</a> ";
+    $pageBanner .= '<a>'.lang('page_common').$total.lang('page_strip')."</a> </div>";
     return $pageBanner;
 }
 
@@ -1256,10 +1443,12 @@ function arrMac($data){
  * 更新字段
  */
 function FieldUpdate($table,$data){
-    $nar = Db::name($table)->where('id',$data['id'])->find();
     $field = $data['field'];
+    $arr = array_keys($data);
+    $fid = $arr[2];
+    $nar = Db::name($table)->where($fid,$data[$fid])->find();
     if($nar){
-        Db::name($table)->save(['id' => $data['id'], $field => $data['value']]);
+        Db::name($table)->save([$fid => $data[$fid], $field => $data['value']]);
         $msg = array('code'=>200,'msg'=>lang('update_success'));
     }else{
         $msg = array('code'=>300,'msg'=>lang('update_failed'));
@@ -1286,6 +1475,33 @@ function SwitchUp($table,$field,$id,$value=0){
             $val = 1;
         }
         Db::name($table)->save(['id' => $id, $field => $val]);
+        $msg = array('code'=>200,'msg'=>lang('update_status'));
+    }else{
+        $msg = array('code'=>300,'msg'=>lang('data_error'));
+    }
+    return $msg;
+}
+function SwitchStatus($args){
+    static $defaults = [
+        'table'=>'vod',
+        'field'=>'vod_status',
+        'id_name'=>'vod_id',
+        'id'=>'',
+        'value'=>0,
+    ];
+    $table = $args['table'] ?? $defaults['table'];
+    $field = $args['field'] ?? $defaults['field'];
+    $id = $args['id'] ?? $defaults['id'];
+    $idName = $args['id_name'] ?? $defaults['id_name'];
+    $value = $args['value'] ?? $defaults['value'];
+    $arr = Db::name($table)->where($idName,$id)->find();
+    if($arr){
+        if($arr[$field] == 1){
+            $val = $value;
+        }else{
+            $val = 1;
+        }
+        Db::name($table)->save([$idName => $id, $field => $val]);
         $msg = array('code'=>200,'msg'=>lang('update_status'));
     }else{
         $msg = array('code'=>300,'msg'=>lang('data_error'));
@@ -1396,7 +1612,12 @@ function FCurl_post($url, $param = array(), $filename = '', $wait = 30,$method =
 
 function GetCurl($url,$param=[]){
     $param = http_build_query($param);
-    $url = $url.'?'.$param;
+    if($param){
+        $param = '?'.$param;
+    }else{
+        $param = '&'.$param;
+    }
+    $url = $url.$param;
     $ch = curl_init();
     curl_setopt_array($ch, [
         CURLOPT_URL => $url,
@@ -1408,6 +1629,7 @@ function GetCurl($url,$param=[]){
             'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
             'Referer: http://www.kuwo.cn/',
             'Accept: application/json, text/plain, */*',
+            'Content-Type: application/json',
         ]
     ]);
 
@@ -1420,16 +1642,88 @@ function GetCurl($url,$param=[]){
 
     if ($httpCode == 200) {
         if (!empty($response)) {
-            return [
+            $msg = [
                 'response_code' => $httpCode,
                 'output' => $response,
-                'error' => $err,
+                'msg' => $err,
             ];
         } else {
-            echo "请求成功但返回内容为空，请检查参数或接口限制。";
+            $msg = [
+                'response_code' => $httpCode,
+                'output' => $response,
+                'msg' => '请求成功但返回内容为空，请检查参数或接口限制。',
+            ];
         }
     } else {
-        echo "请求失败，HTTP状态码：{$httpCode}";
+        $msg = [
+            'response_code' => $httpCode,
+            'output' => $response,
+            'msg' => "请求失败，HTTP状态码：{$httpCode}",
+        ];
+    }
+    return $msg;
+}
+
+function getMusicUrl($args) {
+
+    static $defaults = [
+        'url'=>'https://wyapi.toubiec.cn/api/music/url',
+        'id'=>'191232',
+        'level'=>'standard',
+    ];
+    $url = $args['url'] ?? $defaults['url'];
+    $id = $args['id'] ?? $defaults['id'];
+    $level = $args['level'] ?? $defaults['level'];
+
+    // 初始化cURL
+    $ch = curl_init();
+
+    // 设置cURL选项
+    curl_setopt_array($ch, [
+        CURLOPT_URL => $url,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST => true,
+        CURLOPT_POSTFIELDS => json_encode(['id'=>$id,'level'=>$level]),
+        CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_SSL_VERIFYHOST => 0,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTPHEADER => [
+            'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+            'Referer: https://music.163.com/',
+            'Accept: application/json',
+            'Content-Type: application/json;charset=UTF-8',
+            'X-Requested-With: XMLHttpRequest'
+        ]
+    ]);
+
+    // 执行请求
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $error = curl_error($ch);
+    curl_close($ch);
+
+    // 处理响应
+    if ($httpCode == 200) {
+        $data = json_decode($response, true);
+        if (json_last_error() === JSON_ERROR_NONE) {
+            return [
+                'response_code' => 200,
+                'output' => $data
+            ];
+        } else {
+            return [
+                'response_code' => 300,
+                'error' => 'JSON解析失败: ' . json_last_error_msg(),
+                'raw_response' => $response
+            ];
+        }
+    } else {
+        return [
+            'response_code' => 300,
+            'error' => $error ?: "HTTP错误: {$httpCode}",
+            'http_code' => $httpCode,
+            'raw_response' => $response
+        ];
     }
 }
 
@@ -2082,6 +2376,7 @@ function oneArr($arr){
             'article' => $v['article'],
             'email' => $v['email'],
             'ip' => $v['ip'],
+            'region' => $v['region'],
             'msg' => $v['msg'],
             'good' => $v['good'],
             'bad' => $v['bad'],
@@ -2099,34 +2394,159 @@ function oneArr($arr){
 }
 
 function ubb($Text) {
-    $Text=trim($Text);
-    $Text=preg_replace("/\[Addoil\]/is","<img style='width:22px;' src='/ubb/Addoil.png' />",$Text);
-    $Text=preg_replace("/\[Applause\]/is","<img style='width:22px;' src='/ubb/Applause.png' />",$Text);
-    $Text=preg_replace("/\[Badlaugh\]/is","<img style='width:22px;' src='/ubb/Badlaugh.png' />",$Text);
-    $Text=preg_replace("/\[Bomb\]/is","<img style='width:22px;' src='/ubb/Bomb.png' />",$Text);
-    $Text=preg_replace("/\[Coffee\]/is","<img style='width:22px;' src='/ubb/Coffee.png' />",$Text);
-    $Text=preg_replace("/\[Fabulous\]/is","<img style='width:22px;' src='/ubb/Fabulous.png' />",$Text);
-    $Text=preg_replace("/\[Facepalm\]/is","<img style='width:22px;' src='/ubb/Facepalm.png' />",$Text);
-    $Text=preg_replace("/\[Feces\]/is","<img style='width:22px;' src='/ubb/Feces.png' />",$Text);
-    $Text=preg_replace("/\[Frown\]/is","<img style='width:22px;' src='/ubb/Frown.png' />",$Text);
-    $Text=preg_replace("/\[Heyha\]/is","<img style='width:22px;' src='/ubb/Heyha.png' />",$Text);
-    $Text=preg_replace("/\[Insidious\]/is","<img style='width:22px;' src='/ubb/Insidious.png' />",$Text);
-    $Text=preg_replace("/\[KeepFighting\]/is","<img style='width:22px;' src='/ubb/KeepFighting.png' />",$Text);
-    $Text=preg_replace("/\[NoProb\]/is","<img style='width:22px;' src='/ubb/NoProb.png' />",$Text);
-    $Text=preg_replace("/\[PigHead\]/is","<img style='width:22px;' src='/ubb/PigHead.png' />",$Text);
-    $Text=preg_replace("/\[Shocked\]/is","<img style='width:22px;' src='/ubb/Shocked.png' />",$Text);
-    $Text=preg_replace("/\[Sinistersmile\]/is","<img style='width:22px;' src='/ubb/Sinistersmile.png' />",$Text);
-    $Text=preg_replace("/\[Slap\]/is","<img style='width:22px;' src='/ubb/Slap.png' />",$Text);
-    $Text=preg_replace("/\[Social\]/is","<img style='width:22px;' src='/ubb/Social.png' />",$Text);
-    $Text=preg_replace("/\[Sweat\]/is","<img style='width:22px;' src='/ubb/Sweat.png' />",$Text);
-    $Text=preg_replace("/\[Tolaugh\]/is","<img style='width:22px;' src='/ubb/Tolaugh.png' />",$Text);
-    $Text=preg_replace("/\[Watermelon\]/is","<img style='width:22px;' src='/ubb/Watermelon.png' />",$Text);
-    $Text=preg_replace("/\[Witty\]/is","<img style='width:22px;' src='/ubb/Witty.png' />",$Text);
-    $Text=preg_replace("/\[Wow\]/is","<img style='width:22px;' src='/ubb/Wow.png' />",$Text);
-    $Text=preg_replace("/\[Yeah\]/is","<img style='width:22px;' src='/ubb/Yeah.png' />",$Text);
-    $Text=preg_replace("/\[Yellowdog\]/is","<img style='width:22px;' src='/ubb/Yellowdog.png' />",$Text);
+    $Text = trim($Text);
+    static $replacements = null;
+    if ($replacements === null) {
+        // 所有GIF格式的表情标签
+        $gifTags = [
+            'aoman', 'baiyan', 'bishi', 'bizui', 'cahan', 'ciya',
+            'dabing', 'daku', 'deyi', 'doge', 'fadai', 'fanu',
+            'fendou', 'ganga', 'guzhang', 'haixiu', 'hanxiao', 'zuohengheng',
+            'zhuakuang', 'zhouma', 'zhemo', 'zhayanjian', 'zaijian', 'yun',
+            'youhengheng', 'yiwen', 'yinxianyiwen', 'yinxian', 'xu', 'xieyanxiao', 'xiaoku',
+            'xiaojiujie', 'xia', 'wunai', 'wozuimei', 'weixiao', 'weiqu',
+            'tuosai', 'tu', 'touxiao', 'tiaopi', 'shui', 'se',
+            'saorao', 'qiudale', 'qinqin', 'qiaoda', 'piezui', 'penxue',
+            'nanguo', 'liulei', 'liuhan', 'lenghan', 'leiben', 'kun',
+            'kuaikule', 'ku', 'koubi', 'kelian', 'keai', 'jingya',
+            'jingxi', 'jingkong', 'jie', 'huaixiao', 'haqian', 'aini',
+            'OK', 'qiang', 'quantou', 'shengli', 'woshou', 'gouyin',
+            'baoquan', 'aixin', 'bangbangtang', 'xiaoyanger', 'xigua', 'hexie',
+            'pijiu', 'lanqiu', 'juhua', 'hecai', 'haobang', 'caidao',
+            'baojin', 'chi', 'dan', 'kulou', 'shuai', 'shouqiang', 'yangtuo', 'youling'
+        ];
 
-    return $Text;
+        // 所有支持的标签（包括PNG和GIF）
+        $allTags = [
+            'Addoil', 'Applause', 'Badlaugh', 'Bomb', 'Coffee', 'Fabulous',
+            'Facepalm', 'Feces', 'Frown', 'Heyha', 'Insidious', 'KeepFighting',
+            'NoProb', 'PigHead', 'Shocked', 'Sinistersmile', 'Slap', 'Social',
+            'Sweat', 'Tolaugh', 'Watermelon', 'Witty', 'Wow', 'Yeah', 'Yellowdog'
+        ];
+
+        // 合并所有标签
+        $allTags = array_merge($allTags, $gifTags);
+
+        $replacements = [];
+        foreach ($allTags as $tag) {
+            $ext = in_array($tag, $gifTags) ? 'gif' : 'png';
+            $replacements["[$tag]"] = "<img style='width:22px;' src='/ubb/$tag.$ext' />";
+        }
+    }
+
+    return strtr($Text, $replacements);
+}
+
+function emojiGif(){
+    $emoji = [
+        'aoman'=>'aoman.gif',
+        'baiyan'=>'baiyan.gif',
+        'bishi'=>'bishi.gif',
+        'bizui'=>'bizui.gif',
+        'cahan'=>'cahan.gif',
+        'ciya'=>'ciya.gif',
+
+        'dabing'=>'dabing.gif',
+        'daku'=>'daku.gif',
+        'deyi'=>'deyi.gif',
+        'doge'=>'doge.gif',
+        'fadai'=>'fadai.gif',
+        'fanu'=>'fanu.gif',
+
+        'fendou'=>'fendou.gif',
+        'ganga'=>'ganga.gif',
+        'guzhang'=>'guzhang.gif',
+        'haixiu'=>'haixiu.gif',
+        'hanxiao'=>'hanxiao.gif',
+        'zuohengheng'=>'zuohengheng.gif',
+
+        'zhuakuang'=>'zhuakuang.gif',
+        'zhouma'=>'zhouma.gif',
+        'zhemo'=>'zhemo.gif',
+        'zhayanjian'=>'zhayanjian.gif',
+        'zaijian'=>'zaijian.gif',
+        'yun'=>'yun.gif',
+
+        'youhengheng'=>'youhengheng.gif',
+        'yiwen'=>'yiwen.gif',
+        'yinxian'=>'yinxian.gif',
+        'xu'=>'xu.gif',
+        'xieyanxiao'=>'xieyanxiao.gif',
+        'xiaoku'=>'xiaoku.gif',
+
+        'xiaojiujie'=>'xiaojiujie.gif',
+        'xia'=>'xia.gif',
+        'wunai'=>'wunai.gif',
+        'wozuimei'=>'wozuimei.gif',
+        'weixiao'=>'weixiao.gif',
+        'weiqu'=>'weiqu.gif',
+
+        'tuosai'=>'tuosai.gif',
+        'tu'=>'tu.gif',
+        'touxiao'=>'touxiao.gif',
+        'tiaopi'=>'tiaopi.gif',
+        'shui'=>'shui.gif',
+        'se'=>'se.gif',
+
+        'saorao'=>'saorao.gif',
+        'qiudale'=>'qiudale.gif',
+        'qinqin'=>'qinqin.gif',
+        'qiaoda'=>'qiaoda.gif',
+        'piezui'=>'piezui.gif',
+        'penxue'=>'penxue.gif',
+
+        'nanguo'=>'nanguo.gif',
+        'liulei'=>'liulei.gif',
+        'liuhan'=>'liuhan.gif',
+        'lenghan'=>'lenghan.gif',
+        'leiben'=>'leiben.gif',
+        'kun'=>'kun.gif',
+
+        'kuaikule'=>'kuaikule.gif',
+        'ku'=>'ku.gif',
+        'koubi'=>'koubi.gif',
+        'kelian'=>'kelian.gif',
+        'keai'=>'keai.gif',
+        'jingya'=>'jingya.gif',
+
+        'jingxi'=>'jingxi.gif',
+        'jingkong'=>'jingkong.gif',
+        'jie'=>'jie.gif',
+        'huaixiao'=>'huaixiao.gif',
+        'haqian'=>'haqian.gif',
+        'aini'=>'aini.gif',
+
+        'OK'=>'OK.gif',
+        'qiang'=>'qiang.gif',
+        'quantou'=>'quantou.gif',
+        'shengli'=>'shengli.gif',
+        'woshou'=>'woshou.gif',
+        'gouyin'=>'gouyin.gif',
+
+        'baoquan'=>'baoquan.gif',
+        'aixin'=>'aixin.gif',
+        'bangbangtang'=>'bangbangtang.gif',
+        'xiaoyanger'=>'xiaoyanger.gif',
+        'xigua'=>'xigua.gif',
+        'hexie'=>'hexie.gif',
+
+        'pijiu'=>'pijiu.gif',
+        'lanqiu'=>'lanqiu.gif',
+        'juhua'=>'juhua.gif',
+        'hecai'=>'hecai.gif',
+        'haobang'=>'haobang.gif',
+        'caidao'=>'caidao.gif',
+
+        'baojin'=>'baojin.gif',
+        'chi'=>'chi.gif',
+        'dan'=>'dan.gif',
+        'kulou'=>'kulou.gif',
+        'shuai'=>'shuai.gif',
+        'shouqiang'=>'shouqiang.gif',
+        'yangtuo'=>'yangtuo.gif',
+        'youling'=>'youling.gif',
+    ];
+    return [$emoji];
 }
 
 /**
@@ -2148,6 +2568,12 @@ function UpdateMenu(){
     foreach ($type['type'] as $k=>$v){
         //多维数据
         $cate = GetMenu('category',[['isShow','=',1],['type','=',$k]],'id',['orderSort'=>'desc']);
+
+        foreach ($cate as &$sv){
+            $sv['temp_list'] = (string)url($sv['temp_list']);
+            $sv['temp_archives'] = (string)url($sv['temp_archives']);
+        }
+
         $nav = MdaTree($cate);
         SetCaChe('NavMenu_'.$k,$nav);
         //一维数组
@@ -2168,6 +2594,9 @@ function NavMenu($type = 0){
     $str = GetCache('NavMenu_'.$type);
     if(empty($str)){
         $cate = GetMenu('category',[['isShow','=',1],['type','=',$type]],'id',['orderSort'=>'desc']);
+        foreach ($cate as &$v){
+            $v['temp_list'] = url($v['temp_list']);
+        }
         $nav = MdaTree($cate);
         SetCaChe('NavMenu_'.$type,$nav);
         $str = GetCache('NavMenu_'.$type);
@@ -2204,8 +2633,11 @@ function VodMen($type=1){
  * @throws \think\db\exception\ModelNotFoundException
  * 上网导航缓存
  */
-function Navigation($table='classify',$table2='navigation'){
-    $data = AllTable($table,['status'=>1],['orderBy'=>'desc']);
+function Navigation(){
+    $table='classify';
+    $table2='navigation';
+    //$data = AllTable($table,['status'=>1],['orderBy'=>'desc']);
+    $data = pageTable($table,0,11,['status'=>1],['orderBy'=>'desc']);
     foreach ($data as $k=>$v){
         $data[$k]['nav'] = AllTables($table2,[['cid','=',$v['id']],['is_show','=',1]],$v['number'],['orderBy'=>'desc']);
     }
@@ -2315,7 +2747,7 @@ function batchSave($table,$data){
 
 /**
  * @param $name
- * @param int $thumb  生成缩略图（0-1）
+ * @param int $thumb  生成缩略图（0:不生成-1：生成）
  * @param string $path  保存路径
  * @param int $newWid  生成缩略图宽度
  * @param int $newHei  生成缩略图高度
@@ -2794,10 +3226,13 @@ function fileUrl($path,$url){
  */
 function ImgPath($path){
     $urls = parse_url($path);
-    if(!isset($urls['scheme']) && !isset($urls['host'])){
-        $imgUrl = '/'.$path;
-    }else{
-        $imgUrl = $path;
+    $imgUrl = '';
+    if($urls['path']){
+        if(!isset($urls['scheme']) && !isset($urls['host'])){
+            $imgUrl = '/'.$path;
+        }else{
+            $imgUrl = $path;
+        }
     }
     return $imgUrl;
 }
@@ -2821,240 +3256,172 @@ function getImgList($text){
  * @return string
  * 获得访客浏览器类型
  */
-function GetBrowser()
-{
-    if (!empty($_SERVER['HTTP_USER_AGENT'])) {
-        $br = $_SERVER['HTTP_USER_AGENT'];
-        if (preg_match('/MSIE/i', $br)) {
-            $br = 'MSIE';
-        } elseif (preg_match('/Firefox/i', $br)) {
-            $br = 'Firefox';
-        } elseif (preg_match('/Chrome/i', $br)) {
-            $br = 'Chrome';
-        } elseif (preg_match('/Safari/i', $br)) {
-            $br = 'Safari';
-        } elseif (preg_match('/Opera/i', $br)) {
-            $br = 'Opera';
-        } else {
-            $br = 'Other';
-        }
-        return lang('browser') . $br;
-    } else {
+function GetBrowser() {
+    $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+
+    // 空UA处理
+    if (empty($userAgent)) {
         return lang('browser_error');
     }
+
+    // 浏览器识别规则（按优先级排序）
+    $browserRules = [
+        ['pattern' => '/MSIE|Trident/i', 'name' => 'MSIE'], // 兼容IE的Trident引擎
+        ['pattern' => '/Edg/i', 'name' => 'Edge'],          // 新增Edge检测
+        ['pattern' => '/Firefox|FxiOS/i', 'name' => 'Firefox'],
+        ['pattern' => '/Chrome|CriOS/i', 'name' => 'Chrome'],
+        ['pattern' => '/Safari/i', 'name' => 'Safari'],     // 注意放在Chrome之后
+        ['pattern' => '/Opera|OPR/i', 'name' => 'Opera'],
+        ['pattern' => '/Vivaldi/i', 'name' => 'Vivaldi'],   // 新增浏览器
+        ['pattern' => '/Brave/i', 'name' => 'Brave'],       // 新增浏览器
+        ['pattern' => '/UCBrowser/i', 'name' => 'UC'],      // 新增移动端浏览器
+        ['pattern' => '/SamsungBrowser/i', 'name' => 'Samsung'],
+        ['pattern' => '/WeChat|MicroMessenger/i', 'name' => 'WeChat'], // 微信内置
+        ['pattern' => '/QQBrowser/i', 'name' => 'QQBrowser'],
+        ['pattern' => '/Baidu|Baiduspider/i', 'name' => 'Baidu'],
+    ];
+
+    $browser = 'Other';
+
+    // 遍历规则进行匹配
+    foreach ($browserRules as $rule) {
+        if (preg_match($rule['pattern'], $userAgent)) {
+            $browser = $rule['name'];
+            break;
+        }
+    }
+
+    return lang('browser') . $browser;
 }
 /**
  * @return string
  * 获得访客浏览器语言
  */
-function GetLang()
-{
-    if (!empty($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-        $lang = $_SERVER['HTTP_ACCEPT_LANGUAGE'];
-        $lang = substr($lang, 0, 5);
-        if (preg_match("/zh-cn/i", $lang)) {
-            $lang = lang('lang_ch');
-        } elseif (preg_match("/zh/i", $lang)) {
-            $lang = lang('lang_tw');
-        } else {
-            $lang = lang('lang_en');
-        }
-        return lang('browser_lang') . $lang;
-    } else {
+function GetLang() {
+    $acceptLang = $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '';
+
+    // 空值处理
+    if (empty($acceptLang)) {
         return lang('browser_lang_error');
     }
+
+    // 语言检测规则（优先级从高到低）
+    $langMap = [
+        'zh-CN' => 'lang_ch',     // 简体中文
+        'zh-Hans' => 'lang_ch',   // 简体中文(其他表示法)
+        'zh-TW' => 'lang_tw',     // 繁体中文(台湾)
+        'zh-HK' => 'lang_tw',     // 繁体中文(香港)
+        'zh-MO' => 'lang_tw',     // 繁体中文(澳门)
+        'zh' => 'lang_tw',        // 繁体中文(默认)
+        'en-US' => 'lang_en',     // 英语(美国)
+        'en-GB' => 'lang_en',     // 英语(英国)
+        'ja' => 'lang_jp',        // 日语
+        'ko' => 'lang_kr',        // 韩语
+        'ru' => 'lang_ru',        // 俄语
+        'fr' => 'lang_fr',        // 法语
+        'de' => 'lang_de',        // 德语
+        'es' => 'lang_es',        // 西班牙语
+        'pt' => 'lang_pt',        // 葡萄牙语
+        'ar' => 'lang_ar',        // 阿拉伯语
+    ];
+
+    // 解析语言优先级列表
+    $langs = [];
+    preg_match_all('/([a-z]{1,8}(?:-[a-z]{1,8})?)(?:;q=([0-9.]+))?/i', $acceptLang, $matches);
+
+    for ($i = 0; $i < count($matches[1]); $i++) {
+        $langCode = str_replace('-', '', strtolower($matches[1][$i]));
+        $priority = $matches[2][$i] ? (float)$matches[2][$i] : 1.0;
+
+        // 标准化语言代码 (zh-cn => zhcn)
+        foreach ($langMap as $key => $value) {
+            $normalizedKey = str_replace('-', '', strtolower($key));
+            if ($normalizedKey === $langCode) {
+                $langs[$key] = max($langs[$key] ?? 0, $priority);
+            }
+        }
+    }
+
+    // 按优先级排序
+    arsort($langs);
+
+    // 使用匹配到的最高优先级语言
+    $langType = 'lang_en'; // 默认英语
+    foreach ($langs as $key => $priority) {
+        if (isset($langMap[$key])) {
+            $langType = $langMap[$key];
+            break;
+        }
+    }
+
+    return lang('browser_lang') . lang($langType);
 }
 /**
  * @return string
  * 获取客户端操作系统信息包括win10
  * 获取访问设备操作系统
  */
-function GetOs(){
-    $agent = $_SERVER['HTTP_USER_AGENT'];
-    $os = $agent;
-    if (preg_match('/win/i', $agent) && stripos($agent, '95'))
-    {
-        $os = 'Windows 95';
+function GetOs() {
+    $agent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+    $os = '未知操作系统'; // 默认值
+
+    // 操作系统检测规则（按优先级排序）
+    $rules = [
+        // Windows 系列（从新到旧）
+        ['patterns' => ['Windows NT 10.0', 'Windows 10'], 'os' => 'Windows 10'],
+        ['patterns' => ['Windows NT 6.3', 'Windows 8.1'], 'os' => 'Windows 8.1'],
+        ['patterns' => ['Windows NT 6.2', 'Windows 8'], 'os' => 'Windows 8'],
+        ['patterns' => ['Windows NT 6.1', 'Windows 7'], 'os' => 'Windows 7'],
+        ['patterns' => ['Windows NT 6.0', 'Windows Vista'], 'os' => 'Windows Vista'],
+        ['patterns' => ['Windows NT 5.2'], 'os' => 'Windows Server 2003'],
+        ['patterns' => ['Windows NT 5.1', 'Windows XP'], 'os' => 'Windows XP'],
+        ['patterns' => ['Windows NT 5.0', 'Windows 2000'], 'os' => 'Windows 2000'],
+        ['patterns' => ['Win95', 'Windows 95'], 'os' => 'Windows 95'],
+        ['patterns' => ['Win98', 'Windows 98'], 'os' => 'Windows 98'],
+        ['patterns' => ['WinNT', 'Windows NT'], 'os' => 'Windows NT'],
+
+        // macOS 系列
+        ['patterns' => ['Mac OS X 10_15', 'Mac OS X 10.15', 'Catalina'], 'os' => 'macOS Catalina'],
+        ['patterns' => ['Mac OS X 10_14', 'Mac OS X 10.14', 'Mojave'], 'os' => 'macOS Mojave'],
+        ['patterns' => ['Mac OS X 10_13', 'Mac OS X 10.13', 'High Sierra'], 'os' => 'macOS High Sierra'],
+        ['patterns' => ['Mac OS X 10_12', 'Mac OS X 10.12', 'Sierra'], 'os' => 'macOS Sierra'],
+        ['patterns' => ['Mac OS X 10_11', 'Mac OS X 10.11', 'El Capitan'], 'os' => 'OS X El Capitan'],
+        ['patterns' => ['Mac OS X 10_10', 'Mac OS X 10.10', 'Yosemite'], 'os' => 'OS X Yosemite'],
+        ['patterns' => ['Mac OS X 10_9', 'Mac OS X 10.9', 'Mavericks'], 'os' => 'OS X Mavericks'],
+        ['patterns' => ['Mac OS X'], 'os' => 'macOS'],
+        ['patterns' => ['Macintosh'], 'os' => 'Macintosh'],
+
+        // 移动设备
+        ['patterns' => ['iPhone', 'iOS'], 'os' => 'iPhone iOS'],
+        ['patterns' => ['iPad', 'iPadOS'], 'os' => 'iPad iPadOS'],
+        ['patterns' => ['Android'], 'os' => 'Android'],
+
+        // Linux/Unix 系列
+        ['patterns' => ['Linux'], 'os' => 'Linux'],
+        ['patterns' => ['Ubuntu'], 'os' => 'Ubuntu Linux'],
+        ['patterns' => ['Fedora'], 'os' => 'Fedora Linux'],
+        ['patterns' => ['Debian'], 'os' => 'Debian Linux'],
+        ['patterns' => ['CentOS'], 'os' => 'CentOS Linux'],
+        ['patterns' => ['FreeBSD'], 'os' => 'FreeBSD'],
+        ['patterns' => ['OpenBSD'], 'os' => 'OpenBSD'],
+        ['patterns' => ['NetBSD'], 'os' => 'NetBSD'],
+        ['patterns' => ['SunOS', 'Solaris'], 'os' => 'Solaris'],
+
+        // 其他
+        ['patterns' => ['Chrome OS', 'CrOS'], 'os' => 'Chrome OS'],
+        ['patterns' => ['Xbox'], 'os' => 'Xbox OS'],
+    ];
+
+    // 遍历规则进行匹配
+    foreach ($rules as $rule) {
+        foreach ($rule['patterns'] as $pattern) {
+            if (stripos($agent, $pattern) !== false) {
+                $os = $rule['os'];
+                break 2; // 跳出两层循环
+            }
+        }
     }
-    if (preg_match('/win 9x/i', $agent) && stripos($agent, '4.90'))
-    {
-        $os = 'Windows ME';
-    }
-    if (preg_match('/win/i', $agent) && preg_match('/98/i', $agent))
-    {
-        $os = 'Windows 98';
-    }
-    if (preg_match('/win/i', $agent) && preg_match('/nt/i', $agent))
-    {
-        $os = 'Windows NT';
-    }
-    if (preg_match('/win/i', $agent) && preg_match('/nt 6.0/i', $agent))
-    {
-        $os = 'Windows Vista';
-    }
-    if (preg_match('/win/i', $agent) && preg_match('/nt 6.1/i', $agent))
-    {
-        $os = 'Windows 7';
-    }
-    if (preg_match('/win/i', $agent) && preg_match('/nt 6.2/i', $agent))
-    {
-        $os = 'Windows 8';
-    }
-    if(preg_match('/win/i', $agent) && preg_match('/nt 10.0/i', $agent))
-    {
-        $os = 'Windows 10';#添加win10判断
-    }
-    if (preg_match('/win/i', $agent) && preg_match('/nt 5.1/i', $agent))
-    {
-        $os = 'Windows XP';
-    }
-    if (preg_match('/win/i', $agent) && preg_match('/nt 5/i', $agent))
-    {
-        $os = 'Windows 2000';
-    }
-    if (preg_match('/win/i', $agent) && preg_match('/nt 5.0/i', $agent))
-    {
-        $os = 'Windows 2000';
-    }
-    if (preg_match('/win/i', $agent) && preg_match('/32/i', $agent))
-    {
-        $os = 'Windows 32';
-    }
-    if (stripos($agent,'linux'))
-    {
-        $os = 'Linux';
-    }
-    if (stripos($agent,'unix'))
-    {
-        $os = 'Unix';
-    }
-    if (preg_match('/sun/i', $agent) && preg_match('/os/i', $agent))
-    {
-        $os = 'SunOS';
-    }
-    if (preg_match('/ibm/i', $agent) && preg_match('/os/i', $agent))
-    {
-        $os = 'IBM OS/2';
-    }
-    if (preg_match('/Mac/i', $agent) && preg_match('/OS/i', $agent))
-    {
-        $os = 'Mac OS';
-    }
-    if (preg_match('/Mac/i', $agent) && preg_match('/PC/i', $agent))
-    {
-        $os = 'Macintosh';
-    }
-    if (stripos($agent,'PowerPC'))
-    {
-        $os = 'PowerPC';
-    }
-    if (stripos($agent,'AIX'))
-    {
-        $os = 'AIX';
-    }
-    if (stripos($agent,'HPUX'))
-    {
-        $os = 'HPUX';
-    }
-    if (stripos($agent,'NetBSD'))
-    {
-        $os = 'NetBSD';
-    }
-    if (stripos($agent,'BSD'))
-    {
-        $os = 'BSD';
-    }
-    if (stripos($agent,'OSF1'))
-    {
-        $os = 'OSF1';
-    }
-    if (stripos($agent,'IRIX'))
-    {
-        $os = 'IRIX';
-    }
-    if (stripos($agent,'FreeBSD'))
-    {
-        $os = 'FreeBSD';
-    }
-    if (stripos($agent,'teleport'))
-    {
-        $os = 'teleport';
-    }
-    if (stripos($agent,'flashget'))
-    {
-        $os = 'flashget';
-    }
-    if (stripos($agent,'webzip'))
-    {
-        $os = 'webzip';
-    }
-    if (stripos($agent,'offline'))
-    {
-        $os = 'offline';
-    }
-    if(stripos($agent, 'iphone')){
-        $os = 'iphone';
-    }
-    if(stripos($agent, 'ipad')){
-        $os = 'ipad';
-    }
-    if(stripos($agent, 'android')){
-        $os = 'android';
-    }
-    if (stripos($agent, "SAMSUNG") || stripos($agent, "Galaxy") || stripos($agent, "GT-") || stripos($agent, "SCH-") || stripos($agent, "SM-")) {
-        $os = 'android ->三星';
-    }
-    if (stripos($agent, "Huawei") || stripos($agent, "Honor") || stripos($agent, "H60-") || stripos($agent, "H30-")) {
-        $os = 'android ->华为';
-    }
-    if (stripos($agent, "Lenovo")) {
-        $os = 'android ->联想';
-    }
-    if (stripos($agent, "MI-ONE") || stripos($agent, "MI 1S") || stripos($agent, "MI 2") || stripos($agent, "MI 3") || stripos($agent, "MI 4") || stripos($agent, "MI-4") || stripos($agent,"xiaomi"))  {
-        $os = 'android ->小米';
-    }
-    if (stripos($agent, "HM NOTE") || stripos($agent, "HM201")) {
-        $os = 'android ->红米';
-    }
-    if (stripos($agent, "Coolpad") || stripos($agent, "8190Q") || stripos($agent, "5910")) {
-        $os = 'android ->酷派';
-    }
-    if (stripos($agent, "ZTE") || stripos($agent, "X9180") || stripos($agent, "N9180") || stripos($agent, "U9180")) {
-        $os = 'android ->中兴';
-    }
-    if (stripos($agent, "OPPO") || stripos($agent, "X9007") || stripos($agent, "X907") || stripos($agent, "X909") || stripos($agent, "R831S") || stripos($agent, "R827T") || stripos($agent, "R821T") || stripos($agent, "R811") || stripos($agent, "R2017")) {
-        $os = 'android ->OPPO';
-    }
-    if (stripos($agent, "HTC") || stripos($agent, "Desire")) {
-        $os = 'android ->HTC';
-    }
-    if (stripos($agent, "vivo")) {
-        $os = 'android ->vivo';
-    }
-    if (stripos($agent, "K-Touch")) {
-        $os = 'android ->天语';
-    }
-    if (stripos($agent, "Nubia") || stripos($agent, "NX50") || stripos($agent, "NX40")) {
-        $os = 'android ->努比亚';
-    }
-    if (stripos($agent, "M045") || stripos($agent, "M032") || stripos($agent, "M355")) {
-        $os = 'android ->魅族';
-    }
-    if (stripos($agent, "DOOV")) {
-        $os = 'android ->朵唯';
-    }
-    if (stripos($agent, "GFIVE")) {
-        $os = 'android ->基伍';
-    }
-    if (stripos($agent, "Gionee") || stripos($agent, "GN")) {
-        $os = 'android ->金立';
-    }
-    if (stripos($agent, "HS-U") || stripos($agent, "HS-E")) {
-        $os = 'android ->海信';
-    }
-    if (stripos($agent, "Nokia")) {
-        $os = 'android ->诺基亚';
-    }
+
     return $os;
 }
 
@@ -3072,88 +3439,140 @@ function checkAccept(){
     }
 }
 
-function isbot($tmp){
-    //谷歌蜘蛛
-    if(stripos($tmp, 'compatible; Googlebot/2.1') !== false){$flag = '谷歌蜘蛛';}
-    else if(stripos($tmp, 'Googlebot-Mobile') >0){$flag = '谷歌蜘蛛';}
-    else if(stripos($tmp, 'Googlebot-Image') >0){$flag = '谷歌图片蜘蛛';}
-    else if(stripos($tmp, 'Mediapartners-Google') >0){$flag = '谷歌广告蜘蛛';}
-    else if(stripos($tmp, 'Adsbot-Google') >0){$flag = '谷歌质量蜘蛛';}
-    else if(stripos($tmp, 'Googlebot') >0){$flag = '谷歌蜘蛛';}
-    else if(stripos($tmp, 'GoogleOther') !==false){$flag = '谷歌蜘蛛';}
-    //百度蜘蛛
-    else if(stripos($tmp, 'Baiduspider-mobile') >0){$flag = '百度蜘蛛';}
-    else if(stripos($tmp, 'Baidu-Thumbnail') >0){$flag = '百度图片蜘蛛';}
-    else if(stripos($tmp, 'Baiduspider-image') >0){$flag = '百度图片蜘蛛';}
-    else if(stripos($tmp, 'Baiduspider-news') >0){$flag = '百度新闻蜘蛛';}
-    else if(stripos($tmp, 'Baiduspider-video') >0){$flag = '百度视频蜘蛛';}
-    else if(stripos($tmp, 'Baidu-Transcoder') >0){$flag = '百度音乐蜘蛛';}
-    else if(stripos($tmp, 'baiduspider-mobile-gate') >0){$flag = '百度移动蜘蛛';}
-    else if(stripos($tmp, 'Baiduspider') >0){$flag = '百度蜘蛛';}
-    //搜搜蜘蛛
-    else if(stripos($tmp, 'Sosospider') >0){$flag = '搜搜蜘蛛';}
-    else if(stripos($tmp, 'Sosoimagespider') >0){$flag = '搜搜图片蜘蛛';}
-    //雅虎蜘蛛
-    else if(stripos($tmp, 'Yahoo! Slurp China') !== false){$flag = '雅虎中文蜘蛛';}
-    else if(stripos($tmp, 'Yahoo ContentMatch Crawler') !== false){$flag = '雅虎竞价蜘蛛';}
-    else if(stripos($tmp, 'Yahoo-MMCrawler') !== false){$flag = '雅虎图片蜘蛛';}
-    else if(stripos($tmp, 'Yahoo! Slurp') !== false){$flag = '雅虎英文蜘蛛';}
-    //微软蜘蛛
-    else if(stripos($tmp, 'msnbot') !== false){$flag = '微软蜘蛛';}
-    else if(stripos($tmp, 'msnbot-media') !== false){$flag = '微软媒体蜘蛛';}
-    else if(stripos($tmp, 'MSNBot-Media') !== false){$flag = '微软多媒体蜘蛛';}
-    else if(stripos($tmp, 'MSNBot-NewsBlogs') !== false){$flag = '微软新闻及blog蜘蛛';}
-    else if(stripos($tmp, 'MSNBot-Academic') !== false){$flag = '微软学术蜘蛛';}
-    else if(stripos($tmp, 'MSNBot') !== false){$flag = '微软网页蜘蛛';}
-    //360蜘蛛
-    else if(stripos($tmp, 'Sosospider') !== false){$flag = '360蜘蛛';}
-    //有道蜘蛛
-    else if(stripos($tmp, 'YodaoBot') !== false || stripos($tmp, 'OutfoxBot') !== false){$flag = '有道蜘蛛';}
-    //搜狗蜘蛛
-    else if(stripos($tmp, 'Sogou web spider') !== false || stripos($tmp, 'Sogou Orion spider') !== false){$flag = '搜狗蜘蛛';}
-    else if(stripos($tmp, 'Sogou inst spider') !== false){$flag = '搜狗蜘蛛';}
-    else if(stripos($tmp, 'Sogou News Spider') !== false){$flag = '搜狗新闻蜘蛛';}
-    else if(stripos($tmp, 'Sogou spider2') !== false){$flag = '搜狗蜘蛛';}
-    else if(stripos($tmp, 'Sogou blog') !== false){$flag = '搜狗blog蜘蛛';}
-    else if(stripos($tmp, 'sogou spider') !== false){$flag = '搜狗蜘蛛';}
-    //其他蜘蛛
-    else if(stripos($tmp, 'bingbot') !== false){$flag = '必应蜘蛛';}
-    else if(stripos($tmp, 'EtaoSpider') !== false){$flag = '一淘网蜘蛛';}
-    else if(stripos($tmp, 'Scooter') !== false){$flag = 'Altavista蜘蛛';}
-    else if(stripos($tmp, 'Lycos_Spider') !== false){$flag = 'Lycos蜘蛛';}
-    else if(stripos($tmp, 'FAST-WebCrawler') !== false){$flag = 'Alltheweb蜘蛛';}
-    else if(stripos($tmp, 'Slurp ASPSeek ASPSeek') !== false){$flag = 'INKTOMI蜘蛛';}
-    else if(stripos($tmp, 'lanshanbot') !== false){$flag = '东方网景爬虫';}
-    else if(stripos($tmp, 'BSpider') !== false){$flag = '日本爬虫';}
-    else if(stripos($tmp, 'fast-webcrawler') !== false){$flag = 'fast-webcrawler';}
-    else if(stripos($tmp, 'Gaisbot') !== false){$flag = 'Gaisbot';}
-    else if(stripos($tmp, 'ia_archiver') !== false){$flag = 'Alexa蜘蛛';}
-    else if(stripos($tmp, 'altavista') !== false){$flag = 'altavista爬虫';}
-    else if(stripos($tmp, 'lycos_spider') !== false){$flag = 'Lycos蜘蛛';}
-    else if(stripos($tmp, 'Inktomi slurp') !== false){$flag = 'Inktomi slurp';}
-    else if(stripos($tmp, 'YandexBot') !== false){$flag = 'YandexBot';}
-    else if(stripos($tmp, 'AhrefsBot') !== false){$flag = 'AhrefsBot';}
-    else if(stripos($tmp, 'ezooms.bot') !== false){$flag = 'ezooms.bot';}
-    else if(stripos($tmp, 'YisouSpider') !== false){$flag = '神马搜索';}
-    else if(stripos($tmp, 'MJ12bot') !== false){$flag = 'majestic.com';}
-    else{$flag = '';}
-    return $flag;
+function isbot($tmp) {
+    // 定义蜘蛛识别规则集（保持原顺序）
+    $rules = [
+        ['patterns' => ['compatible; Googlebot/2.1'], 'label' => '谷歌蜘蛛'],
+        ['patterns' => ['Googlebot-Mobile'], 'label' => '谷歌蜘蛛'],
+        ['patterns' => ['Googlebot-Image'], 'label' => '谷歌图片蜘蛛'],
+        ['patterns' => ['Mediapartners-Google'], 'label' => '谷歌广告蜘蛛'],
+        ['patterns' => ['Adsbot-Google'], 'label' => '谷歌质量蜘蛛'],
+        ['patterns' => ['Googlebot'], 'label' => '谷歌蜘蛛'],
+        ['patterns' => ['GoogleOther'], 'label' => '谷歌蜘蛛'],
+        ['patterns' => ['Baiduspider-mobile'], 'label' => '百度蜘蛛'],
+        ['patterns' => ['Baidu-Thumbnail'], 'label' => '百度图片蜘蛛'],
+        ['patterns' => ['Baiduspider-image'], 'label' => '百度图片蜘蛛'],
+        ['patterns' => ['Baiduspider-news'], 'label' => '百度新闻蜘蛛'],
+        ['patterns' => ['Baiduspider-video'], 'label' => '百度视频蜘蛛'],
+        ['patterns' => ['Baidu-Transcoder'], 'label' => '百度音乐蜘蛛'],
+        ['patterns' => ['baiduspider-mobile-gate'], 'label' => '百度移动蜘蛛'],
+        ['patterns' => ['Baiduspider'], 'label' => '百度蜘蛛'],
+        ['patterns' => ['Sosospider'], 'label' => '搜搜蜘蛛'],
+        ['patterns' => ['Sosoimagespider'], 'label' => '搜搜图片蜘蛛'],
+        ['patterns' => ['Yahoo! Slurp China'], 'label' => '雅虎中文蜘蛛'],
+        ['patterns' => ['Yahoo ContentMatch Crawler'], 'label' => '雅虎竞价蜘蛛'],
+        ['patterns' => ['Yahoo-MMCrawler'], 'label' => '雅虎图片蜘蛛'],
+        ['patterns' => ['Yahoo! Slurp'], 'label' => '雅虎英文蜘蛛'],
+        ['patterns' => ['msnbot'], 'label' => '微软蜘蛛'],
+        ['patterns' => ['msnbot-media'], 'label' => '微软媒体蜘蛛'],
+        ['patterns' => ['MSNBot-Media'], 'label' => '微软多媒体蜘蛛'],
+        ['patterns' => ['MSNBot-NewsBlogs'], 'label' => '微软新闻及blog蜘蛛'],
+        ['patterns' => ['MSNBot-Academic'], 'label' => '微软学术蜘蛛'],
+        ['patterns' => ['MSNBot'], 'label' => '微软网页蜘蛛'],
+        ['patterns' => ['Sosospider'], 'label' => '360蜘蛛'], // 注意：此规则在搜搜之后
+        ['patterns' => ['360Spider'], 'label' => '360蜘蛛'], // 注意：此规则在搜搜之后
+        ['patterns' => ['YodaoBot', 'OutfoxBot'], 'label' => '有道蜘蛛'],
+        ['patterns' => ['Sogou web spider', 'Sogou Orion spider'], 'label' => '搜狗蜘蛛'],
+        ['patterns' => ['Sogou inst spider'], 'label' => '搜狗蜘蛛'],
+        ['patterns' => ['Sogou News Spider'], 'label' => '搜狗新闻蜘蛛'],
+        ['patterns' => ['Sogou spider2'], 'label' => '搜狗蜘蛛'],
+        ['patterns' => ['Sogou blog'], 'label' => '搜狗blog蜘蛛'],
+        ['patterns' => ['sogou spider'], 'label' => '搜狗蜘蛛'],
+        ['patterns' => ['bingbot'], 'label' => '必应蜘蛛'],
+        ['patterns' => ['EtaoSpider'], 'label' => '一淘网蜘蛛'],
+        ['patterns' => ['Scooter'], 'label' => 'Altavista蜘蛛'],
+        ['patterns' => ['Lycos_Spider'], 'label' => 'Lycos蜘蛛'],
+        ['patterns' => ['FAST-WebCrawler'], 'label' => 'Alltheweb蜘蛛'],
+        ['patterns' => ['Slurp ASPSeek ASPSeek'], 'label' => 'INKTOMI蜘蛛'],
+        ['patterns' => ['lanshanbot'], 'label' => '东方网景爬虫'],
+        ['patterns' => ['BSpider'], 'label' => '日本爬虫'],
+        ['patterns' => ['fast-webcrawler'], 'label' => 'fast-webcrawler'],
+        ['patterns' => ['Gaisbot'], 'label' => 'Gaisbot'],
+        ['patterns' => ['ia_archiver'], 'label' => 'Alexa蜘蛛'],
+        ['patterns' => ['altavista'], 'label' => 'altavista爬虫'],
+        ['patterns' => ['lycos_spider'], 'label' => 'Lycos蜘蛛'],
+        ['patterns' => ['Inktomi slurp'], 'label' => 'Inktomi slurp'],
+        ['patterns' => ['YandexBot'], 'label' => 'Yandex蜘蛛'],
+        ['patterns' => ['AhrefsBot'], 'label' => 'AhrefsBot'],
+        ['patterns' => ['ezooms.bot'], 'label' => 'ezooms.bot'],
+        ['patterns' => ['YisouSpider'], 'label' => '神马搜索'],
+        ['patterns' => ['MJ12bot'], 'label' => 'Majestic爬虫'],
+        ['patterns' => ['SemrushBot'], 'label' => 'Semrush爬虫'],
+        ['patterns' => ['DuckDuckBot'], 'label' => 'DuckDuckGo蜘蛛'],
+        ['patterns' => ['facebookexternalhit'], 'label' => 'Facebook爬虫'],
+        ['patterns' => ['Twitterbot'], 'label' => 'Twitter爬虫'],
+        ['patterns' => ['LinkedInBot'], 'label' => 'LinkedIn爬虫'],
+        ['patterns' => ['Pinterestbot'], 'label' => 'Pinterest爬虫'],
+        ['patterns' => ['DotBot'], 'label' => 'DotNet爬虫'],
+        ['patterns' => ['PetalBot'], 'label' => 'Petal爬虫'],
+        ['patterns' => ['Exabot'], 'label' => 'Exalead爬虫'],
+        ['patterns' => ['SeznamBot'], 'label' => 'Seznam爬虫'],
+        ['patterns' => ['Slurp'], 'label' => 'Yahoo爬虫'],
+        ['patterns' => ['rogerbot'], 'label' => 'Moz爬虫'],
+        ['patterns' => ['BLEXBot'], 'label' => 'BLEXBot爬虫'],
+        ['patterns' => ['Nimbostratus'], 'label' => 'CloudFlare爬虫'],
+    ];
+
+    foreach ($rules as $rule) {
+        foreach ($rule['patterns'] as $pattern) {
+            if (stripos($tmp, $pattern) !== false) {
+                return $rule['label'];
+            }
+        }
+    }
+
+    return '';
 }
 
-function ClientType(){
-    // 判断蜘蛛
-    $bot = isbot($_SERVER['HTTP_USER_AGENT']);
-    //蜘蛛不存在
-    $msg = "未知";
-    if(!$bot) {
-        if(stripos($_SERVER['HTTP_ACCEPT'], 'text/html') !== false){
-            //可能是真实浏览器
-            $msg = "访客";
-        }
-    }else{
-        $msg = "蜘蛛：".$bot;
+function ClientType() {
+    // 安全获取 HTTP 头部信息
+    $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+    $httpAccept = $_SERVER['HTTP_ACCEPT'] ?? '';
+
+    // 优先检测蜘蛛类型
+    if ($botType = isbot($userAgent)) {
+        return "蜘蛛：" . $botType;
     }
-    return $msg;
+
+    // 非蜘蛛设备分类逻辑
+    if (stripos($httpAccept, 'text/html') !== false) {
+        return "访客";
+    }
+
+    // API 客户端、爬虫工具等特殊类型
+    // 常见爬虫工具列表
+    $crawlerTools = [
+        'curl' => 'cURL命令行工具',
+        'wget' => 'Wget下载工具',
+        'python' => 'Python爬虫',
+        'java' => 'Java爬虫',
+        'php' => 'PHP爬虫',
+        'perl' => 'Perl爬虫',
+        'ruby' => 'Ruby爬虫',
+        'go-http-client' => 'Go爬虫',
+        'node-fetch' => 'Node.js爬虫',
+        'libwww' => 'libwww-perl工具',
+        'okhttp' => 'OkHttp客户端',
+        'http-client' => 'HTTP客户端',
+        'apache-httpclient' => 'Apache HTTP客户端',
+        'axios' => 'Axios HTTP客户端',
+    ];
+    // 检查爬虫工具
+    foreach ($crawlerTools as $key => $name) {
+        if (stripos($userAgent, $key) !== false) {
+            return $name;
+            /*return [
+                'type' => '爬虫',
+                'name' => $name,
+                'icon' => '🤖',
+                'description' => '这是自动化脚本或工具，用于抓取网页数据',
+                'bot_keyword' => $key
+            ];*/
+        }
+    }
+
+    // 默认未知类型
+    return "未知";
 }
 
 /**
@@ -3183,14 +3602,14 @@ function mini_jump($url,$sec=0)
 /**
  * @param array $param
  * @return string
- * 生成 HTML 文件
+ * 生成 HTML 文件名
  */
 function buildHtml($param = []){
     if(empty($param)){
         $param = request()->get();
     }
     //生成静态
-    $staticHtmlDir = "html/" . \think\facade\Request::controller();
+    $staticHtmlDir = "html/". Cfg('view_path') .'/' . \think\facade\Request::controller();
     //目录不存在，则创建
     if(!file_exists($staticHtmlDir)){
         mkdir($staticHtmlDir,0755,true);
@@ -3252,4 +3671,225 @@ function ViewHtml($star=0,$param=[]){
         afterBuild($html,$param);
     }
     return $html;
+}
+
+function VodData($args){
+    if(!is_array($args)){
+        $args = json_decode($args,true);
+        if(!is_array($args['where'])){
+            $args['where'] = json_decode($args['where']);
+        }
+    }
+    static $defaults = [
+        'table'=>'vod',
+        'tables'=>'category',
+        'alias'=>'a',
+        'alias2'=>'b',
+        'condition'=>'b.id= a.type_id',
+        'where'=>[],
+        'order'=>'vod_id desc',
+        'field'=>'a.*,b.name as nickname',
+        'page'=>0,
+        'limit'=>10,
+    ];
+    $table = $args['table'] ?? $defaults['table'];
+    $tables = $args['tables'] ?? $defaults['tables'];
+    $alias = $args['alias'] ?? $defaults['alias'];
+    $alias2 = $args['alias2'] ?? $defaults['alias2'];
+    $condition = $args['condition'] ?? $defaults['condition'];
+    $where = $args['where'] ?? $defaults['where'];
+    $order = $args['order'] ?? $defaults['order'];
+    $field = $args['field'] ?? $defaults['field'];
+    $page = $args['page'] ?? $defaults['page'];
+    $limit = $args['limit'] ?? $defaults['limit'];
+    return Db::name($table)->alias($alias)->leftJoin($tables.' '.$alias2.' ',$condition)->field($field)->where($where)->order($order)->page($page,$limit)->select()->toArray();
+}
+
+function VodDetail($args){
+    if(!is_array($args)){
+        $args = json_decode($args,true);
+        if(!is_array($args['where'])){
+            $args['where'] = json_decode($args['where']);
+        }
+    }
+    unset($args['names']);
+    static $defaults = [
+        'table'=>'vod',
+        'tables'=>'category',
+        'alias'=>'a',
+        'alias2'=>'b',
+        'condition'=>'b.id= a.type_id',
+        'where'=>[],
+        'field'=>'a.*,b.name as nickname',
+    ];
+    if(array_key_exists('field',$args) && $args['field']){
+        $defaults['field'] = 'a.'.$args['field'].',b.name as nickname';
+    }
+    if(array_key_exists('field',$args) && $args['field'] == 'nickname'){
+        $args['field'] = 'a.*,b.name as nickname';
+    }
+    $table = $args['table'] ?? $defaults['table'];
+    $tables = $args['tables'] ?? $defaults['tables'];
+    $alias = $args['alias'] ?? $defaults['alias'];
+    $alias2 = $args['alias2'] ?? $defaults['alias2'];
+    $condition = $args['condition'] ?? $defaults['condition'];
+    $where = $args['where'] ?? $defaults['where'];
+    $field = $args['field'] ?? $defaults['field'];
+
+    return Db::name($table)->alias($alias)->leftJoin($tables.' '.$alias2.' ',$condition)->field($field)->where($where)->find();
+}
+
+function vodExplode($str,$fromkey=''){
+    $pf = explode('$$$',$str);
+    $seep = [];
+    $i = 1;
+    foreach ($pf as $v){
+        $seep[$i++] = $v;
+    }
+    if($fromkey){
+        $fkey = explode('$$$',$fromkey);
+        $j = 1;
+        foreach ($fkey as $item){
+            $seep[$item] = $seep[$j];
+            unset($seep[$j]);
+            $j++;
+        }
+    }
+    return $seep;
+}
+
+function expUrl($str){
+    $pairs = explode('$', $str);
+    return $pairs;
+}
+
+function vodSeep($str,$type=0){
+    // 步骤1：按 "#" 分割成多个键值对片段
+    if(strstr($str,'#')){
+        $pairs = explode('#', $str);
+    }else{
+        $pairs = explode(chr(13), $str);
+    }
+    $result = [];
+
+    // 步骤2：遍历每个片段，按 "$" 分割键值
+    $i = 1;
+    foreach ($pairs as $pair) {
+        $parts = explode('$', $pair, 2); // 限制分割为2部分
+
+        // 确保分割后得到完整键值对
+        if (count($parts) === 2) {
+            $key = $parts[0];        // 键：$左边内容
+            $value = $parts[1];      // 值：$右边内容
+            if($type == 1){
+                $result['page'][$i] = $key;  // 存入结果数组
+                $result['purl'][$i] = $value;  // 存入结果数组
+                $i++;
+            }else{
+                $result[$key] = $value;  // 存入结果数组
+            }
+        }
+    }
+    return $result;
+}
+
+function VodPlay(){
+    $data = playLIst();
+    return $data[0];
+}
+
+function playLIst(){
+    $id = request()->param('id');
+    $vid = explode('-',$id);
+    $arr = [['vod_id','=',$vid[0]]];
+    $args['where'] = array_merge($arr,[['vod_status','=',1]]);
+    $args['field'] = 'a.*,b.name as nickname';
+
+    $data = VodDetail(json_encode($args));
+
+    $pfrom = vodExplode($data['vod_play_from']);
+
+    $play = config('vodplay');
+    $playurl = vodExplode($data['vod_play_url']);
+
+    foreach ($playurl as $k=>$v){
+        if($play[$pfrom[$k]]['status'] == 1){
+            $data['play_info'][$k] = vodSeep($v,1);
+            $data['play_info'][$k]['play_from'] = $play[$pfrom[$k]];
+        }
+    }
+
+    // 假设原始数组名为 $data
+    $data['play_info'] = array_map(function($item) {
+        return $item; // 返回元素本身（实际不需要修改内容）
+    }, $data['play_info']);
+
+    // 创建新数组重新索引
+    $newPlayInfo = [];
+    foreach ($data['play_info'] as $k=>$item) {
+        $sortKey = $item['play_from']['sort'];
+        if(array_key_exists($sortKey,$newPlayInfo)){
+            $newPlayInfo[$sortKey+$k] = $item;
+        }else{
+            $newPlayInfo[$sortKey] = $item;
+        }
+    }
+
+    //  $newPlayInfo 降序排序
+    krsort($newPlayInfo,SORT_REGULAR);
+    $newInfo = [];
+    $i = 1;
+    foreach ($newPlayInfo as $k=>$v){
+        $newInfo[$i++] = $v;
+    }
+    // 替换原数组
+    $data['play_info'] = $newInfo;
+    $data['select_from'] = '';
+    $data['select_page'] = '';
+    $data['select_url'] = '';
+    $data['select_ps'] = '';
+    $data['select_parse'] = '';
+    if(count($vid) >= 2){
+        if(array_key_exists($vid[1],$data['play_info'])){
+            $data['select_from'] = $data['play_info'][$vid[1]]['play_from']['from'];
+            $data['select_ps'] = $data['play_info'][$vid[1]]['play_from']['ps'];
+            $data['select_parse'] = $data['play_info'][$vid[1]]['play_from']['parse'];
+            if(array_key_exists($vid[2],$data['play_info'][$vid[1]]['purl'])){
+                $data['select_page'] = $data['play_info'][$vid[1]]['page'][$vid[2]];
+                $data['select_url'] = $data['play_info'][$vid[1]]['purl'][$vid[2]];
+            }
+        }
+    }
+
+    return [$data];
+}
+
+function topNav($limit = 16){
+    $table = 'navigation';
+    $table2 = 'classify';
+    $field = 'a.*,b.name,b.route,b.routes';
+    $start = 0;
+    $size = $limit;
+    $where = [['a.is_show','=',1]];
+    $order = ['a.click'=>'desc'];
+    $data = Db::name($table)->alias('a')->join($table2.' b ','b.id= a.cid')->field($field)->where($where)->order($order)->page($start,$size)->select()->toArray();
+    return $data;
+}
+
+//文件大小单位转换================================
+function toSize($size){
+    $dw = 'Bytes';
+    if($size > pow(2 , 30)){
+        $size = round($size/pow(2,30),2);
+        $dw = ' GB';
+    }else if($size > pow(2,20)){
+        $size = round($size/pow(2,20),2);
+        $dw = ' MB';
+    }else if($size > pow(2,10)){
+        $size = round($size/pow(2,10),2);
+        $dw = ' KB';
+    }else{
+        $dw = ' Bytes';
+    }
+    return $size.($dw);
 }

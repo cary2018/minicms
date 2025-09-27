@@ -42,6 +42,15 @@
                             </div>
 
                             <div class="layui-input-inline">
+                                <select name="attrId" layui.formselect>
+                                    <option value="">{$Think.lang.DownSelect}</option>
+                                    {volist name="attr" id="item"}
+                                    <option value="{$item.id}" >{$item.remarks}</option>
+                                    {/volist}
+                                </select>
+                            </div>
+
+                            <div class="layui-input-inline">
                                 <select name="cid" layui.formselect>
                                     <option value="">{$Think.lang.DownSelect}</option>
                                     {volist name="tree" id="item"}

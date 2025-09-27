@@ -44,14 +44,7 @@
                                 <input type="text" name="to_url" placeholder="{$Think.lang.to_url}" autocomplete="off" class="layui-input">
                             </div>
                         </div>
-                        <div class="layui-inline" style="width:130px;">
-                            <select name="clientType" layui.formselect>
-                                <option value="">{$Think.lang.DownSelect}{$Think.lang.type}</option>
-                                <option value="{$Think.lang.TypeUN}" >{$Think.lang.TypeUN}</option>
-                                <option value="{$Think.lang.TypeVI}" >{$Think.lang.TypeVI}</option>
-                                <option value="{$Think.lang.TypeSP}" >{$Think.lang.TypeSP}</option>
-                            </select>
-                        </div>
+
                         <div class="layui-inline" style="width:130px;">
                             <select name="guv" layui.formselect>
                                 <option value="">{$Think.lang.pv_count}</option>
@@ -140,8 +133,8 @@
                         }
                     }},
                 {field: 'region', align: 'center',title: '{$Think.lang.region}'},
-                {field: 'clientInfo', align: 'center',width:130,title: '{$Think.lang.clientInfo}'},
-                {field: 'clientType', align: 'center',width:100,title: '{$Think.lang.type}'},
+                /*{field: 'clientInfo', align: 'center',width:130,title: '{$Think.lang.clientInfo}'},
+                {field: 'clientType', align: 'center',width:100,title: '{$Think.lang.type}'},*/
                 {field: 'createTime',width:160, align: 'center',title: '{$Think.lang.createTime}'},
                 {title: '{$Think.lang.operate}', width: 80, toolbar: '#toolBar', align: "center"}
             ]],

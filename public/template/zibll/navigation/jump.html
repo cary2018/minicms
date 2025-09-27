@@ -1,0 +1,106 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="refresh" content="1;url={$url}">
+    <title>页面跳转中...</title>
+    <style>
+        body{background:#000}.loading{-webkit-animation:fadein 1s;-moz-animation:fadein 1s;-o-animation:fadein 1s;animation:fadein 1s}@-moz-keyframes fadein{from{opacity:0}to{opacity:1}}@-webkit-keyframes fadein{from{opacity:0}to{opacity:1}}@-o-keyframes fadein{from{opacity:0}to{opacity:1}}@keyframes fadein{from{opacity:0}to{opacity:1}}.spinner-wrapper{position:absolute;top:0;left:0;z-index:300;height:100%;min-width:100%;min-height:100%;background:rgba(255,255,255,0.93)}.spinner-text{position:absolute;top:50%;left:50%;margin-left:-90px;margin-top: 2px;color:#BBB;letter-spacing:1px;font-weight:700;font-size:36px;font-family:Arial}.spinner{position:absolute;top:50%;left:50%;display:block;margin-left:-160px;width:1px;height:1px;border:25px solid rgba(255,0,0,1);-webkit-border-radius:50px;-moz-border-radius:50px;border-radius:50px;border-left-color:transparent;border-right-color:transparent;-webkit-animation:spin 1.5s infinite;-moz-animation:spin 1.5s infinite;animation:spin 1.5s infinite}@-webkit-keyframes spin{0%,100%{-webkit-transform:rotate(0deg) scale(1)}50%{-webkit-transform:rotate(720deg) scale(0.6)}}@-moz-keyframes spin{0%,100%{-moz-transform:rotate(0deg) scale(1)}50%{-moz-transform:rotate(720deg) scale(0.6)}}@-o-keyframes spin{0%,100%{-o-transform:rotate(0deg) scale(1)}50%{-o-transform:rotate(720deg) scale(0.6)}}@keyframes spin{0%,100%{transform:rotate(0deg) scale(1)}50%{transform:rotate(720deg) scale(0.6)}}
+
+        /* keyFrames */
+        @keyframes rotation {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loader-8 {
+            width: 48px;
+            height: 48px;
+            border: 3px solid #aaa;
+            border-radius: 50%;
+            display: inline-block;
+            position: relative;
+            animation: rotation 1s linear infinite;
+        }
+
+        .loader-8:after {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: #FF3D00;
+            width: 16px;
+            height: 16px;
+            transform: translate(-50%, 50%);
+            border-radius: 50%;
+        }
+    </style>
+    <style type="text/css">
+        .qa-sdk-wrapper {
+            position: fixed;
+            width: 400px;
+            right: -600px;
+            max-height: 530px;
+            overflow: hidden;
+            border-radius: 4px;
+            box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.1);
+            transition: all 0.5s ease-in-out;
+            background: #fff;
+        }
+
+        .qa-sdk-close-btn {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            position: absolute;
+            top: 16px;
+            right: 16px;
+        }
+
+        .qa-sdk-close-btn:hover {
+            border-radius: 50%;
+            background-color: #d5d9df;
+        }
+
+        #qa-sdk-iframe {
+            width: 400px;
+        }
+
+        @media (min-width: 1024px) and (max-width: 1366px) {
+            .qa-sdk-wrapper{
+                width: 356px;
+            }
+            #qa-sdk-iframe {
+                width: 356px;
+            }
+        }
+    </style>
+    <style type="text/css">
+        #_copy{align-items:center;background:#4494d5;border-radius:3px;color:#fff;cursor:pointer;display:flex;font-size:13px;height:30px;justify-content:center;position:absolute;width:60px;z-index:1000}#select-tooltip,#sfModal,.modal-backdrop,div[id^=reader-helper]{display:none!important}.modal-open{overflow:auto!important}._sf_adjust_body{padding-right:0!important}.super_copy_btns_div{position:fixed;width:154px;left:10px;top:45%;background:#e7f1ff;border:2px solid #4595d5;font-weight:600;border-radius:2px;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,PingFang SC,Hiragino Sans GB,Microsoft YaHei,Helvetica Neue,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol;z-index:5000}.super_copy_btns_logo{width:100%;background:#4595d5;text-align:center;font-size:12px;color:#e7f1ff;line-height:30px;height:30px}.super_copy_btns_btn{display:block;width:128px;height:28px;background:#7f5711;border-radius:4px;color:#fff;font-size:12px;border:0;outline:0;margin:8px auto;font-weight:700;cursor:pointer;opacity:.9}.super_copy_btns_btn:hover{opacity:.8}.super_copy_btns_btn:active{opacity:1}
+    </style>
+    <style id="ai-assist-webType-style">
+        .ai-assist-highlight {
+            background: yellow;
+        }
+        @media print {
+            #ai-assist-root-bangs,
+            #ai-assist-root-bilibili,
+            #ai-assist-root-new {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="loading">
+    <div class="spinner-wrapper">
+        <span class="spinner-text">页面跳转中...</span>
+        <span class="spinner loader-8"></span>
+    </div>
+</div>
+</body>
+</html>

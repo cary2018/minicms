@@ -99,7 +99,7 @@
                 {type: "checkbox", width: 50},
                 {field: 'collect_id', align:"center", width: 80, title: 'ID', sort: true},
                 {field: 'collect_name', align: 'center',width:150,title: '{$Think.lang.collect_name}',templet:function(d){
-                        return '<a href="{:url(\'api\')}?'+d.jump+'">'+d.collect_name+'</a>'
+                        return '<a action="{:url(\'api\')}?'+d.jump+'&name='+d.collect_name+'" title="'+d.collect_name+'" lay-event="JumpPage">'+d.collect_name+'</a>'
                     }},
                 {field: 'collect_type', align: 'center',width:100,title: '{$Think.lang.collect_type}'},
                 {field: 'collect_mid', align: 'center',width:100,title: '{$Think.lang.collect_mid}'},

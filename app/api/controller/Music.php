@@ -17,8 +17,10 @@ namespace app\api\controller;
 use app\api\MusicController;
 use Metowolf\Meting;
 //header('Access-Control-Allow-Origin: *');
+
 class Music extends MusicController
 {
+    private $sourceKey = 'kwplayerhd_ar_4.3.0.8_tianbao_T1A_qirui.apk';
     public function index(){
         /**
          *
@@ -326,6 +328,25 @@ class Music extends MusicController
     //图片
     public function kwpic(){
         $id = request()->param('id');
+        // https 下访问会出错
+        /*$url = 'http://artistpic.kwcdn.kuwo.cn/pic.web';
+        $param = [
+            'rid'=>$id,//歌曲id
+            'type'=>'rid_pic',
+            'pictype'=>'url',
+            'size'=>'500',
+        ];
+        $data = GetCurl($url,$param);
+        if($data['response_code']==200){
+            $result = $data['output'];
+            if($result != 'Wrong'){
+                return redirect($result);
+            }else{
+                return '请求出错啦.....';
+            }
+        }else{
+            return '请求失败。。。';
+        }*/
         $url = 'http://m.kuwo.cn/newh5/singles/songinfoandlrc';
         $param = [
             'musicId'=>$id,//歌曲id
@@ -383,7 +404,8 @@ class Music extends MusicController
         $url = 'http://mobi.kuwo.cn/mobi.s';
         $param = [
             'f'=>'web',
-            'source'=>'kwplayerhd_ar_4.3.0.8_tianbao_T1A_qirui.apk',
+            'user'=>0,
+            'source'=>$this->sourceKey,
             'type'=>'convert_url_with_sign',
             'rid'=>$id,
             'br'=>'320kmp3'
@@ -452,7 +474,8 @@ class Music extends MusicController
         $url = 'http://nmobi.kuwo.cn/mobi.s';
         $param = [
             'f'=>'web',
-            'source'=>'kwplayerhd_ar_4.3.0.8_tianbao_T1A_qirui.apk',
+            'user'=>0,
+            'source'=>$this->sourceKey,
             'type'=>'convert_url_with_sign',
             'rid'=>$id,
             'br'=>'320kmp3'
@@ -474,36 +497,40 @@ class Music extends MusicController
                 }
                 $path = parse_url($des->url);
                 $reUrl = transformUrl($des->url);
-                //echo $reUrl;
-                //return $reUrl;
                 //return redirect($reUrl);
             }
         }
-
-        $song = 'http://m.kuwo.cn/newh5/singles/songinfoandlrc';
+        $song = 'http://musicpay.kuwo.cn/music.pay';
         $info = [
-            'musicId'=>$id,//歌曲id
-            'httpsStatus'=>1,
-            'reqId'=>'969ba290-4b49-11eb-8db2-ebd372233623',
+            'ids'=>$id,//歌曲id
+            'uid'=>'',
+            'sid'=>'',
+            'accttype'=>1,
+            'action'=>'play',
+            'signver'=>'new',
+            'op'=>'query',
+            'src'=>'mbox',
+            'ver'=>'MUSIC_8.7.6.0_BDS4',
+            'reqId'=>'fcd6bc60-3e06-11ec-8722-67bb659a8433',
         ];
         $data = GetCurl($song,$info);
         $fileName = uniqid();
         if($data['response_code']==200){
             $result = json_decode($data['output']);
-            if($result->status == 200){
-                $sogInfo = $result->data->songinfo;
-                $fileName = $sogInfo->songName.'-'.$sogInfo->artist;
+            if($result->result == 'ok'){
+                $sogInfo = $result->songs[0];
+                $fileName = $sogInfo->name.'-'.$sogInfo->artist;
             }else{
                 echo $result->msg;
             }
         }else{
             echo '请求失败。。。';
         }
-
         $url = 'http://mobi.kuwo.cn/mobi.s';
         $param = [
             'f'=>'web',
-            'source'=>'kwplayerhd_ar_4.3.0.8_tianbao_T1A_qirui.apk',
+            'user'=>0,
+            'source'=>$this->sourceKey,
             'type'=>'convert_url_with_sign',
             'rid'=>$id,
             'br'=>'320kmp3'
@@ -538,22 +565,7 @@ class Music extends MusicController
             return '获取数据失败！！！';
         }
     }
-    public function toSize($size){
-        $dw = 'Bytes';
-        if($size > pow(2 , 30)){
-            $size = round($size/pow(2,30),2);
-            $dw = ' GB';
-        }else if($size > pow(2,20)){
-            $size = round($size/pow(2,20),2);
-            $dw = ' MB';
-        }else if($size > pow(2,10)){
-            $size = round($size/pow(2,10),2);
-            $dw = ' KB';
-        }else{
-            $dw = ' Bytes';
-        }
-        return $size.($dw);
-    }
+
     public function kwpurl(){
         $id = request()->param('id');
         $type = request()->param('type');
@@ -577,6 +589,33 @@ class Music extends MusicController
         }
         
     }
+    //公告通知
+    public function notice(){
+        $notice = [
+            'notice'=>[
+                "所有数据均来自网络，不保证一直有效，且听且珍惜！",
+                "如有疑问请前往<a href='https://www.itmkk.com/index/message?id=15' target='_blank'>《留言板》</a>进行留言，虽然我不一定会理你",
+                "网站为爱发电，站长不想弄的时候或许会关闭分享",
+            ],
+            'sayings'=>[
+                'author'=>'作者：Hyy-Cary',
+                'sayings'=>'语录：凡人寻仙问道，我的机缘快快出来！',
+                'explain'=>'说明：网站仅用于学习和研究使用， 页面清爽纯净简洁，不存储任何音乐数据， 仅娱乐，在条件允许的情况下尽量支持正版音乐！',
+            ],
+            'reward'=>[
+                'wechat'=>'/images/wechat.png',
+                'aliplay'=>'/images/aliplay.jpg',
+            ],
+        ];
+        return json_encode($notice,JSON_UNESCAPED_UNICODE);
+    }
+
+    public function ransay(){
+        $msg = GetCurl('https://api.nxvav.cn/api/yiyan/?encode=json&charset=utf-8');
+        $txt = json_decode($msg['output']);
+        return '语录：'.$txt->yiyan;
+    }
+
     public function test(){
         $param = request()->param();
         // 示例参数（需与前端一致）

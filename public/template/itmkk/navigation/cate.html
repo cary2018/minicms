@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html xml:lang="zh-cn" lang="zh-cn">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover" />
+    <meta name="applicable-device" content="pc,mobile" />
+    <meta name="renderer" content="webkit" />
+    <meta name="force-rendering" content="webkit" />
+    <title>{cymini:navlist}{$vo.name}{/cymini:navlist}-{$Think.config.web.web_title}</title>
+    <meta name="Keywords" content="{$Think.config.web.web_key}" />
+    <meta name="description" content="{$Think.config.web.web_desc}" />
+    <meta property="og:type" content="category" />
+    <meta property="og:title" content="{$Think.config.web.web_title}" />
+    <meta property="og:description" content="{$Think.config.web.web_desc}" />
+    {include file='layout/file-js'}
+    {include file='layout/file-style'}
+    <!--<link rel="stylesheet" href="{$view_path}/static/css/navigation.css" type="text/css" media="all" />-->
+    <link rel="stylesheet" href="{$view_path}/static/css/navstyle.css" type="text/css" media="all" />
+    {include file='layout/icon'}
+
+    <!--[if lt IE 9]><script src="https://cdn.staticfile.org/html5shiv/3.7.0/html5shiv.js"></script><![endif]-->
+<style type="text/css">
+    .ag-search{
+        position: relative;
+        margin: auto;
+        width: 70%;
+        padding: 20px;
+    }
+    #ag-search {
+        margin: 0 auto;
+        max-width: 80%;
+    }
+    #ag-search form {
+        position: relative;
+    }
+    #ag-search-text {
+        padding: 0 57px 0 20px;
+        width: 100%;
+        height: 48px;
+        border: 0;
+        border-radius: 30px;
+        font-size: 14px;
+        line-height: 48px;
+        outline: 0;
+        border: .01rem solid #e6e6e6;
+    }
+    #ag-search {
+        position: absolute;
+        /*top: 0;*/
+        right: 0;
+        width: 52px;
+        height: 48px;
+        border: 0;
+        border-radius: 0 30px 30px 0;
+        line-height: 48px;
+        cursor: pointer;
+    }
+    #ag-search button::after {
+        content: "\f6c6";
+    }
+    #ag-search button::after, .type-text::after {
+        font-family: uicons-regular-rounded;
+    }
+</style>
+</head>
+<body class="home home-category" style="transform: none;">
+
+{include file='layout/navmenu'}
+
+<div class="container">
+
+    <div style="margin:10px 0">
+        <i class="icon font-home"></i>
+        <a href="/">首页</a>
+        {cymini:navlist}
+        <i class="icon font-angle-right"></i>
+        {if $vo.id}
+        <a href="{$vo.route}?id={$vo.id}" title="{$vo.name}">{$vo.name}</a>
+        {else}
+        {$vo.name}
+        {/if}
+        {/cymini:navlist}
+    </div>
+    <div class="row same-height row-position">
+        <!-- diy-tab  -->
+        <div class="col-md-12 same-height-r">
+            <div class="part" style="position: relative;">
+                <div class="items">
+                    <div class="ag-search">
+                        <form action="" method="get" id="ag-search-form">
+                            <input type="text" name="wd" value="{$Request.param.wd?$Request.param.wd:''}" id="ag-search-text" autocomplete="off" placeholder="搜索。。。">
+                            <button id="ag-search" type="submit" title="搜索">
+                                <i class="layui-icon layui-icon-search"></i>
+                            </button>
+                        </form>
+                    </div>
+                    <div class="art-main">
+                        <span class="undcate {if $vo.id == ''}selcate{/if}">
+                            <a title="" href="/index/navigation/cate">全部</a>
+                        </span>
+                        {cymini:table table='classify' where='["status","=",1]' order="orderBy desc"}
+                        <span class="undcate {if $vo.id == $__navlist__[0]['id']}selcate{/if}">
+                            <a title="{$vo.name}" href="{$vo.route}?id={$vo.id}">{$vo.name}</a>
+                        </span>
+                        {/cymini:table}
+                    </div>
+                </div>
+            </div>
+
+            {cymini:navlist limit='16'}
+            <div class="part" id="cate-{$key}" data-title="{$vo.name}" style="position: relative;">
+                <div class="items">
+                    <div class="row">
+                        {volist name='$vo.list' id='do'}
+                        <div class="col-xs-6 col-sm-4 col-md-3">
+                            <div class="item">
+                                <div class="diva" >
+                                    {if $do.logo}
+                                    <img class="img-bao" src="{$do.logo|ImgPath}" alt="{$do.keywords}" title="{$do.keywords}" />
+                                    {else}
+                                    <img class="img-bao" src="/images/1.png" alt="{$do.keywords}" title="{$do.keywords}" />
+                                    {/if}
+                                    <div class="solititle" >
+                                        <a target="{$do.target}" href="{$do.routes}?url={$do.nav_url}&id={$do.id}" title="{$do.nav_name}">{$do.nav_name}</a>
+                                        {if $do.sun_name}
+                                        |
+                                        <a target="{$do.target}" href="{$do.routes}?url={$do.nav_url}&id={$do.id}" title="{$do.sun_name}">{$do.sun_name}</a>
+                                        {/if}
+                                    </div>
+                                    <p class="partitemp" title="{$do.description}">{$do.description}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {/volist}
+                    </div>
+                </div>
+            </div>
+            {/cymini:navlist}
+            <div style="text-align: center;">
+                {cymini:page total="$__total__" num="16"}
+            </div>
+
+        </div>
+    </div>
+
+</div>
+<style type="text/css">
+    .minicms-page a{
+        display: inline-block;
+        vertical-align: middle;
+        padding: 0 15px;
+        height: 28px;
+        line-height: 28px;
+        margin: 0 -1px 5px 0;
+        background-color: #fff;
+        color: #333;
+        font-size: 12px;
+        border: 1px solid #eee;
+    }
+    .minincms-curr{
+        display: inline-block;
+        vertical-align: middle;
+        padding: 0 15px;
+        height: 28px;
+        line-height: 28px;
+        margin: 0 -1px 5px 0;
+        background-color: #16baaa;
+        color: #fff;
+        font-size: 12px;
+    }
+    .page-disabled{
+        color: #d2d2d2!important;
+        cursor: not-allowed!important
+    }
+    .undcate{
+        display: inline-block;
+        margin: 5px;
+        font-size: 16px;
+        height: 30px;
+        line-height: 30px;
+        padding: 0 15px;
+    }
+    .selcate{
+        background-color: #daf8f5;
+    }
+</style>
+
+
+{include file='layout/footer'}
+<script src="{$view_path}/static/js/main.js"></script>
+<script>var cookieDomain = "https://www.itmkk.com/";</script>
+<script src="{$view_path}/static/js/zh-tw.js"></script>
+<script src="{$view_path}/static/js/custom.js"></script>
+
+</body>
+</html>

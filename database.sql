@@ -62,7 +62,7 @@ CREATE TABLE `cy_vod` (
   `vod_name` varchar(255) NOT NULL DEFAULT '' COMMENT'名称',
   `vod_sub` varchar(255) NOT NULL DEFAULT '' COMMENT'副标题',
   `vod_en` varchar(255) NOT NULL DEFAULT '' COMMENT'拼音',
-  `vod_status` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT'审核状态，1已审核，0未审核',
+  `vod_status` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT'审核状态，1已审核，0待审核',
   `vod_letter` char(1) NOT NULL DEFAULT '' COMMENT'首字母',
   `vod_color` varchar(6) NOT NULL DEFAULT '' COMMENT'颜色',
   `vod_tag` varchar(100) NOT NULL DEFAULT '' COMMENT'TAG标签',

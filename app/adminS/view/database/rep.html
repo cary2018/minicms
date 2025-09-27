@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>{$Think.lang.database_back}</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    {include file="public/file_css"}
+    <style>
+        .layui-form-pane .layui-form-label{
+            width: 122px;
+        }
+        .layui-form-pane .layui-input-block{
+            margin-left:122px;
+        }
+        .min80{
+            min-width:80px;
+            margin:1px 0;
+        }
+    </style>
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+        <form class="layui-form layui-form-pane" id="DataForm" lay-filter="DataForm" onsubmit="return false;">
+            <span id="ActionUrl" alt="{:url('repcon')}"></span>
+            <div class="layui-form-item">
+                <label class="layui-form-label">{$Think.lang.database_table_select}</label>
+                <div class="layui-input-inline" style="min-width:350px;">
+                    <select name="table" lay-filter="table">
+                        {volist name='table' id='vo'}
+                        <option value="{$vo.Name}">{$vo.Name}【{$vo.Comment}】</option>
+                        {/volist}
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">{$Think.lang.database_select_field}</label>
+                <div class="layui-input-block">
+                    <div class="fields"></div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">{$Think.lang.database_replace_field}</label>
+                <div class="layui-input-block">
+                    <input type="tel" id="field" name="field" lay-verify="required" autocomplete="off" class="layui-input demo-phone">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">{$Think.lang.database_replace_where}</label>
+                <div class="layui-input-block">
+                    <input type="text" name="where" placeholder="and id=55" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+
+            <div class="layui-form-item layui-form-text">
+                <div class="layui-input-block">
+                    <textarea name="old" lay-verify="required" placeholder="{$Think.lang.database_replace_content}" class="layui-textarea"></textarea>
+                </div>
+            </div>
+            <div class="layui-form-item layui-form-text">
+                <div class="layui-input-block">
+                    <textarea name="new" lay-verify="required" placeholder="{$Think.lang.database_replace_to}" class="layui-textarea"></textarea>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button type="submit" class="layui-btn" lay-submit lay-filter="doSubmit">{$Think.lang.database_submit}</button>
+                    <button type="reset" class="layui-btn layui-btn-primary">{$Think.lang.database_reset}</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{include file="public/file_js"}
+<script src="/hyy1.0.0/js/jquery.min.js" charset="utf-8"></script>
+<script>
+    layui.use(['form', 'layer'], function(){
+        var form = layui.form
+            , layer = layui.layer,
+            $ = layui.jquery;
+        form.on('select(table)',function (obj) {
+            $.ajax({
+                url:"{:url('columns')}",
+                type:'POST',
+                data:{table:obj.value},
+                success:function (res) {
+                    res = JSON.parse(res);
+                    if(res.code == 200){
+                        $(".fields").html('');
+                        layer.msg(res.msg)
+                        $.each(res.data,function(index,row){
+                            $(".fields").append('<a class="layui-btn layui-btn-xs min80" href="javascript:setField(\''+row.Field+'\')">'+row.Field+'</a>&nbsp;');
+                            if(index>0 && index%5==0){
+                                //$(".fields").append('<br>');
+                            }
+                        });
+                    }else{
+                        layer.msg(res.msg)
+                    }
+                }
+            })
+        });
+    })
+    function setField(v){
+        $('#field').val(v);
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{$Think.lang.AddMenu}</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    {include file="public/file_css"}
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-form layuimini-form">
+
+    <div class="layui-bg-gray" style="padding: 30px;">
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-md6">
+                <div class="layui-card">
+                    <div class="layui-card-header">{$Think.lang.Suspect}：{$data.suspect}</div>
+                    <div class="layui-card-header">{$Think.lang.Victim}：{$data.victim}</div>
+                    <div class="layui-card-header">{$Think.lang.Email}：{$data.email}</div>
+                    <div class="layui-card-header">{$Think.lang.Remark}：{$data.remarks}</div>
+                    <div class="layui-card-header">
+                        {$Think.lang.Identity}：
+                        {if $data.status == 1}
+                        {$Think.lang.Confirm}
+                        {else}
+                        {$Think.lang.Suspected}
+                        {/if}
+                    </div>
+                    <div class="layui-card-header">
+                        {$Think.lang.status}：
+                        {if $data.isShow == 1}
+                        {$Think.lang.Enable}
+                        {else}
+                        {$Think.lang.Disable}
+                        {/if}
+                    </div>
+                    <div class="layui-card-body">
+                        {$Think.lang.createTime}：{$data.createTime|date = 'Y-m-d H:i:s'}
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-md6">
+                <div class="layui-card">
+                    <div class="layui-card-header">{$Think.lang.voucher}</div>
+                    <div class="layui-card-body">
+                        <div id="layer-photos-magnify" class="layer-photos-demo">
+                            {foreach $img as $v}
+                            <img src="/{$v.thumbImg}" layer-src="/{$v.img}" style="width:100px;height:100px;cursor:pointer;">
+                            {/foreach}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{include file="public/file_js"}
+</body>
+</html>

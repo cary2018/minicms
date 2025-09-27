@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{$Think.lang.admin}</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    {include file="public/file_css"}
+    <style type="text/css">
+        .layui-table-cell{
+            text-align:center;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+        .layui-table img{
+            max-width:100%
+        }
+    </style>
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+        <fieldset style="display: none;" id="inputSearch" class="table-search-fieldset">
+            <legend>{$Think.lang.search_info}</legend>
+            <div style="margin: 10px 10px 10px 10px">
+                <form id="searchData" lay-filter="searchData" onsubmit="return false;" class="layui-form layui-form-pane">
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <div class="layui-input-inline">
+                                <input type="text" name="title" placeholder="{$Think.lang.variable_title}" autocomplete="off" class="layui-input">
+                            </div>
+
+                            <div class="layui-input-inline">
+                                <select name="status" layui.formselect>
+                                    <option value="">{$Think.lang.DownSelect}</option>
+                                    {foreach $read as $key=>$vo }
+                                    <option value="{$key}" >{$vo}</option>
+                                    {/foreach}
+                                </select>
+                            </div>
+
+                            <div class="layui-input-inline">
+                                <select name="cid" layui.formselect>
+                                    <option value="">{$Think.lang.DownSelect}</option>
+                                    {volist name="tree" id="item"}
+                                    <option value="{$item.id}" >{$item.p|raw}{$item.name}</option>
+                                    {/volist}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="layui-inline">
+                            <button type="submit" class="layui-btn layui-btn-primary" id="doSearch" lay-submit lay-filter="doSearch""><i class="layui-icon"></i>
+                            {$Think.lang.search}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </fieldset>
+
+        <!--头部工具栏-->
+        <div id="toolbarDemo" style="display: none;background: #fff;">
+            <span id="FieldUrl" alt="{:url('updateField')}" style="display: none"></span>
+            <span id="SwitchUrl" alt="{:url('switchAt')}" style="display: none"></span>
+            <span id="AddUrl" alt="{:url('add')}" style="display: none"></span>
+            <button class="layui-btn layui-btn-sm layui-btn-normal" lay-event="batchRecycle"> {$Think.lang.batchRecycle} </button>
+            <button class="layui-btn layui-btn-sm layui-btn-danger" lay-event="delete"> {$Think.lang.batchDel} </button>
+        </div>
+        <!--数据-->
+        <table class="layui-hide" id="DataDemos" lay-filter="DataDemos"></table>
+        <!--操作-->
+        <script type="text/html" id="toolBar">
+            <span id="DelUrl" alt="{:url('delRecycle')}" style="display: none"></span>
+            <span id="recycleUrl" alt="{:url('revert')}" style="display: none"></span>
+            <span id="ActionUrl" alt="{:url('edit')}" style="display: none"></span>
+            <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="recycle">{$Think.lang.recycle}</a>
+            <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edits">{$Think.lang.edit}</a>
+            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">{$Think.lang.del}</a>
+        </script>
+
+    </div>
+</div>
+{include file="public/file_js"}
+<script>
+    layui.use(['form', 'table'], function () {
+        var $ = layui.jquery,
+            form = layui.form,
+            table = layui.table;
+
+        table.render({
+            elem: '#DataDemos',
+            url: '{:url("recList")}',
+            toolbar: '#toolbarDemo',
+            method: 'get',
+            page: true,  //开启分页
+            limit: 10,  //默认10条
+            height: '550', // 最大高度减去其他容器已占有的高度差
+            defaultToolbar: ['filter', 'exports', 'print', {
+                title: '{$Think.lang.search}',
+                layEvent: 'laySearch',
+                icon: 'layui-icon layui-icon-search'
+            }],
+            cols: [[
+                {type: "checkbox", width: 50},
+                {field: 'id', align:"center", width: 80, title: 'ID', sort: true},
+                {field: 'title', align: 'center',edit:true,title: '{$Think.lang.variable_title}'},
+                {field: 'nickname', align: 'center',width:100,title: '{$Think.lang.category}'},
+                {field: 'articleThumbImg', align: 'center',width:80,title: '{$Think.lang.articleImg}',templet:function (d) {
+                        if(d.articleThumbImg){
+                            return '<img id="imgAmplify" title="'+d.title+'" layer-src="/'+d.articleImg+'" src="/'+d.articleThumbImg+'"/>';
+                        }else{
+                            return '';
+                        }
+                    }},
+                {field: 'orderSort', align: 'center',width:80,edit:true,title: '{$Think.lang.orderSort}'},
+                {field: 'views', align: 'center',width:80,title: '{$Think.lang.views}'},
+                {field: 'createTime', align: 'center',title: '{$Think.lang.createTime}'},
+                {
+                    field: 'status', width: 120, align: 'center', templet: function (d) {
+                        if (d.status == 1) {
+                            return '<input type="checkbox" name="status" value="'+d.id+'" lay-skin="switch" lay-filter="switchTest" lay-text="'+d.status2+'|'+d.status1+'" checked> ';
+                        } else {
+                            return '<input type="checkbox" name="status" value="'+d.id+'" lay-skin="switch" lay-filter="switchTest" lay-text="'+d.status2+'|'+d.status1+'"> ';
+                        }
+                    }, title: '{$Think.lang.status}'
+                },
+                {
+                    field: 'downloadJur', width: 100, align: 'center', templet: function (d) {
+                        if (d.downloadJur == 1) {
+                            return '<input type="checkbox" name="downloadJur" value="'+d.id+'" lay-skin="switch" lay-filter="switchTest" lay-text="{$Think.lang.public}|{$Think.lang.private}" checked> ';
+                        } else {
+                            return '<input type="checkbox" name="downloadJur" value="'+d.id+'" lay-skin="switch" lay-filter="switchTest" lay-text="{$Think.lang.public}|{$Think.lang.private}"> ';
+                        }
+                    }, title: '{$Think.lang.downloadJur}'
+                },
+
+                {fixed:'right',title: '{$Think.lang.operate}', width: 170, toolbar: '#toolBar', align: "center"}
+            ]],
+        });
+    });
+</script>
+
+</body>
+</html>

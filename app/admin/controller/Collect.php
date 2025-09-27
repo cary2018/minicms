@@ -49,7 +49,7 @@ class Collect extends BaseController
             'ac'=>'',
             'h'=>'',
             /*'t'=>'',
-            'ids'=>'',
+            'ids'=>'', //
             'wd'=>'',
             'page'=>0,*/
         ];
@@ -136,6 +136,11 @@ class Collect extends BaseController
 
     public function api(){
         $param = request()->param();
+        $name = '';
+        if(array_key_exists('name',$param)){
+            $name = $param['name'];
+            unset($param['name']);
+        }
         $today = $param;
         $all = $param;
         //分类
@@ -170,6 +175,9 @@ class Collect extends BaseController
             }
             $model = new Model();
             $res = $model->vod($param);
+            if($res['code'] == 1001){
+                return $res['msg'];
+            }
             $bind_list = config('bind');
             foreach($res['type'] as $k=>$v){
                 $key = $param['cjflag'] . '_' . $v['type_id'];
@@ -191,6 +199,27 @@ class Collect extends BaseController
                     $res['type'][$k]['local_type_name'] = $type_name;
                 }
             }
+            $ps = explode(',',$res['data'][0]['vod_play_from']);
+            $playlist = config('vodplay');
+            foreach ($ps as $k=>$v){
+                $playlist[$v]=[
+                    'from'=>$v,
+                    'show'=>$name.$k,
+                    'sort'=>100,
+                    'status'=>1,
+                    'ps'=>0,
+                    'parse'=>'',
+                    'des'=>'支持手机电脑在线播放',
+                    'tip'=>'无需安装任何插件',
+                ];
+            }
+            $sort=[];
+            foreach ($playlist as $k=>&$v){
+                $sort[] = $v['sort'];
+            }
+            array_multisort($sort, SORT_DESC, SORT_FLAG_CASE , $playlist);
+            putConfig($playlist,'vodplay.php');
+
             View::assign('tree',$tree);
             View::assign('type',$res['type']);
             View::assign('param',$param);
@@ -392,7 +421,7 @@ class Collect extends BaseController
             $data['local_type_name'] = '';
             if(intval($val)>0){
                 $data['st'] = 1;
-                $type_list = GetCache('type_list');
+                $type_list = GetCache('VodMen_1');
                 $data['local_type_name'] = $type_list[$val]['name'];
             }
             putConfig($config);

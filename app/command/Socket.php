@@ -20,6 +20,7 @@ class Socket extends Command
 {
     // 全局数组保存uid在线数据
     private $userInfo = [];
+    private $clientTotal = [];
     protected function configure()
     {
         // 指令配置
@@ -77,13 +78,18 @@ class Socket extends Command
             // 定义chat message事件回调函数
             $socket->on('onlineUser', function($msg)use($io){
                 // 触发所有客户端定义的chat message from server事件
-                $info = GetSe('admin');
-                $uid = $msg['uid'];
+                /*$info = GetSe('admin');
+                $uid = $msg['uid'];*/
                 //$io->to($uid)->emit('serverMessage', $msg);
                 //信息发送
                 //$io->emit('serverMessage', $msg);
                 //用户上线
                 $io->emit('online', $this->userInfo);
+            });
+            //统计在线浏览用户数量
+            $socket->on('totalOnlineUser', function($msg)use($io){
+                //新用户上线时向客户端发送统计信息
+                $io->emit('totalOnline', count($this->clientTotal));
             });
 
             // 定义 sendMessage 事件回调函数
@@ -101,6 +107,7 @@ class Socket extends Command
                     //echo '公共频道';
                     //信息发送
                     $io->emit('serverMessage', $msg);
+                    //$io->emit('serverMessage', count($this->clientTotal));
                 }
             });
 
@@ -114,7 +121,7 @@ class Socket extends Command
                     $socket->join($username['uid']);
                     $this->userInfo[$username['uid']] = $username;
                     $socket->uid = $username['uid'];
-                    //用户上线
+                    //向客户端推送用户上线信息
                     $socket->emit('online', $this->userInfo);
                 }
                 if ($socket->addedUser)
@@ -129,6 +136,16 @@ class Socket extends Command
                 ));
                 // 在全局范围内（所有客户端）回显一个人已连接的内容
                 $socket->broadcast->emit('user joined', $this->userInfo);
+            });
+            //接收客户端信息---统计在线浏览用户数量
+            $socket->on('totalUser', function ($username) use($socket){
+                // 将这个连接加入到key分组，方便针对key推送数据
+                if($username['key']){
+                    $this->clientTotal[$username['key']] = $username;
+                    $socket->key = $username['key'];
+                    //用户上线并向客户端发送信息
+                    $socket->emit('totalOnlineUser', count($this->clientTotal));
+                }
             });
             // 当客户端发出“打字”时，我们将其广播给其他人
             $socket->on('typing', function () use($socket) {
@@ -149,22 +166,26 @@ class Socket extends Command
                 // 全局响应此客户端已离开
                 //$socket->broadcast->emit('outline', $socket->uid);
                 if (!isset($socket->uid)) {
-                    return;
+                    //return;
                 }
                 // 全局响应此客户端已离开
                 $socket->broadcast->emit('outline', $socket->uid);
+
                 //离开分组
                 //$socket->leave($socket->uid);
                 //删除离线用户
                 unset($this->userInfo[$socket->uid]);
+                //清除离开浏览用户
+                unset($this->clientTotal[$socket->key]);
+                //向客户端发送统计在线浏览用户
+                $socket->broadcast->emit('totalOutline', count($this->clientTotal));
                 //客户端ip
-                $clientIp = $socket->conn->remoteAddress;
-
-                //echo '用户离开：'.$socket->uid;
+                //$clientIp = $socket->conn->remoteAddress;
+                //echo '用户离开：'.$socket->key;
             });
             //客户端ip
-            $clientIp = $socket->conn->remoteAddress;
-            //echo "new connection coming--{$clientIp}\n";
+            //$clientIp = $socket->conn->remoteAddress;
+            //echo $socket->key."new connection coming--{$clientIp}\n";
         });
         // 监听一个http端口，通过http协议访问这个端口可以向所有客户端推送数据(url类似http://ip:9191?msg=xxxx)
         $io->on('workerStart', function()use($io) {
