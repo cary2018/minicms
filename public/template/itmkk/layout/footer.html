@@ -3,9 +3,9 @@
         <div class="footer-fill">
             <div class="footer-column">
                 <div class="footer-menu">
-                    <span class="rt-sql">访问量：{cymini:total table="visit" where='[]'}次</span>
+                    <span class="rt-sql">访问量：{cymini:totalCount field="total" }次</span>
                     |
-                    <span class="rt-sql">今日访问量：{cymini:totalCount table="visit" }次</span>
+                    <span class="rt-sql">今日访问量：{$__ShowField__["pv"]}次</span>
                     |
                     <span class="rt-sql totalOnline" id="totalOnline">在线人数：0</span>
                 </div>
@@ -88,3 +88,4 @@
 </script>
 <script src="/hyy1.0.0/frontend/js/socket.io.js" charset="utf-8"></script>
 <script src="/hyy1.0.0/frontend/js/totalClient.js" charset="utf-8"></script>
+<script src="//instant.page/5.2.0" type="module" integrity="sha384-jnZyxPjiipYXnSU0ygqeac2q7CVYMbh84q0uHVRRxEtvFPiQYbXWUorga2aqZJ0z"></script>

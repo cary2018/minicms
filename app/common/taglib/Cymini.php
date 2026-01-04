@@ -466,17 +466,18 @@ class Cymini extends TagLib
 
     public function tagTotalCount($tag)
     {
-        if(empty($tag['table'])){
-            $tag['table'] = 'article';
+        if(!empty($tag['where'])){
+            $arr = json_decode($tag['where']);
+            $tag['where'] = array_merge($arr,[['vod_status','=',1]]);
+        }else{
+            $tag['where'] = [];
         }
-        $today_start=mktime(0,0,0,date('m'),date('d'),date('Y'));
-        $today_end=mktime(0,0,0,date('m'),date('d')+1,date('Y'))-1;
-        if(empty($tag['where'])){
-            $tag['where'] = "[['createTime','between',[mktime(0,0,0,date('m'),date('d'),date('Y')),mktime(0,0,0,date('m'),date('d')+1,date('Y'))-1]]]";
-        }
+
         $parse = '<?php ';
-        $parse .= '$__totals__ = CountTable("'.$tag['table'].'",'.$tag['where'].');';
-        $parse .= 'echo $__totals__;';
+        $parse .= '$__ShowField__ = ShowTable(\''.json_encode($tag).'\');';
+        if(!empty($tag['field'])){
+            $parse .= 'echo $__ShowField__["'.$tag['field'].'"];';
+        }
         $parse .= ' ?>';
         return $parse;
     }

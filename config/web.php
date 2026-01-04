@@ -45,7 +45,7 @@ function  DateDiff(sDate1,  sDate2){    //sDate1和sDate2是2002-12-18格式
 </script>',
   'sign_key' => '$2y$10$ct781CSlSvYjwkk/rWP52ui8UfuMBKLH2Kbh4M3g6oU7A5B6vTSVC',
   'async_url' => 'http://www.yi.com/ApiData',
-  'view_path' => 'zibll',
+  'view_path' => 'itmkk',
   'sys_logo' => 'uploads/images/202406/666042237a547.jpg',
   'open_html' => '0',
   'web_ico' => 'uploads/images/202410/67187181b38c2.ico',

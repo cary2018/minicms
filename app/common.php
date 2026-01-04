@@ -229,10 +229,11 @@ function GetConfig($name,$str){
  *  生成客户端 session
  */
 function clientSe(){
-    $userKey = GetSe('userKey');
+    $hostKey = $_SERVER['HTTP_HOST'].'userKey';
+    $userKey = GetSe($hostKey);
     if(!$userKey){
-        SetSe('userKey',md5(time().uniqid()));
-        $userKey = GetSe('userKey');
+        SetSe($hostKey,md5(time().uniqid()));
+        $userKey = GetSe($hostKey);
     }
     return $userKey;
 }
@@ -410,7 +411,17 @@ function FindTable($table,$where = [],$order=['id'=>'desc']){
 function CountTable($table, $where=[],$alias='',$group=''){
     return Db::name($table)->alias($alias)->where($where)->group($group)->count();
 }
-
+function CountData($args){
+    static $defaults = [
+        'table'=>'count_ip',
+        'where'=>[],
+        'group'=>'ip',
+    ];
+    $table = $args['table'] ?? $defaults['table'];
+    $where = $args['where'] ?? $defaults['where'];
+    $group = $args['group'] ?? $defaults['group'];
+    return Db::name($table)->where($where)->group($group)->count();
+}
 /**
  * @param $table
  * @param array $where
@@ -1086,8 +1097,16 @@ function vod_xml_replace($url)
  *
  */
 function Tags($start=0,$size=10){
-    $field = 'a.id,a.tag,c.tags,count(c.id) as count';
-    $list = Db::name('taglist')->alias('a')->leftJoin('article'.' c ','c.tags LIKE CONCAT(\'%\', a.tag, \'%\')')->field($field)->group('a.id, a.tag')->order(['a.id'=>'desc'])->page($start,$size)->select()->toArray();
+    $field = 'a.id, a.tag, GROUP_CONCAT(DISTINCT c.tags SEPARATOR \'|\') as all_tags, COUNT(DISTINCT c.id) as count';
+    $list = Db::name('taglist')
+        ->alias('a')
+        ->leftJoin('article c', 'c.tags LIKE CONCAT(\'%\', a.tag, \'%\')')
+        ->field($field)
+        ->group('a.id, a.tag')
+        ->order(['a.id' => 'desc'])
+        ->page($start, $size)
+        ->select()
+        ->toArray();
     foreach ($list as &$v){
         $v['rand'] = mt_rand(0,10);
     }
@@ -1105,7 +1124,7 @@ function AttrId($size=10,$aid=''){
     $prefix = Config::get('database.connections.mysql.prefix');
     $table = $prefix.'article';
     $table2 = $prefix.'category';
-    $sql = "SELECT a.id,a.cid,a.title,a.author,a.attrId,a.description,a.author,a.articleThumbImg,a.createTime,a.updateTime,a.keywords,a.views,b.name,b.temp_archives,b.temp_list,.b.target FROM `$table` as a left join `$table2` as b on a.cid = b.id WHERE FIND_IN_SET('$aid',a.attrId) > 0 and a.status = 1 and a.recycle = 0 ORDER BY a.id DESC LIMIT $size";
+    $sql = "SELECT a.id,a.cid,a.title,a.author,a.attrId,a.description,a.author,a.articleThumbImg,a.createTime,a.updateTime,a.keywords,a.views,b.name,b.temp_archives,b.temp_list,b.target FROM `$table` as a left join `$table2` as b on a.cid = b.id WHERE FIND_IN_SET('$aid',a.attrId) > 0 and a.status = 1 and a.recycle = 0 ORDER BY a.id DESC LIMIT $size";
     $list = Db::query($sql);
     foreach ($list as &$v){
         if(!$v['articleThumbImg'] || !file_exists($v['articleThumbImg'])){
@@ -1702,6 +1721,8 @@ function getMusicUrl($args) {
     $error = curl_error($ch);
     curl_close($ch);
 
+    print_r($response);
+    die;
     // 处理响应
     if ($httpCode == 200) {
         $data = json_decode($response, true);
@@ -3876,6 +3897,25 @@ function topNav($limit = 16){
     return $data;
 }
 
+function showTable($args){
+    if(!is_array($args)){
+        $args = json_decode($args,true);
+        if(!is_array($args['where'])){
+            $args['where'] = json_decode($args['where']);
+        }
+    }
+    static $defaultsT = [
+        'table'=>'count_today',
+        'where'=>[],
+        'order'=>['id'=>'desc'],
+    ];
+    $table = $args['table'] ?? $defaultsT['table'];
+    $where = $args['where'] ?? $defaultsT['where'];
+    $order = $args['order'] ?? $defaultsT['order'];
+
+    return Db::name($table)->where($where)->order($order)->find();
+}
+
 //文件大小单位转换================================
 function toSize($size){
     $dw = 'Bytes';
@@ -3892,4 +3932,40 @@ function toSize($size){
         $dw = ' Bytes';
     }
     return $size.($dw);
+}
+//统计访问量
+function Counts($args){
+    static $defaults = [
+        'table'=>'count_today',
+        'where'=>[],
+        'field'=>'total'
+    ];
+    $table = $args['table'] ?? $defaults['table'];
+    $field = $args['field'] ?? $defaults['field'];
+    $where = $args['where'] ?? $defaults['where'];
+    Db::name($table)->where('id',1)->inc($field)->update();
+}
+
+//获取本周数据，例：今天周二，会返回 周一和周二的数据
+function getWeekDayTimestamps() {
+    $weekDays = [];
+    $current = strtotime('monday this week');
+    $today = date('w');
+    if($today == 0){
+        $today = 7;
+    }
+    for ($i = 0; $i < $today; $i++) {
+        $dayStart = strtotime(date('Y-m-d 00:00:00', $current));
+        $dayEnd = strtotime(date('Y-m-d 23:59:59', $current));
+
+        $weekDays[] = [
+            'week' => date('l', $current),
+            'date' => date('Y-m-d', $current),
+            'start' => $dayStart,
+            'end' => $dayEnd
+        ];
+
+        $current = strtotime('+1 day', $current);
+    }
+    return $weekDays;
 }

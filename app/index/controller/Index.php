@@ -18,7 +18,6 @@ class Index extends BaseController
         echo $c;
         echo $html;
         die;*/
-
         return ViewHtml();
     }
 }

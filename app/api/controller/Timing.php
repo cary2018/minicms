@@ -36,8 +36,8 @@ class Timing extends BaseController
             $oldhours= date('H',$data['updateTime']);
             $curweek= date('w',time()) ;
             $curhours= date("H",time());
-            echo '旧：'.$oldweek.'-'.$oldhours;
-            echo '新：'.$curweek.'-'.$curhours;
+            //echo '旧：'.$oldweek.'-'.$oldhours;
+            //echo '新：'.$curweek.'-'.$curhours;
             $model = new Collect();
             parse_str($data['param'],$param);
 

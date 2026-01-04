@@ -63,6 +63,6 @@ class Plugin extends Addons
         return $this->fetch('info');
     }
     public function show(){
-        echo 'hello world';
+        echo 'hello world...';
     }
 }

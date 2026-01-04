@@ -330,6 +330,10 @@ class Collect extends Model
 
     public function vod_data($param,$data,$show=1)
     {
+        if($data['code'] === 1001){
+            echo $data['msg'];
+            die;
+        }
         if($show==1) {
             mac_echo('[' . __FUNCTION__ . '] ' . lang('data_tip1', [$data['page']['page'],$data['page']['pagecount'],$data['page']['url']]));
         }

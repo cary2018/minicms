@@ -11,19 +11,24 @@
  */
 use think\facade\Route;
 
-Route::get('nav$', 'Navigation/index');
+
+//动态路由
+Route::get('/:controller', 'index/:controller/index');
+Route::get('/:controller/:action', 'index/:controller/:action');
+
+//Route::get('nav$', 'Navigation/index');
 
 // 绑定到类
-Route::bind('\app\index\controller\Article\index');
+//Route::bind('\app\index\controller\Article\index');
 //访问：http://www.tp8.com/index/article/index/id/3
 
 // 为 /article/id/3 配置路由，映射到 index/article/id
-Route::get('article/id/:id', 'index/article/index');
+//Route::get('article/id/:id', 'index/article/index');
 
 //访问：http://www.tp8.com/article/id/3
 
 // 为 /index/article/id/3 配置路由（保持原样）
-Route::get('index/article/id/:id', 'index/article/index');
+//Route::get('index/article/id/:id', 'index/article/index');
 //访问：http://www.tp8.com/index/article/id/3
 
 /*

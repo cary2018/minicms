@@ -380,6 +380,23 @@ create table cy_liar_img(
     img varchar(120) not null default '' comment'原图',
     thumbImg varchar(120) not null default '' comment'缩略图'
 )engine=myisam charset=utf8;
+//今日访问数据
+create table cy_count_today(
+    id int not null primary key auto_increment,
+    total int not null default 0 comment'访问总量',
+    pv int not null default 0 comment'今日浏览量(pv)',
+    uv int not null default 0 comment'今日访客数(uv)',
+    unknown int not null default 0 comment'未知',
+    spider int not null default 0 comment'蜘蛛',
+    visitor int not null default 0 comment'访客'
+)engine=myisam charset=utf8 COMMENT='主要统计今日访问数据量';
+//统计今日ip访问量
+CREATE TABLE `cy_count_ip` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `ip` varchar(20) NOT NULL DEFAULT '0' COMMENT 'ip',
+  PRIMARY KEY (`id`),
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='统计今日ip访问量';
+
 //导航分类
 CREATE TABLE `cy_classify` (
   `id` int(11) NOT NULL AUTO_INCREMENT,

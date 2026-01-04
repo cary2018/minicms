@@ -5,11 +5,15 @@
 $domain = $_SERVER['HTTP_HOST'];
 return [
     // 应用地址
-    'app_host'         => env('app.host', ''),
+    //'app_host'         => env('app.host', ''),
+    'app_host'         => true,
     // 应用的命名空间
     'app_namespace'    => '',
     // 是否启用路由
     'with_route'       => true,
+    // 是否支持多模块
+    'app_multi_module'   => true,
+    'auto_multi_app' => true,
     // 默认应用
     'default_app'      => 'index',
     // 默认时区
@@ -21,7 +25,7 @@ return [
     ],
     // 域名绑定（自动多应用模式有效）
     //'domain_bind'      => ['www.tp8.com' =>  'index','tp8.com' =>  'admin',],
-    //'domain_bind'      => [$domain =>  'index',],
+    //'domain_bind'      => [$domain =>  ''],
     // 禁止URL访问的应用列表（自动多应用模式有效）
     'deny_app_list'    => [],
 

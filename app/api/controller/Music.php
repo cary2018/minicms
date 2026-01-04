@@ -595,7 +595,8 @@ class Music extends MusicController
             'notice'=>[
                 "所有数据均来自网络，不保证一直有效，且听且珍惜！",
                 "如有疑问请前往<a href='https://www.itmkk.com/index/message?id=15' target='_blank'>《留言板》</a>进行留言，虽然我不一定会理你",
-                "网站为爱发电，站长不想弄的时候或许会关闭分享",
+                "想要独属于自己的网站可联系站长，373889161@qq.com",
+                "有偿提供资源查找，需要请联系站长，373889161@.com",
             ],
             'sayings'=>[
                 'author'=>'作者：Hyy-Cary',

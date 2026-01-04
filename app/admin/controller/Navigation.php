@@ -101,6 +101,10 @@ class Navigation extends BaseController
                 die;
             }else{
                 $data['logo']=$res['result']['img'];
+                $img = FindTable('navigation',[['id','=',$data['id']]]);
+                if(file_exists($img['logo'])){
+                    unlink($img['logo']);
+                }
             }
         }
         SaveAt('navigation',$data);

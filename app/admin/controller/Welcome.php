@@ -21,13 +21,10 @@ use think\facade\View;
 class Welcome extends BaseController
 {
     public function index(){
-        $today_start=mktime(0,0,0,date('m'),date('d'),date('Y'));
-        $today_end=mktime(0,0,0,date('m'),date('d')+1,date('Y'))-1;
-        $where = [['createTime','between',[$today_start,$today_end]]];
+        $todayData = FindTable('count_today');
+        $countIp = CountData([]);
         $feedCount = CountTable('feedback',[['status','=',1]]);
-        $todayCount = CountTable('visit',$where);
-        $todayGuv = CountTable('visit',$where,'','guv');
-        $todayIp = CountTable('visit',$where,'','ip');
+
         $article =  CountTable('article');
         $sql = 'SELECT VERSION() AS version';
         $version = Db::query($sql);
@@ -53,9 +50,8 @@ class Welcome extends BaseController
         $wekdata = $this->weekdata();
         View::assign('wekData',$wekdata);
         View::assign('feed',$feedCount);
-        View::assign('today',$todayCount);
-        View::assign('todayGuv',$todayGuv);
-        View::assign('todayIp',$todayIp);
+        View::assign('today',$todayData);
+        View::assign('todayIp',$countIp);
         View::assign('article',$article);
         View::assign('mysql',$mysql);
         View::assign('update',$update);
@@ -64,17 +60,28 @@ class Welcome extends BaseController
     }
     function weekdata(){
         // 使用示例
-        $weekTimestamps = $this->getWeekDayTimestamps();
+        $weekTimestamps = getWeekDayTimestamps();
         $type = 'line';
-
+        //查询今天的访问数据
+        $todayData = FindTable('count_today');
+        $countIp = CountData([]);
+        if(!$todayData){
+            $todayData = [
+                'pv'=>0,
+                'uv'=>0,
+                'visitor'=>0,
+                'spider'=>0,
+                'unknown'=>0,
+            ];
+        }
         // 定义指标配置
         $metrics = [
-            'to' => ['name' => '浏览量(pv)', 'where' => []],
-            'vis' => ['name' => '访客量(uv)', 'field' => 'guv'],
-            'ip' => ['name' => 'IP量', 'field' => 'ip'],
-            'us' => ['name' => '访客', 'where' => [['clientType', 'like', '%访客%']]],
-            'bo' => ['name' => '蜘蛛', 'where' => [['clientType', 'like', '%蜘蛛%']]],
-            'un' => ['name' => '未知', 'where' => [['clientType', 'like', '%未知%']]]
+            'pv' => ['name' => '浏览量(pv)', 'countData' => $todayData['pv']],
+            'uv' => ['name' => '访客量(uv)', 'countData' => $todayData['uv']],
+            'ip' => ['name' => 'IP量', 'countData' => $countIp],
+            'visitor' => ['name' => '访客', 'countData' => $todayData['visitor']],
+            'spider' => ['name' => '蜘蛛', 'countData' => $todayData['spider']],
+            'unknown' => ['name' => '未知', 'countData' => $todayData['unknown']],
         ];
 
         // 初始化结果数组
@@ -87,23 +94,17 @@ class Welcome extends BaseController
             // 检查是否有缓存（今天除外）
             if (!$isToday && ($cached = GetCache($dateKey.'metrics'))) {
                 foreach ($metrics as $key => $_) {
+                    //读取缓存数据
                     $result[$key][] = $cached[$key] ?? 0;
                 }
                 continue;
             }
 
-            // 基础查询条件
-            $baseWhere = [['createTime', 'between', [$day['start'], $day['end']]]];
-
             // 收集统计数据
             $stats = [];
             foreach ($metrics as $key => $config) {
-                $where = $baseWhere;
-                if (!empty($config['where'])) {
-                    $where = array_merge($where, $config['where']);
-                }
-
-                $stats[$key] = CountTable('visit', $where, '', $config['field'] ?? '');
+                //读取今日数据
+                $stats[$key] = $metrics[$key]['countData'];
             }
 
             // 如果不是今天，设置缓存
@@ -129,28 +130,6 @@ class Welcome extends BaseController
 
         //return $output;
         return json_encode($output,JSON_UNESCAPED_UNICODE);
-    }
-    function getWeekDayTimestamps() {
-        $weekDays = [];
-        $current = strtotime('monday this week');
-        $today = date('w');
-        if($today == 0){
-            $today = 7;
-        }
-        for ($i = 0; $i < $today; $i++) {
-            $dayStart = strtotime(date('Y-m-d 00:00:00', $current));
-            $dayEnd = strtotime(date('Y-m-d 23:59:59', $current));
-
-            $weekDays[] = [
-                'day' => date('l', $current),
-                'date' => date('Y-m-d', $current),
-                'start' => $dayStart,
-                'end' => $dayEnd
-            ];
-
-            $current = strtotime('+1 day', $current);
-        }
-        return $weekDays;
     }
 }
 

@@ -76,9 +76,21 @@
                         {cymini:table table='software' where='["aid","=",$__detail__["id"]]'}
                         <a class="layui-btn layui-bg-blue layui-btn-sm bt-download" data-code="{$vo.code}" data-href="{$vo.url}" target="_blank">{$vo.name}</a>
                         {/cymini:table}
-
                     </div>
                     {/if}
+                    <div class="entry-next-prev wow fadeInDown" style="text-align: center;">
+                        <div class="text-center muted-3-color box-body em09">喜欢就支持以下吧</div>
+                        <div class="text-center post-actions">
+                            <a href="javascript:;" onclick="ClickLike({$__detail__['id']})" class="action action-like">
+                                <div style="font-size:25px;">
+                                    <i class="icon layui-icon layui-icon-praise"></i>
+                                </div>
+                                <text>点赞</text>
+                                <count id="ViewsClick">{$__detail__["click"]}</count>
+                            </a>
+                        </div>
+                    </div>
+
                 </article>
             </div>
             <div class="entry-next-prev wow fadeInDown " style="visibility: hidden; animation-name: none;">
@@ -257,6 +269,7 @@
 <script src="{$view_path}/static/js/custom.js"></script>
 <script src="{$view_path}/static/js/wow.min.js"></script>
 <script src="{$view_path}/static/js/fancybox.umd.js"></script>
+<script src="{$view_path}/static/js/public.min.js"></script>
 <script>
     $("document").ready(function(){
         var img=$("#post-body-888888 img");
